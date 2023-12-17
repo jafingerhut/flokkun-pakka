@@ -6,7 +6,7 @@
        3         16       d.ip[31:16]
        4         8        proto
        5         16       s.port
-       6         16       d.port   
+       6         16       d.port
 ****************************************/
 
 #include "stdinc.h"
@@ -35,7 +35,7 @@ int preprocessing_2chunk(eq *a, int na, eq *b, int nb, eq *x, int *tb){
   unsigned int k, r;
   unsigned int current_num_rules;
   int *current_rule_list = NULL;
-  unsigned int current_eq_id;
+  int current_eq_id;
   int match;
 
   current_eq_id = -1;
@@ -71,10 +71,10 @@ int preprocessing_2chunk(eq *a, int na, eq *b, int nb, eq *x, int *tb){
             k++;
           }
         }
-      }     
+      }
       //set the equivalence classes
       match = 0;
-      for(k=0; k<=current_eq_id; k++){
+      for(k=0; (int) k <= current_eq_id; k++){
         if(current_num_rules == x[k].numrules){
           match = 1;
           for(r=0; r<current_num_rules; r++){
@@ -105,14 +105,14 @@ int preprocessing_3chunk(eq *a, unsigned int na, eq *b, int nb, eq *c, int nc, e
   unsigned int i, k, r, t;
   unsigned int current_num_rules;
   int *current_rule_list = NULL;
-  unsigned int current_eq_id;
+  int current_eq_id;
   int match;
 
   current_eq_id = -1;
   for(i=0; i<na; i++){
     for(j=0; j<nb; j++){
       for(s=0; s<nc; s++){
-   
+
         //get the intersection list
         if(a[i].numrules == 0 || b[j].numrules == 0 || c[s].numrules == 0) {
           current_num_rules = 0;
@@ -148,10 +148,10 @@ int preprocessing_3chunk(eq *a, unsigned int na, eq *b, int nb, eq *c, int nc, e
             }
           }
         }
-        
+
         //set the equivalent classes
         match = 0;
-        for(k=0; k<=current_eq_id; k++){
+        for(k=0; (int) k <= current_eq_id; k++){
           if(current_num_rules == x[k].numrules){
             match = 1;
             for(r=0; r<current_num_rules; r++){
@@ -180,17 +180,17 @@ int preprocessing_3chunk(eq *a, unsigned int na, eq *b, int nb, eq *c, int nc, e
 
 
 int loadrule(FILE *fp, pc_rule *rule){
-  
+
   int tmp;
   unsigned sip1, sip2, sip3, sip4, siplen;
   unsigned dip1, dip2, dip3, dip4, diplen;
   unsigned proto, protomask;
   int i = 0;
-  
+
   while(1){
-    
-    if(fscanf(fp,"@%d.%d.%d.%d/%d %d.%d.%d.%d/%d %d : %d %d : %d %x/%x\n", 
-        &sip1, &sip2, &sip3, &sip4, &siplen, &dip1, &dip2, &dip3, &dip4, &diplen, 
+
+    if(fscanf(fp,"@%d.%d.%d.%d/%d %d.%d.%d.%d/%d %d : %d %d : %d %x/%x\n",
+        &sip1, &sip2, &sip3, &sip4, &siplen, &dip1, &dip2, &dip3, &dip4, &diplen,
         &rule[i].field[3].low, &rule[i].field[3].high, &rule[i].field[4].low, &rule[i].field[4].high,
         &proto, &protomask) != 16) break;
     if(siplen == 0){
@@ -205,12 +205,12 @@ int loadrule(FILE *fp, pc_rule *rule){
       rule[i].field[0].low = tmp; 	
       rule[i].field[0].high = rule[i].field[0].low + (1<<(32-siplen)) - 1;	
     }else if(siplen > 16 && siplen <= 24){
-      tmp = sip1<<24; tmp += sip2<<16; tmp +=sip3<<8; 
+      tmp = sip1<<24; tmp += sip2<<16; tmp +=sip3<<8;
       rule[i].field[0].low = tmp; 	
       rule[i].field[0].high = rule[i].field[0].low + (1<<(32-siplen)) - 1;			
     }else if(siplen > 24 && siplen <= 32){
       tmp = sip1<<24; tmp += sip2<<16; tmp += sip3<<8; tmp += sip4;
-      rule[i].field[0].low = tmp; 
+      rule[i].field[0].low = tmp;
       rule[i].field[0].high = rule[i].field[0].low + (1<<(32-siplen)) - 1;	
     }else{
       printf("Src IP length exceeds 32\n");
@@ -277,7 +277,7 @@ void parseargs(int argc, char *argv[]) {
 	  ok = 0;
     }
   }
-  
+
   if(phase < 3 || phase > 4){
     printf("number of phases should be either 3 or 4\n");
     ok = 0;
@@ -298,7 +298,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
   unsigned int i, j;
   dheap H(2*MAXRULES+1, 2);
   int match;
-  unsigned int current_eq_id;
+  int current_eq_id;
   unsigned int current_end_point;
   unsigned int current_num_rules;
   int *current_rule_list;
@@ -357,7 +357,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
     H.insert(2*numrules, 0);
     H.insert(2*numrules+1, 65535);
   }
-  
+
   //assign equivalence classes
   current_eq_id = -1;
   current_end_point = 0;
@@ -368,7 +368,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
     while(current_end_point == H.key(H.findmin())){
       H.deletemin();
     }
-    
+
     //printf("current end point %d\n", current_end_point);
     current_num_rules = 0;
     k = 0;
@@ -384,7 +384,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
         if((rule[i].field[0].low & 0xFFFF) <= current_end_point &&
            (rule[i].field[0].high & 0xFFFF) >= current_end_point){
           current_rule_list[k] = i;
-          k++;             
+          k++;
         }
       }
     }else if(chunk_id == 1){
@@ -399,7 +399,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
         if(((rule[i].field[0].low >> 16) & 0xFFFF) <= current_end_point &&
            ((rule[i].field[0].high >> 16) & 0xFFFF) >= current_end_point){
           current_rule_list[k] = i;
-          k++;             
+          k++;
         }
       }
     }else if(chunk_id == 2){
@@ -414,7 +414,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
         if((rule[i].field[1].low & 0xFFFF) <= current_end_point &&
            (rule[i].field[1].high & 0xFFFF) >= current_end_point){
           current_rule_list[k] = i;
-          k++;             
+          k++;
         }
       }
     }else if(chunk_id == 3){
@@ -429,7 +429,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
         if(((rule[i].field[1].low >> 16) & 0xFFFF) <= current_end_point &&
            ((rule[i].field[1].high >> 16) & 0xFFFF) >= current_end_point){
           current_rule_list[k] = i;
-          k++;             
+          k++;
         }
       }
     }else if(chunk_id == 4){
@@ -444,7 +444,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
         if(rule[i].field[2].low <= current_end_point &&
            rule[i].field[2].high >= current_end_point){
           current_rule_list[k] = i;
-          k++;             
+          k++;
         }
       }
     }else if(chunk_id == 5){
@@ -459,7 +459,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
         if(rule[i].field[3].low <= current_end_point &&
            rule[i].field[3].high >= current_end_point){
           current_rule_list[k] = i;
-          k++;             
+          k++;
         }
       }
     }else{
@@ -474,15 +474,15 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
         if(rule[i].field[4].low <= current_end_point &&
            rule[i].field[4].high >= current_end_point){
           current_rule_list[k] = i;
-          k++;             
+          k++;
         }
       }
     }
-    
+
     //printf("current num rules %d\n", current_num_rules);
 
     match = 0;
-    for(i=0; i<=current_eq_id; i++){
+    for(i=0; (int) i <= current_eq_id; i++){
       if(current_num_rules == p0_eq[chunk_id][i].numrules){
         match = 1;
         for(j=0; j<current_num_rules; j++){
@@ -518,7 +518,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
         if((rule[i].field[0].low & 0xFFFF) <= current_end_point &&
            (rule[i].field[0].high & 0xFFFF) >= H.key(H.findmin())){
           current_rule_list[k] = i;
-          k++;             
+          k++;
         }
       }
     }else if(chunk_id == 1){
@@ -533,7 +533,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
         if(((rule[i].field[0].low >> 16) & 0xFFFF) <= current_end_point &&
            ((rule[i].field[0].high >> 16) & 0xFFFF) >= H.key(H.findmin())){
           current_rule_list[k] = i;
-          k++;             
+          k++;
         }
       }
     }else if(chunk_id == 2){
@@ -548,7 +548,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
         if((rule[i].field[1].low & 0xFFFF) <= current_end_point &&
            (rule[i].field[1].high & 0xFFFF) >= H.key(H.findmin())){
           current_rule_list[k] = i;
-          k++;             
+          k++;
         }
       }
     }else if(chunk_id == 3){
@@ -563,7 +563,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
         if(((rule[i].field[1].low >> 16) & 0xFFFF) <= current_end_point &&
            ((rule[i].field[1].high >> 16) & 0xFFFF) >= H.key(H.findmin())){
           current_rule_list[k] = i;
-          k++;             
+          k++;
         }
       }
     }else if(chunk_id == 4){
@@ -578,7 +578,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
         if(rule[i].field[2].low <= current_end_point &&
            rule[i].field[2].high >= H.key(H.findmin())){
           current_rule_list[k] = i;
-          k++;             
+          k++;
         }
       }
     }else if(chunk_id == 5){
@@ -593,7 +593,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
         if(rule[i].field[3].low <= current_end_point &&
            rule[i].field[3].high >= H.key(H.findmin())){
           current_rule_list[k] = i;
-          k++;             
+          k++;
         }
       }
     }else{
@@ -608,15 +608,15 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
         if(rule[i].field[4].low <= current_end_point &&
            rule[i].field[4].high >= H.key(H.findmin())){
           current_rule_list[k] = i;
-          k++;             
+          k++;
         }
       }
     }
-    
+
     //printf("current num rules %d\n", current_num_rules);
 
     match = 0;
-    for(i=0; i<=current_eq_id; i++){
+    for(i=0; (int) i <= current_eq_id; i++){
       if(current_num_rules == p0_eq[chunk_id][i].numrules){
         match = 1;
         for(j=0; j<current_num_rules; j++){
@@ -646,7 +646,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
     npoints ++;
 
   }
-  
+
   //printf("%d end points in total\n", npoints);
   return current_eq_id+1;
 }
@@ -654,7 +654,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
 int main(int argc, char* argv[]){
 
   int numrules=0;  // actual number of rules in rule set
-  struct pc_rule *rule; 
+  struct pc_rule *rule;
   int i,j;
   unsigned a, b, c, d, e, f, g;
   int header[MAXDIMENSIONS];
@@ -666,17 +666,17 @@ int main(int argc, char* argv[]){
   int tmp;
 
   parseargs(argc, argv);
-   
+
   while(fgets(s, 200, fpr) != NULL)numrules++;
   rewind(fpr);
-  
+
   free(s);
-  
+
   rule = (pc_rule *)calloc(numrules, sizeof(pc_rule));
   numrules = loadrule(fpr, rule);
-  
+
   printf("the number of rules = %d\n", numrules);
-  
+
   //initilization
   for(i=0; i<7; i++){
     p0_neq[i] = 0;
@@ -742,7 +742,7 @@ int main(int argc, char* argv[]){
       p1_neq[1] = preprocessing_2chunk(p0_eq[2], p0_neq[2], p0_eq[3], p0_neq[3], p1_eq[1], p1_table[1]);
       p1_neq[2] = preprocessing_3chunk(p0_eq[4], p0_neq[4], p0_eq[5], p0_neq[5], p0_eq[6], p0_neq[6], p1_eq[2], p1_table[2]);
 
-      printf("phase 1 table (%d, %d), (%d, %d), (%d, %d)\n", 
+      printf("phase 1 table (%d, %d), (%d, %d), (%d, %d)\n",
               p1_neq[0], p0_neq[0]*p0_neq[1],
               p1_neq[1], p0_neq[2]*p0_neq[3],
               p1_neq[2], p0_neq[4]*p0_neq[5]*p0_neq[6]);
@@ -765,7 +765,7 @@ int main(int argc, char* argv[]){
       p2_neq[0] = preprocessing_2chunk(p1_eq[0], p1_neq[0], p1_eq[1], p1_neq[1], p2_eq[0], p2_table[0]);
 
       printf("phase 2 table (%d, %d)\n", p2_neq[0], p1_neq[0]*p1_neq[1]);
-  
+
       tmp = (int)((log(p2_neq[0])/log(2))/8)+1;
       access += tmp;
       size += tmp * p1_neq[0]*p1_neq[1];
@@ -774,9 +774,9 @@ int main(int argc, char* argv[]){
       //phase 3 network
       printf("\nstart phase 3:\n");
       p3_neq = preprocessing_2chunk(p1_eq[2], p1_neq[2], p2_eq[0], p2_neq[0], p3_eq, p3_table);
-      
+
       printf("phase 3 table (%d, %d)\n", p3_neq, p1_neq[2]*p2_neq[0]);
-      
+
       access += 2;
       size += 2 * p1_neq[2]*p2_neq[0];
       printf("size = %d, access = %d\n", size, access);
@@ -791,7 +791,7 @@ int main(int argc, char* argv[]){
       p1_neq[1] = preprocessing_2chunk(p0_eq[2], p0_neq[2], p0_eq[3], p0_neq[3], p1_eq[1], p1_table[1]);
       p1_neq[2] = preprocessing_3chunk(p0_eq[4], p0_neq[4], p0_eq[5], p0_neq[5], p0_eq[6], p0_neq[6], p1_eq[2], p1_table[2]);
 
-      printf("phase 1 table (%d, %d), (%d, %d), (%d, %d)\n", 
+      printf("phase 1 table (%d, %d), (%d, %d), (%d, %d)\n",
               p1_neq[0], p0_neq[0]*p0_neq[1],
               p1_neq[1], p0_neq[2]*p0_neq[3],
               p1_neq[2], p0_neq[4]*p0_neq[5]*p0_neq[6]);
@@ -821,7 +821,7 @@ int main(int argc, char* argv[]){
       //**********************************************************************************************************************
       break;
   }
-  printf("\n%10.1f bytes/filter, %d bytes per packet lookup\n", (float)size/numrules+FILTERSIZE, access); 
+  printf("\n%10.1f bytes/filter, %d bytes per packet lookup\n", (float)size/numrules+FILTERSIZE, access);
   //perform packet classification
   if(fpt != NULL){
     done = 1;
@@ -831,24 +831,24 @@ int main(int argc, char* argv[]){
       //phase 0
       a = p0_table[0][header[0] & 0xFFFF];
       b = p0_table[1][(header[0] >> 16) & 0xFFFF];
-      c = p0_table[2][header[1] & 0xFFFF]; 
+      c = p0_table[2][header[1] & 0xFFFF];
       d = p0_table[3][(header[1] >> 16) & 0xFFFF];
-      e = p0_table[4][header[2]]; 
+      e = p0_table[4][header[2]];
       f = p0_table[5][header[3]];
       g = p0_table[6][header[4]];
-      
+
       //phase 1
       a = p1_table[0][a*p0_neq[1]+b];
       c = p1_table[1][c*p0_neq[3]+d];
       e = p1_table[2][e*p0_neq[5]*p0_neq[6]+f*p0_neq[6]+g];
-      
+
       if(phase == 4){
         //phase 2
         a = p2_table[0][a*p1_neq[1]+c];
-      
+
         //phase 3
         a = p3_table[e*p2_neq[0]+a];
-      
+
         if(p3_eq[a].numrules == 0)printf("No rule matches packet %d\n", index);
         else if(p3_eq[a].rulelist[0] != fid-1){
           printf("Match rule %d, should be %d\n", p3_eq[a].rulelist[0], fid-1);
@@ -863,13 +863,12 @@ int main(int argc, char* argv[]){
           printf("Match rule %d, should be %d\n", p2_eq[0][a].rulelist[0], fid-1);
           done = 0;
         }
-      } 
+      }
+    }
+    if (done) {
+        printf("\npacket classification done on %d packets without any error!\n", index);
     }
   }
-  if(done)printf("\npacket classification done without any error!\n");  
 
   free(rule);
-}  
-  
-
-
+}
