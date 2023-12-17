@@ -287,7 +287,7 @@ void parseargs(int argc, char *argv[]) {
     ok = 0;
   }
   if (!ok || optind < argc) {
-    fprintf (stderr, "rfc [-p phase][-r ruleset][-t trace][-h]\n");
+    fprintf (stderr, "rfc [-p phase] [-r ruleset] [-t trace] [-h]\n");
     exit(1);
   }
 }
@@ -867,6 +867,9 @@ int main(int argc, char* argv[]){
     }
     if (done) {
         printf("\npacket classification done on %d packets without any error!\n", index);
+    } else {
+        printf("\nError encountered during packet trace test.\n");
+        exit(1);
     }
   }
 
