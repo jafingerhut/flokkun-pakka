@@ -13,9 +13,10 @@ do
     echo $j
     echo "-----------------------------------------------------------------"
     set -x
-    ./rfc -r ../orig/song-filterset/${j} -t ../orig/song-filterset/${j}_trace
+    ./hypercut -r ../orig/song-filterset/${j} -t ../orig/song-filterset/${j}_trace
     set +x
 done
 
+set +x
 echo ""
 echo "All tests passed without errors."

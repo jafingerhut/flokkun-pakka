@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# A longer running set of tests of rfc program.
+# A longer running set of tests of hypercut program.
 
 # TODO: This failed on file fw1_1K the last time I tried it, with a
 # segmentation fault.  Debug this to figure out what is going wrong.
@@ -17,7 +17,7 @@ do
     echo $j
     echo "-----------------------------------------------------------------"
     set -x
-    ./rfc -r ../orig/song-filterset/${j} -t ../orig/song-filterset/${j}_trace
+    ./hypercut -r ../orig/song-filterset/${j} -t ../orig/song-filterset/${j}_trace
     set +x
 done
 
