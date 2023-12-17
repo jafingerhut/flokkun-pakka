@@ -5,6 +5,8 @@
 # TODO: This failed on file fw1_1K the last time I tried it, with a
 # segmentation fault.  Debug this to figure out what is going wrong.
 
+CMD="./hypercut"
+
 set -e
 make
 for j in \
@@ -17,7 +19,7 @@ do
     echo $j
     echo "-----------------------------------------------------------------"
     set -x
-    ./hypercut -r ../orig/song-filterset/${j} -t ../orig/song-filterset/${j}_trace
+    ${CMD} -r ../orig/song-filterset/${j} -t ../orig/song-filterset/${j}_trace
     set +x
 done
 
