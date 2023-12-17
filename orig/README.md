@@ -9,7 +9,8 @@ found.
 ## Software from PClassEval project pages
 
 The files in these directories were copied from TAR files that can be
-found in pages linked from the PClassEval project pages:
+found in pages linked from the PClassEval project pages, or the files
+in `song-filterset` are directly linked from this page:
 
 + https://web.archive.org/web/20150627051657/https://www.arl.wustl.edu/~hs1/PClassEval.html
 
@@ -22,3 +23,4 @@ software license associated with them:
 + `song-rfc`
 + `song-tss`
 + `song-woo`
++ `song-filterset`
