@@ -202,7 +202,7 @@ int main(int argc, char* argv[]){
   if(fpt != NULL){
     i=0; j=0;
     while(fscanf(fpt,"%u %u %d %d %d %d\n", 
-          &header[0], &header[1], &header[2], &header[3], &header[4], &fid) != Null){
+          &header[0], &header[1], &header[2], &header[3], &header[4], &fid) == 6){
       i++;
       
       if((matchid = T.trieLookup(header)) == -1){
