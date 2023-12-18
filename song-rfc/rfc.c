@@ -33,18 +33,19 @@ int p3_neq;                              //phase 3 number of chunk equivalence c
 unsigned int
 search_for_eq_id_add_new_if_not_found(eq *x,
                                       unsigned int *num_eq_ids,
-                                      unsigned int current_num_rules,
-                                      int *current_rule_list,
+                                      unsigned int num_rules,
+                                      int *rule_list,
                                       int *out_match)
 {
     unsigned int i, j;
+    int *save_rule_list;
     
     *out_match = 0;
     for (i = 0; i < *num_eq_ids; i++) {
-        if (current_num_rules == x[i].numrules) {
+        if (num_rules == x[i].numrules) {
             *out_match = 1;
-            for (j = 0; j < current_num_rules; j++) {
-                if (x[i].rulelist[j] != current_rule_list[j]) {
+            for (j = 0; j < num_rules; j++) {
+                if (x[i].rulelist[j] != rule_list[j]) {
                     *out_match = 0;
                     break;
                 }
@@ -61,8 +62,12 @@ search_for_eq_id_add_new_if_not_found(eq *x,
             fflush(stdout);
             abort();
         }
-        x[*num_eq_ids].numrules = current_num_rules;
-        x[*num_eq_ids].rulelist = current_rule_list;
+        save_rule_list = (int *) calloc(num_rules, sizeof(int));
+        for (j = 0; j < num_rules; j++) {
+            save_rule_list[j] = rule_list[j];
+        }
+        x[*num_eq_ids].numrules = num_rules;
+        x[*num_eq_ids].rulelist = save_rule_list;
         i = *num_eq_ids;
         (*num_eq_ids)++;
     }
@@ -73,7 +78,6 @@ int preprocessing_2chunk(eq *a, int na, eq *b, int nb, eq *x, int *tb, unsigned 
     int i, j;
     unsigned int k, r;
     unsigned int current_num_rules;
-    int *current_rule_list = NULL;
     unsigned int num_eq_ids;
     int match;
     unsigned int matching_eq_id;
@@ -100,7 +104,6 @@ int preprocessing_2chunk(eq *a, int na, eq *b, int nb, eq *x, int *tb, unsigned 
                 fflush(stdout);
             }
             // get the intersection rule set
-            current_rule_list = NULL;
             if (a[i].numrules == 0 || b[j].numrules == 0) {
                 current_num_rules = 0;
             } else {
@@ -117,21 +120,12 @@ int preprocessing_2chunk(eq *a, int na, eq *b, int nb, eq *x, int *tb, unsigned 
                         k++;
                     }
                 }
-                if (current_num_rules != 0) {
-                    current_rule_list = (int *) calloc(current_num_rules, sizeof(int));
-                    for (k = 0; k < current_num_rules; k++) {
-                        current_rule_list[k] = rule_list[k];
-                    }
-                }
             }
             // set the equivalence classes
             matching_eq_id = search_for_eq_id_add_new_if_not_found(
                                      x, &num_eq_ids, current_num_rules,
-                                     current_rule_list, &match);
+                                     rule_list, &match);
             tb[i*nb +j] = matching_eq_id;
-            if ((match == 1) && (current_rule_list != NULL)) {
-                free(current_rule_list);
-            }
         }
     }
     free(rule_list);
@@ -142,7 +136,6 @@ int preprocessing_3chunk(eq *a, unsigned int na, eq *b, int nb, eq *c, int nc, e
     int j, s;
     unsigned int i, k, r, t;
     unsigned int current_num_rules;
-    int *current_rule_list = NULL;
     unsigned int num_eq_ids;
     int match;
     unsigned int matching_eq_id;
@@ -164,7 +157,6 @@ int preprocessing_3chunk(eq *a, unsigned int na, eq *b, int nb, eq *c, int nc, e
         for (j = 0; j < nb; j++) {
             for (s = 0; s < nc; s++) {
                 // get the intersection list
-                current_rule_list = NULL;
                 if (a[i].numrules == 0 || b[j].numrules == 0 || c[s].numrules == 0) {
                     current_num_rules = 0;
                 } else {
@@ -183,21 +175,12 @@ int preprocessing_3chunk(eq *a, unsigned int na, eq *b, int nb, eq *c, int nc, e
                             t++;
                         }
                     }
-                    if (current_num_rules != 0) {
-                        current_rule_list = (int *) calloc(current_num_rules, sizeof(int));
-                        for (k = 0; k < current_num_rules; k++) {
-                            current_rule_list[k] = rule_list[k];
-                        }
-                    }
                 }
                 // set the equivalent classes
                 matching_eq_id = search_for_eq_id_add_new_if_not_found(
                                          x, &num_eq_ids, current_num_rules,
-                                         current_rule_list, &match);
+                                         rule_list, &match);
                 tb[i*nb*nc +j*nc + s] = matching_eq_id;
-                if ((match == 1) && (current_rule_list != NULL)) {
-                    free(current_rule_list);
-                }
             }
         }
     }
@@ -362,7 +345,6 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
   unsigned int num_eq_ids;
   unsigned int current_end_point;
   unsigned int current_num_rules;
-  int *current_rule_list;
   unsigned int matching_eq_id;
   unsigned char in_heap[65536];
   int *rule_list;
@@ -415,23 +397,12 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
             current_num_rules++;
         }
     }
-    current_rule_list = (int *) calloc(current_num_rules, sizeof(int));
-    for (i = 0; i < current_num_rules; i++) {
-        current_rule_list[i] = rule_list[i];
-    }
 
     //printf("current num rules %d\n", current_num_rules);
     matching_eq_id = search_for_eq_id_add_new_if_not_found(
                         &(p0_eq[chunk_id][0]), &num_eq_ids,
-                        current_num_rules, current_rule_list, &match);
+                        current_num_rules, rule_list, &match);
     p0_table[chunk_id][current_end_point] = matching_eq_id;
-    if (match == 1) {
-        // If match is 0, the allocated current_rule_list will be
-        // pointed-to and used for the rest of this call to
-        // preprocessing_phase0's execution.  But if match is 1, it is
-        // not needed any longer.
-        free(current_rule_list);
-    }
 
     if (H.findmin() == Null) {
         //printf("dbg H.findmin() is Null when current_end_point is %d\n",
@@ -447,20 +418,13 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
             current_num_rules++;
         }
     }
-    current_rule_list = (int *) calloc(current_num_rules, sizeof(int));
-    for (i = 0; i < current_num_rules; i++) {
-        current_rule_list[i] = rule_list[i];
-    }
 
     //printf("current num rules %d\n", current_num_rules);
     matching_eq_id = search_for_eq_id_add_new_if_not_found(
                         &(p0_eq[chunk_id][0]), &num_eq_ids,
-                        current_num_rules, current_rule_list, &match);
+                        current_num_rules, rule_list, &match);
     for (j = current_end_point+1; j < H.key(H.findmin()); j++) {
         p0_table[chunk_id][j] = matching_eq_id;
-    }
-    if (match == 1) {
-        free(current_rule_list);
     }
 
     current_end_point = H.key(H.findmin());
