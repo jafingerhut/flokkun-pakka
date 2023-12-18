@@ -21,57 +21,21 @@ int p0_table[7][65536];                  //phase 0 chunk tables
 int p1_table[4][MAXTABLE];               //phase 1 chunk tables
 int p2_table[2][MAXTABLE];               //phase 2 chunk tables
 int p3_table[MAXTABLE];                  //phase 3 chunk tables
-struct eq p0_eq[7][2*MAXRULES];          //phase 0 chunk equivalence class
-struct eq p1_eq[4][2*MAXRULES];          //phase 1 chunk equivalence class
-struct eq p2_eq[2][2*MAXRULES];          //phase 2 chunk equivalence class
-struct eq p3_eq[2*MAXRULES];             //phase 3 chunk equivalence class
+struct eq p0_eq[7][MAXEQIDS];            //phase 0 chunk equivalence class
+struct eq p1_eq[4][MAXEQIDS];            //phase 1 chunk equivalence class
+struct eq p2_eq[2][MAXEQIDS];            //phase 2 chunk equivalence class
+struct eq p3_eq[MAXEQIDS];               //phase 3 chunk equivalence class
 int p0_neq[7];                           //phase 0 number of chunk equivalence classes
 int p1_neq[4];                           //phase 1 number of chunk equivalence classes
 int p2_neq[2];                           //phase 2 number of chunk equivalence classes
 int p3_neq;                              //phase 3 number of chunk equivalence classes
 
 unsigned int
-search_for_eq_id_add_new_if_not_found(int chunk_id,
+search_for_eq_id_add_new_if_not_found(eq *x,
                                       unsigned int *num_eq_ids,
                                       unsigned int current_num_rules,
                                       int *current_rule_list,
                                       int *out_match)
-{
-    unsigned int i, j;
-    
-    *out_match = 0;
-    for (i = 0; i < *num_eq_ids; i++) {
-        if (current_num_rules == p0_eq[chunk_id][i].numrules) {
-            *out_match = 1;
-            for (j = 0; j < current_num_rules; j++) {
-                if (p0_eq[chunk_id][i].rulelist[j] != current_rule_list[j]) {
-                    *out_match = 0;
-                    break;
-                }
-            }
-            if (*out_match == 1) {
-                break;
-            }
-        }
-    }
-    if (*out_match == 0) {
-        p0_eq[chunk_id][*num_eq_ids].numrules = current_num_rules;
-        p0_eq[chunk_id][*num_eq_ids].rulelist = current_rule_list;
-        i = *num_eq_ids;
-        (*num_eq_ids)++;
-    }
-    return i;
-}
-
-// TODO: make search_for_eq_id_add_new_if_not_found and
-// search_for_eq_id_add_new_if_not_found2 into a single function,
-// after I figure out a correct way to do so.
-unsigned int
-search_for_eq_id_add_new_if_not_found2(eq *x,
-                                       unsigned int *num_eq_ids,
-                                       unsigned int current_num_rules,
-                                       int *current_rule_list,
-                                       int *out_match)
 {
     unsigned int i, j;
     
@@ -91,6 +55,12 @@ search_for_eq_id_add_new_if_not_found2(eq *x,
         }
     }
     if (*out_match == 0) {
+        if (*num_eq_ids >= MAXEQIDS) {
+            printf("Tried to create more than %d eq ids, which is compile-time maximum limit.  Suggest increasing MAXEQIDS.\n",
+                   MAXEQIDS);
+            fflush(stdout);
+            abort();
+        }
         x[*num_eq_ids].numrules = current_num_rules;
         x[*num_eq_ids].rulelist = current_rule_list;
         i = *num_eq_ids;
@@ -108,12 +78,29 @@ int preprocessing_2chunk(eq *a, int na, eq *b, int nb, eq *x, int *tb, unsigned 
     int match;
     unsigned int matching_eq_id;
     int *rule_list;
+    int iter = 0;
     
+    if ((MAXTABLE / na) < nb) {
+        printf("%d (na) * %d (nb) = %d > %d = MAXTABLE.  Suggest increasing MAXTABLE\n",
+               na, nb, na * nb, MAXTABLE);
+        fflush(stdout);
+        abort();
+    } else {
+        printf("%d (na) * %d (nb) = %d <= %d = MAXTABLE\n",
+               na, nb, na * nb, MAXTABLE);
+        fflush(stdout);
+    }
     rule_list = (int *) calloc(numrules, sizeof(int));
     num_eq_ids = 0;
     for (i = 0; i < na; i++) {
         for (j = 0; j < nb; j++) {
+            ++iter;
+            if ((iter % 100000) == 0) {
+                printf("    dbg iter=%d num_eq_ids=%d ...\n", iter, num_eq_ids);
+                fflush(stdout);
+            }
             // get the intersection rule set
+            current_rule_list = NULL;
             if (a[i].numrules == 0 || b[j].numrules == 0) {
                 current_num_rules = 0;
             } else {
@@ -130,16 +117,21 @@ int preprocessing_2chunk(eq *a, int na, eq *b, int nb, eq *x, int *tb, unsigned 
                         k++;
                     }
                 }
-                current_rule_list = (int *) calloc(current_num_rules, sizeof(int));
-                for (k = 0; k < current_num_rules; k++) {
-                    current_rule_list[k] = rule_list[k];
+                if (current_num_rules != 0) {
+                    current_rule_list = (int *) calloc(current_num_rules, sizeof(int));
+                    for (k = 0; k < current_num_rules; k++) {
+                        current_rule_list[k] = rule_list[k];
+                    }
                 }
             }
             // set the equivalence classes
-            matching_eq_id = search_for_eq_id_add_new_if_not_found2(
+            matching_eq_id = search_for_eq_id_add_new_if_not_found(
                                      x, &num_eq_ids, current_num_rules,
                                      current_rule_list, &match);
             tb[i*nb +j] = matching_eq_id;
+            if ((match == 1) && (current_rule_list != NULL)) {
+                free(current_rule_list);
+            }
         }
     }
     free(rule_list);
@@ -155,13 +147,24 @@ int preprocessing_3chunk(eq *a, unsigned int na, eq *b, int nb, eq *c, int nc, e
     int match;
     unsigned int matching_eq_id;
     int *rule_list;
-    
+
+    if ((MAXTABLE / (na * nb)) < (unsigned int) nc) {
+        printf("%d (na) * %d (nb) * %d (nc) = %d > %d = MAXTABLE.  Suggest increasing MAXTABLE\n",
+               na, nb, nc, na * nb * nc, MAXTABLE);
+        fflush(stdout);
+        abort();
+    } else {
+        printf("%d (na) * %d (nb) * %d (nc) = %d <= %d = MAXTABLE\n",
+               na, nb, nc, na * nb * nc, MAXTABLE);
+        fflush(stdout);
+    }
     rule_list = (int *) calloc(numrules, sizeof(int));
     num_eq_ids = 0;
     for (i = 0; i < na; i++) {
         for (j = 0; j < nb; j++) {
             for (s = 0; s < nc; s++) {
                 // get the intersection list
+                current_rule_list = NULL;
                 if (a[i].numrules == 0 || b[j].numrules == 0 || c[s].numrules == 0) {
                     current_num_rules = 0;
                 } else {
@@ -180,16 +183,21 @@ int preprocessing_3chunk(eq *a, unsigned int na, eq *b, int nb, eq *c, int nc, e
                             t++;
                         }
                     }
-                    current_rule_list = (int *) calloc(current_num_rules, sizeof(int));
-                    for (k = 0; k < current_num_rules; k++) {
-                        current_rule_list[k] = rule_list[k];
+                    if (current_num_rules != 0) {
+                        current_rule_list = (int *) calloc(current_num_rules, sizeof(int));
+                        for (k = 0; k < current_num_rules; k++) {
+                            current_rule_list[k] = rule_list[k];
+                        }
                     }
                 }
                 // set the equivalent classes
-                matching_eq_id = search_for_eq_id_add_new_if_not_found2(
+                matching_eq_id = search_for_eq_id_add_new_if_not_found(
                                          x, &num_eq_ids, current_num_rules,
                                          current_rule_list, &match);
                 tb[i*nb*nc +j*nc + s] = matching_eq_id;
+                if ((match == 1) && (current_rule_list != NULL)) {
+                    free(current_rule_list);
+                }
             }
         }
     }
@@ -413,11 +421,9 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
     }
 
     //printf("current num rules %d\n", current_num_rules);
-    matching_eq_id = search_for_eq_id_add_new_if_not_found(chunk_id,
-                                                           &num_eq_ids,
-                                                           current_num_rules,
-                                                           current_rule_list,
-                                                           &match);
+    matching_eq_id = search_for_eq_id_add_new_if_not_found(
+                        &(p0_eq[chunk_id][0]), &num_eq_ids,
+                        current_num_rules, current_rule_list, &match);
     p0_table[chunk_id][current_end_point] = matching_eq_id;
     if (match == 1) {
         // If match is 0, the allocated current_rule_list will be
@@ -447,11 +453,9 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
     }
 
     //printf("current num rules %d\n", current_num_rules);
-    matching_eq_id = search_for_eq_id_add_new_if_not_found(chunk_id,
-                                                           &num_eq_ids,
-                                                           current_num_rules,
-                                                           current_rule_list,
-                                                           &match);
+    matching_eq_id = search_for_eq_id_add_new_if_not_found(
+                        &(p0_eq[chunk_id][0]), &num_eq_ids,
+                        current_num_rules, current_rule_list, &match);
     for (j = current_end_point+1; j < H.key(H.findmin()); j++) {
         p0_table[chunk_id][j] = matching_eq_id;
     }
@@ -463,6 +467,17 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
   }
   free(rule_list);
   return num_eq_ids;
+}
+
+void check_max_neq(int neq, const char *name, int idx) {
+    printf("%s[%d]=%d out of a maximum allocated of %d\n",
+           name, idx, neq, MAXEQIDS);
+    fflush(stdout);
+    if (neq > MAXEQIDS) {
+        printf("    larger than maximum allocation.  Sugest increasing MAXEQIDS.  Aborting.\n");
+        fflush(stdout);
+        abort();
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -495,7 +510,7 @@ int main(int argc, char* argv[]) {
   for (i=0; i<7; i++) {
     p0_neq[i] = 0;
     for (j=0; j<=65535; j++) p0_table[i][j] = 0;
-    for (j=0; j<2*MAXRULES; j++) {
+    for (j=0; j<MAXEQIDS; j++) {
       p0_eq[i][j].numrules = 0;
       p0_eq[i][j].rulelist = NULL;
     }
@@ -503,7 +518,7 @@ int main(int argc, char* argv[]) {
   for (i=0; i<4; i++) {
     p1_neq[i] = 0;
     for (j=0; j<MAXTABLE; j++) p1_table[i][j] = 0;
-    for (j=0; j<2*MAXRULES; j++) {
+    for (j=0; j<MAXEQIDS; j++) {
       p1_eq[i][j].numrules = 0;
       p1_eq[i][j].rulelist = NULL;
     }
@@ -511,14 +526,14 @@ int main(int argc, char* argv[]) {
   for (i=0; i<2; i++) {
     p2_neq[i] = 0;
     for (j=0; j<MAXTABLE; j++) p2_table[i][j] = 0;
-    for (j=0; j<2*MAXRULES; j++) {
+    for (j=0; j<MAXEQIDS; j++) {
       p2_eq[i][j].numrules = 0;
       p2_eq[i][j].rulelist = NULL;
     }
   }
   p3_neq = 0;
   for (j=0; j<MAXTABLE; j++) p3_table[j] = 0;
-  for (j=0; j<2*MAXRULES; j++) {
+  for (j=0; j<MAXEQIDS; j++) {
     p3_eq[j].numrules = 0;
     p3_eq[j].rulelist = NULL;
   }
@@ -527,6 +542,7 @@ int main(int argc, char* argv[]) {
   for (i=0; i<7; i++) {
     p0_neq[i] = preprocessing_phase0(i, rule, numrules);
     printf("Chunk %d has %d equivalence classes\n", i, p0_neq[i]);
+    check_max_neq(p0_neq[i], "p0_neq", i);
     if (i == 4) {
       tmp = (int)((log(p0_neq[i])/log(2))/8)+1;
       access += tmp;
@@ -553,8 +569,11 @@ int main(int argc, char* argv[]) {
       //phase 1 network
       printf("\nstart phase 1:\n");
       p1_neq[0] = preprocessing_2chunk(p0_eq[0], p0_neq[0], p0_eq[1], p0_neq[1], p1_eq[0], p1_table[0], numrules);
+      check_max_neq(p1_neq[0], "p1_neq", 0);
       p1_neq[1] = preprocessing_2chunk(p0_eq[2], p0_neq[2], p0_eq[3], p0_neq[3], p1_eq[1], p1_table[1], numrules);
+      check_max_neq(p1_neq[1], "p1_neq", 1);
       p1_neq[2] = preprocessing_3chunk(p0_eq[4], p0_neq[4], p0_eq[5], p0_neq[5], p0_eq[6], p0_neq[6], p1_eq[2], p1_table[2], numrules);
+      check_max_neq(p1_neq[2], "p1_neq", 2);
 
       printf("phase 1 table (%d, %d), (%d, %d), (%d, %d)\n",
               p1_neq[0], p0_neq[0]*p0_neq[1],
@@ -577,6 +596,7 @@ int main(int argc, char* argv[]) {
       //phase 2 network
       printf("\nstart phase 2:\n");
       p2_neq[0] = preprocessing_2chunk(p1_eq[0], p1_neq[0], p1_eq[1], p1_neq[1], p2_eq[0], p2_table[0], numrules);
+      check_max_neq(p2_neq[0], "p2_neq", 0);
 
       printf("phase 2 table (%d, %d)\n", p2_neq[0], p1_neq[0]*p1_neq[1]);
 
@@ -588,6 +608,7 @@ int main(int argc, char* argv[]) {
       //phase 3 network
       printf("\nstart phase 3:\n");
       p3_neq = preprocessing_2chunk(p1_eq[2], p1_neq[2], p2_eq[0], p2_neq[0], p3_eq, p3_table, numrules);
+      check_max_neq(p3_neq, "p3_neq", 0);
 
       printf("phase 3 table (%d, %d)\n", p3_neq, p1_neq[2]*p2_neq[0]);
 
@@ -602,8 +623,11 @@ int main(int argc, char* argv[]) {
       //phase 1 network
       printf("\nstart phase 1:\n");
       p1_neq[0] = preprocessing_2chunk(p0_eq[0], p0_neq[0], p0_eq[1], p0_neq[1], p1_eq[0], p1_table[0], numrules);
+      check_max_neq(p1_neq[0], "p1_neq", 0);
       p1_neq[1] = preprocessing_2chunk(p0_eq[2], p0_neq[2], p0_eq[3], p0_neq[3], p1_eq[1], p1_table[1], numrules);
+      check_max_neq(p1_neq[1], "p1_neq", 1);
       p1_neq[2] = preprocessing_3chunk(p0_eq[4], p0_neq[4], p0_eq[5], p0_neq[5], p0_eq[6], p0_neq[6], p1_eq[2], p1_table[2], numrules);
+      check_max_neq(p1_neq[2], "p1_neq", 2);
 
       printf("phase 1 table (%d, %d), (%d, %d), (%d, %d)\n",
               p1_neq[0], p0_neq[0]*p0_neq[1],
@@ -626,6 +650,7 @@ int main(int argc, char* argv[]) {
       //phase 2 network
       printf("\nstart phase 2:\n");
       p2_neq[0] = preprocessing_3chunk(p1_eq[0], p1_neq[0], p1_eq[1], p1_neq[1], p1_eq[2], p1_neq[2], p2_eq[0], p2_table[0], numrules);
+      check_max_neq(p2_neq[0], "p2_neq", 0);
 
       printf("phase 2 table (%d, %d)\n", p2_neq[0], p1_neq[0]*p1_neq[1]*p1_neq[2]);
 

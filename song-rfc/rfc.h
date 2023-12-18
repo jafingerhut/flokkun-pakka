@@ -2,6 +2,7 @@
 #define MAXDIMENSIONS 5
 #define MAXCHUNKS 7
 #define MAXTABLE 5000000
+#define MAXEQIDS 50000
 #define FILTERSIZE 18
 
 struct eq {
