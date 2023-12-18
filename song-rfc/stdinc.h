@@ -9,7 +9,7 @@ typedef char bit;
 // const int false = 0;
 // const int true = 1;
 
-const int Null = -1;
+const int Null = 0;
 const int BIGINT = 0x7fffffff;
 const int EOS = '\0';
 

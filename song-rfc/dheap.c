@@ -19,6 +19,12 @@ dheap::dheap(int N1, int d1) {
 dheap::~dheap() { delete [] h; delete [] pos; delete [] kvec; }
 
 void dheap::insert(item i, keytyp k) {
+    if ((i < 1) || (i > N)) {
+        fprintf(stderr, "dheap::insert(i=%d, k=%lu) Attempting to insert item outside of range [1..N] for N=%d in dheap\n",
+                i, k, N);
+        abort();
+        exit(1);
+    }
 // Add i to heap.
 	kvec[i] = k; n++; siftup(i,n);
 }
