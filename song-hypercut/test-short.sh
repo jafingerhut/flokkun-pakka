@@ -3,7 +3,8 @@
 # A quick test of the rfc program using a small ACL and set of test
 # packets.
 
-CMD="./hypercut"
+#CMD="./hypercut"
+CMD="valgrind --tool=memcheck ./hypercut"
 
 set -e
 make

@@ -32,10 +32,26 @@ public:		dheap(int=100,int=2);
 inline int dheap::findmin() { return n == 0 ? Null : h[1]; }
 
 // Return key of i.
-inline keytyp dheap::key(item i) { return kvec[i]; }
+inline keytyp dheap::key(item i) {
+    if ((i < 1) || (i > N)) {
+        fprintf(stderr, "dheap::key(i=%d) Attempting to get key of item outside of range [1..N] for N=%d in dheap\n",
+                i, N);
+        abort();
+        exit(1);
+    }
+    return kvec[i];
+}
 
 // Return true if i in heap, else false.
-inline bit dheap::member(item i) { return pos[i] != Null; }
+inline bit dheap::member(item i) {
+    if ((i < 1) || (i > N)) {
+        fprintf(stderr, "dheap::member(i=%d) Attempting to check membership of item outside of range [1..N] for N=%d in dheap\n",
+                i, N);
+        abort();
+        exit(1);
+    }
+    return pos[i] != Null;
+}
 
 // Return true if heap is empty, else false.
 inline bit dheap::empty() { return n == 0; };

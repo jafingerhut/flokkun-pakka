@@ -35,6 +35,13 @@ int list::operator()(int i) {
 
 // Add i to the end of the list.
 void list::operator&=(int i) {
+    if (i < 1 || i > N) {
+        char buf[512];
+        snprintf(buf, sizeof(buf),
+                 "list::operator&=: item %d is outside of allowed range [1,%d]",
+                 i, N);
+        fatal(buf);
+    }
 	if (next[i] != -1) fatal("list::operator&=: item already in list");
 	if (first == Null) first = i;
 	else next[last] = i;

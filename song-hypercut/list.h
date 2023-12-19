@@ -1,5 +1,8 @@
 // Header file for data structure representing list of small positive integers.
 
+// Each integer in the range [1,N] may only occur in the list at most
+// once.
+
 class list {
 	int	N;			// list defined on ints in {1,...,N}
 	int	first;			// beginning of list
