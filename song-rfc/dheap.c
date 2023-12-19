@@ -31,6 +31,12 @@ void dheap::insert(item i, keytyp k) {
 
 void dheap::remove(item i) {
 // Remove item i from heap. Name remove is used since delete is C++ keyword.
+    if ((i < 1) || (i > N)) {
+        fprintf(stderr, "dheap::remove(i=%d) Attempting to remove item outside of range [1..N] for N=%d in dheap\n",
+                i, N);
+        abort();
+        exit(1);
+    }
 	int j = h[n--];
 	     if (i != j && kvec[j] <= kvec[i]) siftup(j,pos[i]);
 	else if (i != j && kvec[j] >  kvec[i]) siftdown(j,pos[i]);
@@ -78,6 +84,12 @@ int dheap::minchild(int x) {
 
 void dheap::changekey(item i, keytyp k) {
 // Change the key of i and restore heap order.
+    if ((i < 1) || (i > N)) {
+        fprintf(stderr, "dheap::changekey(i=%d, k=%lu) Attempting to change key of item outside of range [1..N] for N=%d in dheap\n",
+                i, k, N);
+        abort();
+        exit(1);
+    }
 	keytyp ki = kvec[i]; kvec[i] = k;
 	     if (k < ki) siftup(i,pos[i]);
 	else if (k > ki) siftdown(i,pos[i]);
