@@ -317,6 +317,9 @@ int main(int argc, char* argv[]){
     }
     printf("%d packets are classified, %d of them are misclassified\n", i, j);
     printf("# of bytes accessed/pkt = %f\n", T.trieMemAccess()/i);
+    if (j != 0) {
+      exit(1);
+    }
   }else{
     printf("No packet trace input\n");
   }
