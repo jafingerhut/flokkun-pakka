@@ -37,7 +37,7 @@ do
     echo $j
     echo "-----------------------------------------------------------------"
     set -x
-    ${CMD} -r ../orig/song-filterset/${j} -t ../orig/song-filterset/${j}_trace
+    time ${CMD} -r ../orig/song-filterset/${j} -t ../orig/song-filterset/${j}_trace
     set +x
 done
 

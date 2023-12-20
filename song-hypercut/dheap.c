@@ -2,59 +2,65 @@
 #include "dheap.h"
 
 // parent of item, leftmost and rightmost children
-#define p(x) (((x)+(d-2))/d)
-#define left(x) (d*((x)-1)+2)
-#define right(x) (d*(x)+1)
+#define p(x) (((x)-1)/d)
+#define left(x) (d*(x)+1)
+#define right(x) (d*((x)+1))
 
 dheap::dheap(int N1, int d1) {
 // Initialize a heap to store items in {1,...,N}.
-	static int x = 0; x++;
 	N = N1; d = d1; n = 0;
-	h = new item[N+1];
-	pos = new int[N+1];
-	kvec = new keytyp[N+1];
-	for (int i = 1; i <= N; i++) pos[i] = Null;
+	h = new item[N];
+	pos = new int[N];
+	kvec = new keytyp[N];
+	for (int i = 0; i < N; i++) pos[i] = -1;
 }
 
 dheap::~dheap() { delete [] h; delete [] pos; delete [] kvec; }
 
 void dheap::insert(item i, keytyp k) {
-    if ((i < 1) || (i > N)) {
-        fprintf(stderr, "dheap::insert(i=%d, k=%lu) Attempting to insert item outside of range [1..N] for N=%d in dheap\n",
-                i, k, N);
-        abort();
-        exit(1);
-    }
 // Add i to heap.
-	kvec[i] = k; n++; siftup(i,n);
+	//printf("dbg insert item %d key %lu\n", i, k);
+	//fflush(stdout);
+	if ((i < 0) || (i >= N)) {
+		fprintf(stderr, "dheap::insert(i=%d, k=%lu) Attempting to insert item outside of range [0..(N-1)] for N=%d in dheap\n",
+                        i, k, N);
+		abort();
+		exit(1);
+	}
+	kvec[i] = k; siftup(i,n); n++;
 }
 
 void dheap::remove(item i) {
 // Remove item i from heap. Name remove is used since delete is C++ keyword.
-    if ((i < 1) || (i > N)) {
-        fprintf(stderr, "dheap::remove(i=%d) Attempting to remove item outside of range [1..N] for N=%d in dheap\n",
-                i, N);
-        abort();
-        exit(1);
-    }
-	int j = h[n--];
+	if ((i < 0) || (i >= N)) {
+		fprintf(stderr, "dheap::remove(i=%d) Attempting to remove item outside of range [0..(N-1)] for N=%d in dheap\n",
+                        i, N);
+		abort();
+		exit(1);
+	}
+	--n;
+	int j = h[n];
 	     if (i != j && kvec[j] <= kvec[i]) siftup(j,pos[i]);
 	else if (i != j && kvec[j] >  kvec[i]) siftdown(j,pos[i]);
-	pos[i] = Null;
+	pos[i] = -1;
 }
 
 int dheap::deletemin() {
 // Remove and return item with smallest key.
-	if (n == 0) return Null;
-	item i = h[1];
-	remove(h[1]);
+	//printf("dbg deletemin\n");
+	//fflush(stdout);
+	if (n == 0) return -1;
+	item i = h[0];
+	remove(h[0]);
+        //printf("    -> item %d key %lu\n", i, kvec[i]);
+        //fflush(stdout);
 	return i;
 }
 
 void dheap::siftup(item i, int x) {
 // Shift i up from position x to restore heap order.
 	int px = p(x);
-	while (x > 1 && kvec[h[px]] > kvec[i]) {
+	while (x > 0 && kvec[h[px]] > kvec[i]) {
 		h[x] = h[px]; pos[h[x]] = x;
 		x = px; px = p(x);
 	}
@@ -64,7 +70,7 @@ void dheap::siftup(item i, int x) {
 void dheap::siftdown(item i, int x) {
 // Shift i down from position x to restore heap order.
 	int cx = minchild(x);
-	while (cx != Null && kvec[h[cx]] < kvec[i]) {
+	while (cx != -1 && kvec[h[cx]] < kvec[i]) {
 		h[x] = h[cx]; pos[h[x]] = x;
 		x = cx; cx = minchild(x);
 	}
@@ -75,8 +81,8 @@ void dheap::siftdown(item i, int x) {
 // having minimum key.
 int dheap::minchild(int x) {
 	int y, minc;
-	if ((minc = left(x)) > n) return Null;
-	for (y = minc + 1; y <= right(x) && y <= n; y++) {
+	if ((minc = left(x)) >= n) return -1;
+	for (y = minc + 1; y <= right(x) && y < n; y++) {
 		if (kvec[h[y]] < kvec[h[minc]]) minc = y;
 	}
 	return minc;
@@ -84,12 +90,12 @@ int dheap::minchild(int x) {
 
 void dheap::changekey(item i, keytyp k) {
 // Change the key of i and restore heap order.
-    if ((i < 1) || (i > N)) {
-        fprintf(stderr, "dheap::changekey(i=%d, k=%lu) Attempting to change key of item outside of range [1..N] for N=%d in dheap\n",
-                i, k, N);
-        abort();
-        exit(1);
-    }
+	if ((i < 0) || (i >= N)) {
+		fprintf(stderr, "dheap::changekey(i=%d, k=%lu) Attempting to change key of item outside of range [0..(N-1)] for N=%d in dheap\n",
+                        i, k, N);
+		abort();
+		exit(1);
+	}
 	keytyp ki = kvec[i]; kvec[i] = k;
 	     if (k < ki) siftup(i,pos[i]);
 	else if (k > ki) siftdown(i,pos[i]);

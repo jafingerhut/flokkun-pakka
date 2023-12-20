@@ -182,12 +182,12 @@ int trie::selectbit(nodeItem *v){
   }
     
   for(i=0; i < 104; i++){
-    H.insert(i+1, pref[i]);
+    H.insert(i, pref[i]);
   }
   
   //printf("select bit %d with pref %f\n", H.findmin(), H.key(H.findmin()));
   
-  j = H.deletemin() - 1;
+  j = H.deletemin();
   
   return j;
 

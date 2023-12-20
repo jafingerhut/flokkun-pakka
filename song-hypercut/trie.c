@@ -79,32 +79,32 @@ void trie::choose_np_dim(nodeItem *v){
     ncomponent[k]=0;
     for(i = 0; i<v->nrules; i++){
       if(rule[v->ruleid[i]].field[k].low < v->field[k].low){
-        H1.insert(v->ruleid[i]+1, v->field[k].low);
+        H1.insert(v->ruleid[i], v->field[k].low);
       }else{
-        H1.insert(v->ruleid[i]+1, rule[v->ruleid[i]].field[k].low);
+        H1.insert(v->ruleid[i], rule[v->ruleid[i]].field[k].low);
       }
     }
-    while (H1.findmin() != Null) {
+    while (H1.findmin() != -1) {
       temp = H1.findmin();
       tmpkey = H1.key(temp);
       while (tmpkey == H1.key(H1.findmin())) {
-          j = H1.deletemin() - 1;
+          j = H1.deletemin();
           if(rule[j].field[k].high > v->field[k].high){
-            H2.insert(j+1, v->field[k].high);
+            H2.insert(j, v->field[k].high);
           }else{
-            H2.insert(j+1, rule[j].field[k].high);
+            H2.insert(j, rule[j].field[k].high);
           }
-          if (H1.findmin() == Null) {
+          if (H1.findmin() == -1) {
               break;
           }
       }
-      while(H2.findmin() != Null){
+      while(H2.findmin() != -1){
           ncomponent[k]++;
-          j = H2.findmin() - 1;
-          tmpkey = H2.key(j + 1);
-        while(H2.findmin() != Null && H2.key(j+1) == tmpkey){
+          j = H2.findmin();
+          tmpkey = H2.key(j);
+        while(H2.findmin() != -1 && H2.key(j) == tmpkey){
             H2.deletemin();
-            j = H2.findmin() - 1;
+            j = H2.findmin();
           }
       }
     }

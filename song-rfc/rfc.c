@@ -355,18 +355,18 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
   //sort the end points
   unsigned int lo;
   unsigned int hi;
-  H.insert(2*numrules+1, 0);
-  H.insert(2*numrules+2, 65535);
+  H.insert(2*numrules, 0);
+  H.insert(2*numrules+1, 65535);
   in_heap[0] = 1;
   in_heap[65535] = 1;
   for (i = 0; i < numrules; i++) {
       get_chunk_lo_hi(chunk_id, &(rule[i]), &lo, &hi);
       if (in_heap[lo] == 0) {
-          H.insert(i+1, lo);
+          H.insert(i, lo);
           in_heap[lo] = 1;
       }
       if (in_heap[hi] == 0) {
-          H.insert(numrules+i+1, hi);
+          H.insert(numrules+i, hi);
           in_heap[hi] = 1;
       }
   }
@@ -376,14 +376,14 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
   current_end_point = 0;
   rule_list = (int *) calloc(numrules, sizeof(int));
 
-  while (H.findmin() != Null) {
+  while (H.findmin() != -1) {
 
       while (true) {
           if (current_end_point != H.key(H.findmin())) {
               break;
           }
           H.deletemin();
-          if (H.findmin() == Null) {
+          if (H.findmin() == -1) {
               break;
           }
       }
@@ -404,7 +404,7 @@ int preprocessing_phase0(int chunk_id, pc_rule *rule, unsigned int numrules) {
                         current_num_rules, rule_list, &match);
     p0_table[chunk_id][current_end_point] = matching_eq_id;
 
-    if (H.findmin() == Null) {
+    if (H.findmin() == -1) {
         //printf("dbg H.findmin() is Null when current_end_point is %d\n",
         //       current_end_point);
         break;
