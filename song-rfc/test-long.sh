@@ -5,8 +5,8 @@
 # TODO: This failed on file fw1_1K the last time I tried it, with a
 # segmentation fault.  Debug this to figure out what is going wrong.
 
-#CMD="./rfc"
-CMD="valgrind --tool=memcheck ./rfc"
+CMD="./rfc"
+#CMD="valgrind --tool=memcheck ./rfc"
 
 set -e
 make
