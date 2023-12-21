@@ -385,6 +385,9 @@ void trie::createtrie(){
 
                 if(!empty){
                   n++;
+                  if (freelist == Null) {
+                      fatal("trie: freelist is exhausted");
+                  }
                   nodeSet[v].child[index] = freelist;
                   u = freelist;
                   freelist = nodeSet[freelist].child[0];
