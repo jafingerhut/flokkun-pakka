@@ -1,4 +1,4 @@
-#define MAXNODES 1000000
+#define MAXNODES 4000000
 #define MAXRULES 10000
 #define MAXBUCKETS 40 
 #define MAXCUTS 64

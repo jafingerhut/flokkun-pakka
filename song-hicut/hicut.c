@@ -171,7 +171,7 @@ int main(int argc, char* argv[]){
   //    rule[i].field[4].low, rule[i].field[4].high);
   //}
 
-  trie T(1000000, numrules, binth, spfac, rule, opt);
+  trie T(MAXNODES, numrules, binth, spfac, rule, opt);
 
   printf("*************************\n");
   fflush(stdout);

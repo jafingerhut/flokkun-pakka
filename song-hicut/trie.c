@@ -203,8 +203,14 @@ void trie::choose_np_dim(nodeItem *v, int *d, int *np){
       
     }
     
-    if(ncomponent[0]==1 && ncomponent[1]==1 && ncomponent[2]==1 &&
-       ncomponent[3]==1 && ncomponent[4]==1 && ncomponent[5]==1){
+    int allone = 1;
+    for (k = 0; k < MAXDIMENSIONS; k++) {
+        if (ncomponent[k] != 1) {
+            allone = 0;
+            break;
+        }
+    }
+    if (allone) {
         *d = 0;
         *np = 1;
         return;
@@ -315,6 +321,9 @@ void trie::createtrie(){
         }
         if(!empty){
           n++;
+          if (freelist == Null) {
+              fatal("trie: freelist is exhausted");
+          }
           nodeSet[v].child[i] = freelist; 
           u = freelist;
           freelist = nodeSet[freelist].child[0];	

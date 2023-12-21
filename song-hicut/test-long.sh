@@ -2,26 +2,23 @@
 
 # A longer running set of tests of hicut program.
 
-#CMD="./hicut"
-CMD="valgrind --tool=memcheck ./hicut"
+CMD="./hicut"
+#CMD="valgrind --tool=memcheck ./hicut"
 
 # Failing test cases:
-# fw1_1K fw1_5K fw1_10K
-# ipc1_10K
-# Some kind of failure reading uninitialized data that led to a SIGSEGV
-# after 5.8 mins of running with valgrind memcheck enabled
-# see file out-test-fail-fw1_1K.txt
-# see file out-test-fail-fw1_5K.txt
-# see file out-test-fail-fw1_10K.txt
-# see file out-test-fail-ipc1_10K.txt
+# fw1_5K fw1_10K
 
+# These two fail due to the freelist running out of entries.  I have
+# added an explicit check so that the reason for future failures of
+# this kind will be explained.  Increasing MAXNODES from 1,000,000 to
+# 4,000,000 is still not enough for these two tests to pass.
 
 set -e
 make
 for j in \
     acl1_100 acl1_1K acl1_5K acl1_10K \
-    fw1_100 \
-    ipc1_100 ipc1_1K ipc1_5K
+    fw1_100 fw1_1K \
+    ipc1_100 ipc1_1K ipc1_5K ipc1_10K
 do
     echo ""
     echo "-----------------------------------------------------------------"
