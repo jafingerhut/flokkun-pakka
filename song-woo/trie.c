@@ -4,6 +4,27 @@
 #include "dheap.h"
 #include "list.h"
 
+void trie::init_freelist() {
+    int i;
+
+    freelist = jumptablesize + 1;	// create list of unallocated nodes
+    for (i = freelist; i < N; i++) nodeSet[i].child0 = i+1;
+    nodeSet[N].child0 = Null;
+}
+
+int trie::alloc_node() {
+    int ret;
+
+    if (freelist == Null) {
+        char buf[512];
+        snprintf(buf, sizeof(buf), "trie: freelist, originally containing %d entries, is exhausted", N);
+        fatal(buf);
+    }
+    ret = freelist;
+    freelist = nodeSet[freelist].child0;
+    return ret;
+}
+
 trie::trie(int N1, int numrules1, int bucketSize1, struct pc_rule* rule1, int kk0, int kk1) {
 // Initialize trie that can have up to N1 nodes.
   int i;
@@ -22,13 +43,8 @@ trie::trie(int N1, int numrules1, int bucketSize1, struct pc_rule* rule1, int kk
   printf("size of tree node %lu\n", sizeof(nodeItem));
   
   buildjumptable();
-  
-  freelist = jumptablesize +1;	// create list of unallocated nodes
-  for (i = freelist; i < N; i++) nodeSet[i].child0 = i+1;
-  nodeSet[N].child0 = Null;
-
+  init_freelist();
   createtrie();
-	
 }
 
 trie::~trie() { delete [] nodeSet; }
@@ -256,20 +272,13 @@ void trie::createtrie(){
         cbit = selectbit(&nodeSet[v]);
         nodeSet[v].sbit = cbit;
         //printf("choose bit %d\n", cbit);
-        if (freelist == Null) {
-            char buf[512];
-            snprintf(buf, sizeof(buf), "trie: freelist, originally containing %d entries, is exhausted", N);
-            fatal(buf);
-        }
-        nodeSet[v].child0 = freelist; 
-        u = freelist;
-        freelist = nodeSet[freelist].child0;
+        u = alloc_node();
+        nodeSet[v].child0 = u;
         nodeSet[u].ruleid = (int *)calloc(nodeSet[v].nrules, sizeof(int));
         lindex = 0;
 
-        nodeSet[v].child1 = freelist; 
-        w = freelist;
-        freelist = nodeSet[freelist].child0;
+        w = alloc_node();
+        nodeSet[v].child1 = w;
         nodeSet[w].ruleid = (int *)calloc(nodeSet[v].nrules, sizeof(int));
         rindex = 0;
     

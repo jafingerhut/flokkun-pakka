@@ -26,6 +26,9 @@ class trie {
 	void    createtrie();
 	void    remove_redundancy(nodeItem *);
 
+	void    init_freelist();
+	int     alloc_node();
+
 public:		//trie(int=10000, int=100, int=16, int=1000, struct pc_rule*, int=1);
                 trie(int, int, int, struct pc_rule*, int, int);
 		~trie();
