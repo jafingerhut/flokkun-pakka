@@ -147,7 +147,7 @@ int main(int argc, char* argv[]){
   int numrules=0;  // actual number of rules in rule set
   struct pc_rule *rule;
   int i,j;
-  int header[MAXDIMENSIONS];
+  unsigned int header[MAXDIMENSIONS];
   int matchid, fid;
   char *s = (char *)calloc(200, sizeof(char));
 

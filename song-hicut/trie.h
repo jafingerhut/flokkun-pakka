@@ -1,7 +1,7 @@
 class trie {
 	struct nodeItem {
 		bool isleaf;            //is a leaf node if true
-  		int nrules;             //number of rules in this node  
+		unsigned int nrules;             //number of rules in this node
             int *ruleid;             //rule ids in this node
   		struct range field[MAXDIMENSIONS];      
   		unsigned int dim : 3;  	//0:sip; 1:dip; 2:proto; 3:sp; 4:dp
@@ -14,7 +14,7 @@ class trie {
 	int   n2;               // removed rules during preprocessing
 	int   n3;               // number of rules stored
 	float n4;               // number of memory access;
-	int   binth;                 
+	unsigned int   binth;
 	float spfac;
 	int   numrules;
 	int   opt;              // dimension choose option
@@ -31,7 +31,7 @@ public:		//trie(int=10000, int=100, int=16, int=1000, struct pc_rule*, int=1);
             trie(int, int, int, float, struct pc_rule*, int);
 		~trie();
 
-	int     trieLookup(int*);
+	int     trieLookup(unsigned int*);
 	int	  trieSize();
 	int     trieDepth();
 	int     trieRedun();

@@ -7,25 +7,23 @@ Compiles with:
 
 All tests pass!
 
-Handles bc1* test cases without any scaling problems, due to how
+Handles `bc1*` test cases without any scaling problems, due to how
 algorithm works.
 
 
 # song-hicut
 
 Compiles with:
-+ `g++ -O3 -Wall` v9.4.0 with no errors.  About a dozen warnings about
-  comparison of integer eexpressions of different signedness:
-  'unsigned int' and 'int'.
-+ Similarly with g++ v13.2.0
++ `g++ -O3 -Wall` v9.4.0 with no errors nor warnings
++ Similarly with g++ v13.2.0   TODO similar?
 
 All tests pass except: fw1_5K fw1_10K
 
 Failures are for known reasons that parameter settings are too small,
 and their names are printed on a failure.
 
-Handles bc1* test cases up to bc1_k40, but exhausts freelist for
-bc1_k100.  The worst case bytes/lookup and bytes/filter values grow
+Handles `bc1*` test cases up to `bc1_k40`, but exhausts freelist for
+`bc1_k100`.  The worst case bytes/lookup and bytes/filter values grow
 very fast with k, which I suspect is a property of the hicut algorithm
 and those rule sets.
 
@@ -109,7 +107,7 @@ All tests pass except: fw1_5K fw1_10K
 Failures are for known reasons that parameter settings are too small,
 and their names are printed on a failure.
 
-Fails with genrules/bc1_k5, and all other bc1_k* files.  This seems
+Fails with `genrules/bc1_k5`, and all other `bc1*` files.  This seems
 like it is either a bug in the song-woo code, or a pretty severe
 limitation in the algorithm.
 

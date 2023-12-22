@@ -55,13 +55,14 @@ trie::~trie() { delete [] nodeSet; }
 //opt 3: dimension with largest distinct components
 void trie::choose_np_dim(nodeItem *v, int *d, int *np){
 
-  int nump[MAXDIMENSIONS];
+  unsigned int nump[MAXDIMENSIONS];
   int done;
   int sm[MAXDIMENSIONS];               //space measurement
   float entropy[MAXDIMENSIONS];
   int ncomponent[MAXDIMENSIONS];
-  int i,j,k;
-  int lo,hi,r;
+  unsigned int i,j,k;
+  unsigned int lo,hi;
+  int r;
   int minv;
   unsigned long tmpkey;
   int max[MAXDIMENSIONS];
@@ -254,7 +255,7 @@ void trie::remove_redundancy(nodeItem *v){
       }
       if(cover == 1){
       	
-      	for(int j = tmp; j < v->nrules-1; j++){
+      	for(unsigned int j = tmp; j+1 < v->nrules; j++){
       	  v->ruleid[j] = v->ruleid[j+1]; 	
       	}
       	
@@ -276,10 +277,11 @@ void trie::createtrie(){
   int last;
   int *d = (int *)malloc(sizeof(int));
   int *np = (int *)malloc(sizeof(int));
-  int nr;
+  unsigned int nr;
   int empty;
   int u,v;
-  int r, lo, hi;
+  int r;
+  unsigned int lo, hi;
   float worstcase = 0.0;
   
   Q &= root; last = root; pass = 0;
@@ -308,10 +310,10 @@ void trie::createtrie(){
       r = (nodeSet[v].field[k].high - nodeSet[v].field[k].low)/nodeSet[v].ncuts;
       lo = nodeSet[v].field[k].low;
       hi = lo + r;
-      for(int i = 0; i < nodeSet[v].ncuts; i++){ 
+      for(unsigned int i = 0; i < nodeSet[v].ncuts; i++){
 	  empty = 1;
 	  nr = 0;
-        for(int j=0; j<nodeSet[v].nrules; j++){
+        for(unsigned int j=0; j<nodeSet[v].nrules; j++){
           if ((rule[nodeSet[v].ruleid[j]].field[k].low  >= lo && rule[nodeSet[v].ruleid[j]].field[k].low  <= hi) ||
               (rule[nodeSet[v].ruleid[j]].field[k].high >= lo && rule[nodeSet[v].ruleid[j]].field[k].high <= hi) ||
               (rule[nodeSet[v].ruleid[j]].field[k].low  <= lo && rule[nodeSet[v].ruleid[j]].field[k].high >= hi)) {
@@ -349,7 +351,7 @@ void trie::createtrie(){
           }
           int s = 0;
           nodeSet[u].ruleid = (int *)calloc(nodeSet[v].nrules, sizeof(int));
-          for(int j=0; j<nodeSet[v].nrules; j++){
+          for(unsigned int j=0; j<nodeSet[v].nrules; j++){
             if ((rule[nodeSet[v].ruleid[j]].field[k].low  >= lo && rule[nodeSet[v].ruleid[j]].field[k].low  <= hi) ||
                 (rule[nodeSet[v].ruleid[j]].field[k].high >= lo && rule[nodeSet[v].ruleid[j]].field[k].high <= hi) ||
                 (rule[nodeSet[v].ruleid[j]].field[k].low  <= lo && rule[nodeSet[v].ruleid[j]].field[k].high >= hi)) {
@@ -374,7 +376,7 @@ void trie::createtrie(){
   printf("worst case %f bytes/lookup\n", worstcase*4); 
 }
 
-int trie::trieLookup(int* header){
+int trie::trieLookup(unsigned int* header){
   
   int index[MAXDIMENSIONS];
   int cdim, cchild, cover, cuts;
@@ -413,7 +415,7 @@ int trie::trieLookup(int* header){
   }
   
   if(cnode != Null){
-    for(i = 0; i < nodeSet[cnode].nrules; i++){
+      for(i = 0; (unsigned int) i < nodeSet[cnode].nrules; i++){
       n4+=RULEPTSIZE+RULESIZE;
       cover = 1;
       for(k = 0; k < MAXDIMENSIONS; k++){
