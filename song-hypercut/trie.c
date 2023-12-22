@@ -526,7 +526,7 @@ int trie::trieLookup(unsigned int* header){
         cvalue[i] = 0;
         for(k = index[i]; k > index[i] - nbits[i]; k--){
           if((header[i] & 1<<(k-1)) != 0){
-            cvalue[i] += (int)pow(2, k-index[i]+nbits[i]-1);
+            cvalue[i] += pow2(k-index[i]+nbits[i]-1);
           }
         }
       }else{
