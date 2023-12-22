@@ -256,6 +256,11 @@ void trie::createtrie(){
         cbit = selectbit(&nodeSet[v]);
         nodeSet[v].sbit = cbit;
         //printf("choose bit %d\n", cbit);
+        if (freelist == Null) {
+            char buf[512];
+            snprintf(buf, sizeof(buf), "trie: freelist, originally containing %d entries, is exhausted", N);
+            fatal(buf);
+        }
         nodeSet[v].child0 = freelist; 
         u = freelist;
         freelist = nodeSet[freelist].child0;
