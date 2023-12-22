@@ -10,7 +10,9 @@ import argparse
 
 import argparse
 
-parser = argparse.ArgumentParser(description="""
+parser = argparse.ArgumentParser(
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    description="""
 Generate an instance of the normal classification problem with the
 syntax used by ClassBench for IPv4 5-tuples, and the rules specified
 as described in reference [1], Section 4.2.
