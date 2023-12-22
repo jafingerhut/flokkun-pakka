@@ -197,15 +197,15 @@ void parseargs(int argc, char *argv[]) {
 
 int main(int argc, char* argv[]){
 
-  int numrules=0;  // actual number of rules in rule set
-  int numexprules= 0;
+  unsigned int numrules=0;  // actual number of rules in rule set
+  unsigned int numexprules= 0;
   struct pc_rule *rule;
   struct pc_rule_tuple *exprule;
-  int i,j,k;
+  unsigned int i,j,k;
   char *s = (char *)calloc(200, sizeof(char));
   struct prefix *pf1 =(prefix *)malloc(sizeof(prefix));
   struct prefix *pf2 =(prefix *)malloc(sizeof(prefix));
-  int numtuples;
+  unsigned int numtuples;
   struct tuple *tuplelist = (tuple *)calloc(MAXRULES, sizeof(tuple));
   struct tuple currenttuple;
 
@@ -382,8 +382,8 @@ int main(int argc, char* argv[]){
 
   int fid;
   int match;
-  int sipnumtuples;
-  int dipnumtuples;
+  unsigned int sipnumtuples;
+  unsigned int dipnumtuples;
   int *siptuplelist;
   int *diptuplelist;
   int tuplecount;

@@ -2,8 +2,8 @@
 
 # A longer running set of tests of tss program.
 
-CMD="./tss"
-#CMD="valgrind --tool=memcheck ./tss"
+#CMD="./tss"
+CMD="valgrind --tool=memcheck ./tss"
 
 set -e
 make

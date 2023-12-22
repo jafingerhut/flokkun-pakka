@@ -80,10 +80,8 @@ RFC implementation in directory `song-rfc`:
 # song-tss
 
 Compiles with:
-+ `g++ -O3 -Wall` v9.4.0 with no errors.  Only 2 warnings about
-  comparison of integer eexpressions of different signedness:
-  'unsigned int' and 'int'.
-+ Similarly with g++ v13.2.0, but in addition there are 3 warnings
++ `g++ -O3 -Wall` v9.4.0 with no errors nor warnings
++ Similarly with g++ v13.2.0, except there are 3 warnings
   about C++17 does not allow 'register' storage class specifier.
 
 All tests pass!

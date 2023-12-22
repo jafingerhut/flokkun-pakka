@@ -7,7 +7,7 @@ struct range{
 };
 
 struct tuple{
-  int tuplesize;
+  unsigned int tuplesize;
   int siplen;
   int diplen;
   int protolen;

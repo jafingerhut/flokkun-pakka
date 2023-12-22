@@ -19,7 +19,7 @@ class trie {
 
 public:		trie(int=100,int=32, int=64);
 		~trie();
-	int	*lookup(unsigned, int*);	
+	int	*lookup(unsigned, unsigned int*);
 	void	insert(int,int, int);	
 	int	trieSize() { return n*NODESIZE+numprefix*(numtuples/8+1); };
         int     trieAccess() { return numaccess; };
