@@ -2,8 +2,8 @@
 
 # A longer running set of tests of woo program.
 
-CMD="./woo"
-#CMD="valgrind --tool=memcheck ./woo"
+#CMD="./woo"
+CMD="valgrind --tool=memcheck ./woo"
 
 # tests with errors:
 # fw1_5K fw1_10K

@@ -1,3 +1,15 @@
+TODO:
+
++ Replace all uses of pow(2,k) with pow2(k) that I added to stdinc.h
+  in song-woo.
++ Find all calls to log() and see if they can be replaced with
+  something that does fast exact integer arithmetic, not floating
+  point.  OK if it is used to report statistics, but not in the packet
+  classification part of code.
++ See if there is any use of float or double anywhere in packet
+  classification code, and replace with integer arithmetic if so.
+
+
 # song-bv
 
 Compiles with:
@@ -92,9 +104,7 @@ algorithm works.
 # song-woo
 
 Compiles with:
-+ `g++ -O3 -Wall` v9.4.0 with no errors.  About 10 warnings about
-  comparison of integer eexpressions of different signedness:
-  'unsigned int' and 'int'.
++ `g++ -O3 -Wall` v9.4.0 with no errors nor warnings
 + Similarly with g++ v13.2.0
 
 All tests pass except: fw1_5K fw1_10K

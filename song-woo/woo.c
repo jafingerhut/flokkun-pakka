@@ -27,18 +27,18 @@ struct prefix *expand_prefix(unsigned ai, unsigned aj){
   }
 
   while(1) {
-    for(k=0; (ai & (int)pow(2,k)) == 0 && k <= 15 ; k ++);
-    if(ai + pow(2,k) - 1 == aj) {
+    for(k=0; (ai & pow2(k)) == 0 && k <= 15 ; k ++);
+    if(ai + pow2(k) - 1 == aj) {
       //printf("b: Prefix = %4x, Mask = %4x, k=%d\n", ai>>k<<k, mask<<k, k);
       pf->value[i]=ai>>k<<k;
       pf->length[i]=16-k;
       pf->nvalid=i+1;
       return pf;
-    }else if (ai + pow(2,k) - 1 < aj) {
+    }else if (ai + pow2(k) - 1 < aj) {
       //printf("c: Prefix = %4x, Mask = %4x, k=%d\n", ai>>k<<k, mask<<k, k);
       pf->value[i]=ai>>k<<k;
       pf->length[i]=16-k;
-      ai = ai + (int)pow(2,k);
+      ai = ai + pow2(k);
     }else{
       break;
     } // end if
@@ -57,8 +57,8 @@ struct prefix *expand_prefix(unsigned ai, unsigned aj){
 
   while(ai < aj) {
 
-    for(k=15; ((ai ^ aj) & (int)pow(2,k)) == 0 ; k--);
-    if(ai + pow(2,k+1) - 1 == aj) {
+    for(k=15; ((ai ^ aj) & pow2(k)) == 0 ; k--);
+    if(ai + pow2(k+1) - 1 == aj) {
       //printf("e: Prefix = %4x, Mask = %4x\n", ai>>(k+1)<<(k+1), mask<<(k+1));
       pf->value[i]=ai>>(k+1)<<(k+1);
       pf->length[i]=15-k;
@@ -68,7 +68,7 @@ struct prefix *expand_prefix(unsigned ai, unsigned aj){
       //printf("f: Prefix = %4x, Mask = %4x\n", ai>>k<<k, mask<<k);
       pf->value[i]=ai>>k<<k;
       pf->length[i]=16-k;
-      ai = ai + (int)pow(2,k);
+      ai = ai + pow2(k);
     } // end if
 
     i++;
@@ -220,7 +220,8 @@ int main(int argc, char* argv[]){
   struct pc_rule *exprule;
   unsigned header[MAXDIMENSIONS];
   int matchid, fid;
-  int i,j,k;
+  int i;
+  unsigned int j,k;
   char *s = (char *)calloc(200, sizeof(char));
   struct prefix *pf1 =(prefix *)malloc(sizeof(prefix));
   struct prefix *pf2 =(prefix *)malloc(sizeof(prefix));
@@ -268,9 +269,9 @@ int main(int argc, char* argv[]){
         exprule[index].field[4].low = rule[i].field[4].low;
         exprule[index].field[4].high = rule[i].field[4].high;
         exprule[index].field[2].low = pf1->value[j];
-        exprule[index].field[2].high = pf1->value[j] + (int)pow(2, 16-pf1->length[j]) - 1;
+        exprule[index].field[2].high = pf1->value[j] + pow2(16-pf1->length[j]) - 1;
         exprule[index].field[3].low = pf2->value[k];
-        exprule[index].field[3].high = pf2->value[k] + (int)pow(2, 16-pf2->length[k]) - 1;
+        exprule[index].field[3].high = pf2->value[k] + pow2(16-pf2->length[k]) - 1;
         exprule[index].id = i;
         index++;
       }

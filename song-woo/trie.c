@@ -27,7 +27,6 @@ int trie::alloc_node() {
 
 trie::trie(int N1, int numrules1, int bucketSize1, struct pc_rule* rule1, int kk0, int kk1) {
 // Initialize trie that can have up to N1 nodes.
-  int i;
   N = N1;
   numrules = numrules1;
   bucketSize = bucketSize1;
@@ -37,7 +36,7 @@ trie::trie(int N1, int numrules1, int bucketSize1, struct pc_rule* rule1, int kk
   n3 = 0;
   n4 = 0;
   k0=kk0; k1=kk1; 
-  jumptablesize = (int)pow(2,k0+k1);
+  jumptablesize = pow2(k0+k1);
   n = jumptablesize;
   
   printf("size of tree node %lu\n", sizeof(nodeItem));
@@ -212,24 +211,24 @@ int trie::selectbit(nodeItem *v){
 void trie::buildjumptable(){
   
   int i,j, index;
-  int i0, i1;
+  unsigned int i0, i1;
   
-  for(i0=0; i0<pow(2,k0); i0++){
-    for(i1=0; i1<pow(2,k1); i1++){
-      i=i0*(int)pow(2, k1) + i1 + 1;
+  for(i0=0; i0<pow2(k0); i0++){
+    for(i1=0; i1<pow2(k1); i1++){
+      i=i0*pow2(k1) + i1 + 1;
       nodeSet[i].nrules=0;
       for(j=0; j<numrules; j++){
             	
-      if((((rule[j].field[0].low >> (32-k0)) & (int)(pow(2,k0)-1)) <= i0) && (((rule[j].field[0].high >> (32-k0)) & (int)(pow(2,k0)-1)) >= i0) &&
-         (((rule[j].field[1].low >> (32-k1)) & (int)(pow(2,k1)-1)) <= i1) && (((rule[j].field[1].high >> (32-k1)) & (int)(pow(2,k1)-1)) >= i1)){
+        if((((rule[j].field[0].low >> (32-k0)) & (pow2(k0)-1)) <= i0) && (((rule[j].field[0].high >> (32-k0)) & (pow2(k0)-1)) >= i0) &&
+         (((rule[j].field[1].low >> (32-k1)) & (pow2(k1)-1)) <= i1) && (((rule[j].field[1].high >> (32-k1)) & (pow2(k1)-1)) >= i1)){
              nodeSet[i].nrules ++;
         }
       }
       nodeSet[i].ruleid = (int *)calloc(nodeSet[i].nrules, sizeof(int));
       index = 0;
       for(j=0; j<numrules; j++){
-        if((((rule[j].field[0].low >> (32-k0)) & (int)(pow(2,k0)-1)) <= i0) && (((rule[j].field[0].high >> (32-k0)) & (int)(pow(2,k0)-1)) >= i0) &&
-           (((rule[j].field[1].low >> (32-k1)) & (int)(pow(2,k1)-1)) <= i1) && (((rule[j].field[1].high >> (32-k1)) & (int)(pow(2,k1)-1)) >= i1)){
+        if((((rule[j].field[0].low >> (32-k0)) & (pow2(k0)-1)) <= i0) && (((rule[j].field[0].high >> (32-k0)) & (pow2(k0)-1)) >= i0) &&
+           (((rule[j].field[1].low >> (32-k1)) & (pow2(k1)-1)) <= i1) && (((rule[j].field[1].high >> (32-k1)) & (pow2(k1)-1)) >= i1)){
              nodeSet[i].ruleid[index] = j;
              index ++;
         }
@@ -411,9 +410,9 @@ int trie::trieLookup(unsigned* header){
   int i0,i1;
   
   
-  i0 = header[0] >> (32-k0) & (int)(pow(2,k0)-1);
-  i1 = header[1] >> (32-k1) & (int)(pow(2,k1)-1);
-  cnode =i0*(int)pow(2, k1) + i1 +1;
+  i0 = header[0] >> (32-k0) & (pow2(k0)-1);
+  i1 = header[1] >> (32-k1) & (pow2(k1)-1);
+  cnode =i0*pow2(k1) + i1 +1;
   n4+=NODESIZE;
   
   //printf("%d, %d, %d, %d, %d => %d\n", i0, i1, i2, i3, i4, cnode);
