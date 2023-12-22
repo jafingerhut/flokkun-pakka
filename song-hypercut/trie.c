@@ -5,7 +5,7 @@
 #include "list.h"
 
 
-trie::trie(int N1, int numrules1, int bucketSize1, float spfac1, struct pc_rule* rule1, int redun1, int push1, int pushthresh1) {
+trie::trie(int N1, int numrules1, unsigned int bucketSize1, float spfac1, struct pc_rule* rule1, int redun1, int push1, int pushthresh1) {
 // Initialize trie that can have up to N1 nodes.
   int i;
   N = N1;
@@ -56,15 +56,16 @@ trie::~trie() { delete [] nodeSet; }
 
 void trie::choose_np_dim(nodeItem *v){
 
-  int nc[MAXDIMENSIONS];
-  int maxnc, minnc;
+  unsigned int nc[MAXDIMENSIONS];
+  unsigned int maxnc, minnc;
   int NC;
   int done;
   int *nr[MAXDIMENSIONS];      //number of rules in each child
   int ncomponent[MAXDIMENSIONS];
   float avgcomponent;
-  int i,j,k;
-  int lo,hi,r;
+  unsigned int i,j,k;
+  unsigned int lo,hi;
+  int r;
   int temp;
   unsigned int tmpkey;
   dheap H1(MAXRULES,2);
@@ -244,7 +245,7 @@ void trie::remove_redundancy(nodeItem *v){
       }
       if(cover == 1){
 
-        for(int j = tmp; j < v->nrules-1; j++){
+        for(unsigned int j = tmp; j+1 < v->nrules; j++){
           v->ruleid[j] = v->ruleid[j+1];
         }
 
@@ -263,7 +264,7 @@ void trie::remove_redundancy(nodeItem *v){
 
 void trie::pushing_rule(nodeItem *v){
 
-  int i, j;
+  unsigned int i, j;
   int index = 0;
   int cover = 0;
   //int tmp = v-> nrules;
@@ -309,13 +310,13 @@ void trie::createtrie(){
 
   list Q(MAXNODES);
   int last;
-  int nr;
+  unsigned int nr;
   int empty;
   int u,v;
-  int r[MAXDIMENSIONS], lo[MAXDIMENSIONS], hi[MAXDIMENSIONS];
+  unsigned int r[MAXDIMENSIONS], lo[MAXDIMENSIONS], hi[MAXDIMENSIONS];
   int index, flag;
   int i[MAXDIMENSIONS];
-  int j, k, t;
+  unsigned int j, k, t;
 
   Q &= root; last = root; pass = 0;
 
@@ -459,7 +460,7 @@ void trie::createtrie(){
 }
 
 //perform packet classification
-int trie::trieLookup(int* header){
+int trie::trieLookup(unsigned int* header){
 
   int index[MAXDIMENSIONS];
 
@@ -469,7 +470,8 @@ int trie::trieLookup(int* header){
   int cnode = root;
   int match = 0;
   int nbits[MAXDIMENSIONS];
-  int i,j,k;
+  unsigned int i;
+  int j,k;
   int minID = numrules;
   int *cnodelist = NULL;
   int ncnode = 0;

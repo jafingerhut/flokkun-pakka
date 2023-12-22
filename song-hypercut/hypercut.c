@@ -92,10 +92,12 @@ void print_usage(FILE *f) {
 void parseargs(int argc, char *argv[]) {
   int	c;
   bool	ok = 1;
+  int   argBucketSize = 1;
   while ((c = getopt(argc, argv, "b:s:r:t:hdp:")) != -1) {
     switch (c) {
 	case 'b':
-	  bucketSize = atoi(optarg);
+          argBucketSize = atoi(optarg);
+          bucketSize = (unsigned int) argBucketSize;
 	  break;
 	case 's':
 	  spfac = atof(optarg);
@@ -122,7 +124,7 @@ void parseargs(int argc, char *argv[]) {
     }
   }
   
-  if(bucketSize <= 0 || bucketSize > MAXBUCKETS){
+  if(argBucketSize <= 0 || argBucketSize > MAXBUCKETS){
     printf("bucketSize should be greater than 0 and less than %d\n", MAXBUCKETS);
     ok = 0;
   }	
@@ -145,7 +147,7 @@ void parseargs(int argc, char *argv[]) {
     exit(1);
   }
   
-  printf("Bucket Size =  %d\n", bucketSize);
+  printf("Bucket Size =  %u\n", bucketSize);
   printf("Space Factor = %f\n", spfac);
   if(redun == 1){
     printf("Remove redundancy optimization on\n");
@@ -165,7 +167,7 @@ int main(int argc, char* argv[]){
   int numrules=0;  // actual number of rules in rule set
   struct pc_rule *rule; 
   int i,j; 
-  int header[MAXDIMENSIONS];
+  unsigned int header[MAXDIMENSIONS];
   int matchid, fid;
   char *s = (char *)calloc(200, sizeof(char));
   

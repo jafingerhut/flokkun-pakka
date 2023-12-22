@@ -2,9 +2,9 @@ class trie {
 	struct nodeItem {
 		int isleaf;             //is a leaf node if 1
 		int nonemptylist;       //
-		int lengthoflist;       //
+		unsigned int lengthoflist;       //
 		int *rulelist;
-  		int nrules;             //number of rules in this node
+		unsigned int nrules;             //number of rules in this node
             int *ruleid;            //rule ids in this node
   		struct range field[MAXDIMENSIONS];      
   		int dim[MAXDIMENSIONS];   //dimensions to cut
@@ -20,7 +20,7 @@ class trie {
 	float   n4;                     // number of memeory access
 	int     n5;                     // internally stored rules
         float   worstcost;
-	int     bucketSize;                 
+	unsigned int bucketSize;
 	float   spfac;
 	int     redun;
 	int     push;
@@ -36,10 +36,10 @@ class trie {
 	void    pushing_rule(nodeItem *v);
 	void    createtrie();
 
-public:	        trie(int, int, int, float, struct pc_rule*, int, int, int);
+public:	        trie(int, int, unsigned int, float, struct pc_rule*, int, int, int);
 		~trie();
 		
-	int     trieLookup(int*);
+	int     trieLookup(unsigned int*);
 	int	  trieSize();
 	int     trieDepth();
 	int     trieRedun();
