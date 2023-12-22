@@ -25,7 +25,7 @@ trie::trie(int N1, int bound1, int numtuple1) {
 trie::~trie() { delete [] nodeSet; }
 
 int *trie::lookup(unsigned adr, unsigned int *num) {
-	register int i, p, q;
+	int i, p, q;
 
 	q = Null;		// deepest next hop value found so far
 	p = root;		// p is current node in the trie

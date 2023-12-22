@@ -2,8 +2,8 @@
 
 # A longer running set of tests of hicut program.
 
-CMD="./hicut"
-#CMD="valgrind --tool=memcheck ./hicut"
+#CMD="./hicut"
+CMD="valgrind --tool=memcheck ./hicut"
 
 # Failing test cases:
 # fw1_5K fw1_10K

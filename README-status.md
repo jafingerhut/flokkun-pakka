@@ -81,12 +81,11 @@ RFC implementation in directory `song-rfc`:
 
 Compiles with:
 + `g++ -O3 -Wall` v9.4.0 with no errors nor warnings
-+ Similarly with g++ v13.2.0, except there are 3 warnings
-  about C++17 does not allow 'register' storage class specifier.
++ Similarly with g++ v13.2.0
 
 All tests pass!
 
-Handles bc1* test cases without any scaling problems, due to how
+Handles `bc1*` test cases without any scaling problems, due to how
 algorithm works.
 
 
