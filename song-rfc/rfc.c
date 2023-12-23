@@ -625,6 +625,7 @@ int main(int argc, char* argv[]) {
       break;
   }
   printf("\n%10.1f bytes/filter, %d bytes per packet lookup\n", (float)size/numrules+FILTERSIZE, access);
+  int misclassified_count = 0;
   //perform packet classification
   if (fpt != NULL) {
     done = 1;
@@ -652,29 +653,33 @@ int main(int argc, char* argv[]) {
         //phase 3
         a = p3_table[e*p2_neq[0]+a];
 
-        if (p3_eq[a].numrules == 0)printf("No rule matches packet %d\n", index);
-        else if (p3_eq[a].rulelist[0] != fid-1) {
-          printf("Match rule %d, should be %d\n", p3_eq[a].rulelist[0], fid-1);
-          done = 0;
+        if (p3_eq[a].numrules == 0) {
+            printf("No rule matches packet %d\n", index);
+            ++misclassified_count;
+        } else if (p3_eq[a].rulelist[0] != fid-1) {
+            printf("Match rule %d, should be %d\n", p3_eq[a].rulelist[0], fid-1);
+            ++misclassified_count;
         }
       } else {
         //phase 2
         a = p2_table[0][a*p1_neq[1]*p1_neq[2]+c*p1_neq[2]+e];
 
-        if (p2_eq[0][a].numrules == 0)printf("No rule matches packet %d\n", index);
-        else if (p2_eq[0][a].rulelist[0] != fid-1) {
-          printf("Match rule %d, should be %d\n", p2_eq[0][a].rulelist[0], fid-1);
-          done = 0;
+        if (p2_eq[0][a].numrules == 0) {
+            printf("No rule matches packet %d\n", index);
+            ++misclassified_count;
+        } else if (p2_eq[0][a].rulelist[0] != fid-1) {
+            printf("Match rule %d, should be %d\n", p2_eq[0][a].rulelist[0], fid-1);
+            ++misclassified_count;
         }
       }
     }
     if (done) {
-        printf("\npacket classification done on %d packets without any error!\n", index);
-    } else {
-        printf("\nError encountered during packet trace test.\n");
-        exit(1);
+        printf("%d packets are classified, %d of them are misclassified\n",
+               index, misclassified_count);
     }
   }
-
   free(rule);
+  if (misclassified_count != 0) {
+      exit(1);
+  }
 }
