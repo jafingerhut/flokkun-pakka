@@ -30,6 +30,19 @@ int p1_neq[4];                           //phase 1 number of chunk equivalence c
 int p2_neq[2];                           //phase 2 number of chunk equivalence classes
 int p3_neq;                              //phase 3 number of chunk equivalence classes
 
+unsigned int mask(int k) {
+    if (k < 0 || k > 32) {
+        char buf[512];
+        snprintf(buf, sizeof(buf), "mask parameter k=%d must be in range [0,32]\n", k);
+        fatal(buf);
+    }
+    if (k == 32) {
+        return 0xffffffff;
+    } else {
+        return (((unsigned int) 1) << k) - 1;
+    }
+}
+
 unsigned int
 search_for_eq_id_add_new_if_not_found(eq *x,
                                       unsigned int *num_eq_ids,
@@ -190,11 +203,11 @@ int preprocessing_3chunk(eq *a, unsigned int na, eq *b, int nb, eq *c, int nc, e
 
 int loadrule(FILE *fp, pc_rule *rule) {
 
-  int tmp;
-  unsigned sip1, sip2, sip3, sip4, siplen;
-  unsigned dip1, dip2, dip3, dip4, diplen;
+  unsigned sip1, sip2, sip3, sip4, siplen, sip;
+  unsigned dip1, dip2, dip3, dip4, diplen, dip;
   unsigned proto, protomask;
   int i = 0;
+  char buf[512];
 
   while (1) {
 
@@ -202,52 +215,62 @@ int loadrule(FILE *fp, pc_rule *rule) {
         &sip1, &sip2, &sip3, &sip4, &siplen, &dip1, &dip2, &dip3, &dip4, &diplen,
         &rule[i].field[3].low, &rule[i].field[3].high, &rule[i].field[4].low, &rule[i].field[4].high,
         &proto, &protomask) != 16) break;
-    if (siplen == 0) {
-      rule[i].field[0].low = 0;
-      rule[i].field[0].high = 0xFFFFFFFF;
-    } else if (siplen > 0 && siplen <= 8) {
-      tmp = sip1<<24;
-      rule[i].field[0].low = tmp;
-      rule[i].field[0].high = rule[i].field[0].low + (1<<(32-siplen)) - 1;
-    } else if (siplen > 8 && siplen <= 16) {
-      tmp = sip1<<24; tmp += sip2<<16;
-      rule[i].field[0].low = tmp; 	
-      rule[i].field[0].high = rule[i].field[0].low + (1<<(32-siplen)) - 1;	
-    } else if (siplen > 16 && siplen <= 24) {
-      tmp = sip1<<24; tmp += sip2<<16; tmp +=sip3<<8;
-      rule[i].field[0].low = tmp; 	
-      rule[i].field[0].high = rule[i].field[0].low + (1<<(32-siplen)) - 1;			
-    } else if (siplen > 24 && siplen <= 32) {
-      tmp = sip1<<24; tmp += sip2<<16; tmp += sip3<<8; tmp += sip4;
-      rule[i].field[0].low = tmp;
-      rule[i].field[0].high = rule[i].field[0].low + (1<<(32-siplen)) - 1;	
-    } else {
-      printf("Src IP length exceeds 32\n");
-      return 0;
+    if (sip1 > 255 || sip2 > 255 || sip3 > 255 || sip4 > 255) {
+        snprintf(buf, sizeof(buf), "Rule %d has source IPv4 address %u.%u.%u.%u with some value greater than 255, which is not supported.\n",
+                 i+1, sip1, sip2, sip3, sip4);
+        fatal(buf);
     }
-    if (diplen == 0) {
-      rule[i].field[1].low = 0;
-      rule[i].field[1].high = 0xFFFFFFFF;
-    } else if (diplen > 0 && diplen <= 8) {
-      tmp = dip1<<24;
-      rule[i].field[1].low = tmp;
-      rule[i].field[1].high = rule[i].field[1].low + (1<<(32-diplen)) - 1;
-    } else if (diplen > 8 && diplen <= 16) {
-      tmp = dip1<<24; tmp +=dip2<<16;
-      rule[i].field[1].low = tmp; 	
-      rule[i].field[1].high = rule[i].field[1].low + (1<<(32-diplen)) - 1;	
-    } else if (diplen > 16 && diplen <= 24) {
-      tmp = dip1<<24; tmp +=dip2<<16; tmp+=dip3<<8;
-      rule[i].field[1].low = tmp; 	
-      rule[i].field[1].high = rule[i].field[1].low + (1<<(32-diplen)) - 1;			
-    } else if (diplen > 24 && diplen <= 32) {
-      tmp = dip1<<24; tmp +=dip2<<16; tmp+=dip3<<8; tmp +=dip4;
-      rule[i].field[1].low = tmp; 	
-      rule[i].field[1].high = rule[i].field[1].low + (1<<(32-diplen)) - 1;	
-    } else {
-      printf("Dest IP length exceeds 32\n");
-      return 0;
+    if (dip1 > 255 || dip2 > 255 || dip3 > 255 || dip4 > 255) {
+        snprintf(buf, sizeof(buf), "Rule %d has destination IPv4 address %u.%u.%u.%u with some value greater than 255, which is not supported.\n",
+                 i+1, dip1, dip2, dip3, dip4);
+        fatal(buf);
     }
+    if ((rule[i].field[3].low > rule[i].field[3].high) ||
+        (rule[i].field[3].high > 65535)) {
+        snprintf(buf, sizeof(buf), "Rule %d has L4 source port range [%u,%u] with lo larger than hi, or hi greater than 65535, which is not supported.\n",
+                 i+1, rule[i].field[3].low, rule[i].field[3].high);
+        fatal(buf);
+    }
+    if ((rule[i].field[4].low > rule[i].field[4].high) ||
+        (rule[i].field[4].high > 65535)) {
+        snprintf(buf, sizeof(buf), "Rule %d has L4 source port range [%u,%u] with lo larger than hi, or hi greater than 65535, which is not supported.\n",
+                 i+1, rule[i].field[4].low, rule[i].field[4].high);
+        fatal(buf);
+    }
+    if (proto > 255) {
+        snprintf(buf, sizeof(buf), "Rule %d has protocol %u larger than 255, which is not supported.\n",
+                 i+1, proto);
+        fatal(buf);
+    }
+    if (siplen < 0 || siplen > 32) {
+        snprintf(buf, sizeof(buf), "Rule %d has source IPv4 prefix length %u outside of range [0,32], which is not supported.\n",
+                 i+1, siplen);
+        fatal(buf);
+    }
+    sip = ((sip1 << 24) | (sip2 << 16) | (sip3 << 8) | sip4);
+    unsigned int smask = mask(32-siplen);
+    if ((sip & smask) != 0) {
+        snprintf(buf, sizeof(buf), "Rule %d has source IPv4 address %u.%u.%u.%u and prefix len %u with non-0 bits after the prefix length, which is not supported.\n",
+                 i+1, sip1, sip2, sip3, sip4, siplen);
+        fatal(buf);
+    }
+    rule[i].field[0].low = sip;
+    rule[i].field[0].high = sip + smask;
+
+    if (diplen < 0 || diplen > 32) {
+        snprintf(buf, sizeof(buf), "Rule %d has destination IPv4 prefix length %u outside of range [0,32], which is not supported.\n",
+                 i+1, diplen);
+        fatal(buf);
+    }
+    dip = ((dip1 << 24) | (dip2 << 16) | (dip3 << 8) | dip4);
+    unsigned int dmask = mask(32-diplen);
+    if ((dip & dmask) != 0) {
+        snprintf(buf, sizeof(buf), "Rule %d has destination IPv4 address %u.%u.%u.%u and prefix len %u with non-0 bits after the prefix length, which is not supported.\n",
+                 i+1, dip1, dip2, dip3, dip4, diplen);
+        fatal(buf);
+    }
+    rule[i].field[1].low = dip;
+    rule[i].field[1].high = dip + dmask;
     if (protomask == 0xFF) {
       rule[i].field[2].low = proto;
       rule[i].field[2].high = proto;
@@ -255,8 +278,7 @@ int loadrule(FILE *fp, pc_rule *rule) {
       rule[i].field[2].low = 0;
       rule[i].field[2].high = 0xFF;
     } else {
-      printf("Protocol mask error\n");
-      return 0;
+      fatal("Protocol mask error\n");
     }
     i++;
   }
