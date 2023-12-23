@@ -21,11 +21,19 @@ inline unsigned min(unsigned x, unsigned y) { return x < y ? x : y; }
 inline double min(double x, double y) { return x < y ? x : y; }
 inline int abs(int x) { return x < 0 ? -x : x; }
 
-inline void warning(char* p) { fprintf(stderr,"Warning:%s \n",p); }
-inline void fatal(char* string) {fprintf(stderr,"Fatal:%s\n",string); exit(1); }
+inline void warning(const char* p) { fprintf(stderr,"Warning:%s \n",p); }
+inline void fatal(const char* string) {fprintf(stderr,"Fatal:%s\n",string); exit(1); }
 
 double pow(double,double);
 double log(double);
+inline unsigned int pow2(int k) {
+    if (k < 0 || k > 30) {
+        char buf[512];
+        snprintf(buf, sizeof(buf), "pow2 parameter k=%d must be in range [0,30]\n", k);
+        fatal(buf);
+    }
+    return (1 << k);
+}
 
 // long random();
 double exp(double),log(double);

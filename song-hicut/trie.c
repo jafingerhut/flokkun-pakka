@@ -403,7 +403,7 @@ int trie::trieLookup(unsigned int* header){
     cchild = 0;
     for(i = index[cdim]; i > index[cdim] - nbits; i--){
       if((header[cdim] & 1<<(i-1)) != 0){
-      	cchild += (int)pow(2, i-index[cdim]+nbits-1);
+	cchild += pow2(i-index[cdim]+nbits-1);
       }
     }
     
