@@ -26,6 +26,14 @@ inline void fatal(const char* string) {fprintf(stderr,"Fatal:%s\n",string); exit
 
 double pow(double,double);
 double log(double);
+inline unsigned int pow2(int k) {
+    if (k < 0 || k > 30) {
+        char buf[512];
+        snprintf(buf, sizeof(buf), "pow2 parameter k=%d must be in range [0,30]\n", k);
+        fatal(buf);
+    }
+    return (1 << k);
+}
 
 // long random();
 double exp(double),log(double);

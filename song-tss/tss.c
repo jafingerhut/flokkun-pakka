@@ -5,9 +5,21 @@
 FILE *fpr;       // ruleset file
 FILE *fpt;       // test trace file
 
+unsigned int mask(int k) {
+    if (k < 0 || k > 32) {
+        char buf[512];
+        snprintf(buf, sizeof(buf), "mask parameter k=%d must be in range [0,32]\n", k);
+        fatal(buf);
+    }
+    if (k == 32) {
+        return 0xffffffff;
+    } else {
+        return (((unsigned int) 1) << k) - 1;
+    }
+}
+
 struct prefix *expand_prefix(unsigned ai, unsigned aj){
 
-  //unsigned mask = 0xFFFFFFFF;
   int  k;
   struct prefix *pf = (prefix *)malloc(sizeof(prefix));
   int i = 0;
@@ -21,18 +33,18 @@ struct prefix *expand_prefix(unsigned ai, unsigned aj){
   }
 
   while(1) {
-    for(k=0; (ai & (int)pow(2,k)) == 0 && k <= 15 ; k ++);
-    if(ai + pow(2,k) - 1 == aj) {
+    for(k=0; (ai & pow2(k)) == 0 && k <= 15 ; k ++);
+    if(ai + pow2(k) - 1 == aj) {
       //printf("b: Prefix = %4x, Mask = %4x, k=%d\n", ai>>k<<k, mask<<k, k);
       pf->value[i]=ai>>k<<k;
       pf->length[i]=16-k;
       pf->nvalid=i+1;
       return pf;
-    }else if (ai + pow(2,k) - 1 < aj) {
+    }else if (ai + pow2(k) - 1 < aj) {
       //printf("c: Prefix = %4x, Mask = %4x, k=%d\n", ai>>k<<k, mask<<k, k);
       pf->value[i]=ai>>k<<k;
       pf->length[i]=16-k;
-      ai = ai + (int)pow(2,k);
+      ai = ai + pow2(k);
     }else{
       break;
     } // end if
@@ -51,8 +63,8 @@ struct prefix *expand_prefix(unsigned ai, unsigned aj){
 
   while(ai < aj) {
 
-    for(k=15; ((ai ^ aj) & (int)pow(2,k)) == 0 ; k--);
-    if(ai + pow(2,k+1) - 1 == aj) {
+    for(k=15; ((ai ^ aj) & pow2(k)) == 0 ; k--);
+    if(ai + pow2(k+1) - 1 == aj) {
       //printf("e: Prefix = %4x, Mask = %4x\n", ai>>(k+1)<<(k+1), mask<<(k+1));
       pf->value[i]=ai>>(k+1)<<(k+1);
       pf->length[i]=15-k;
@@ -62,7 +74,7 @@ struct prefix *expand_prefix(unsigned ai, unsigned aj){
       //printf("f: Prefix = %4x, Mask = %4x\n", ai>>k<<k, mask<<k);
       pf->value[i]=ai>>k<<k;
       pf->length[i]=16-k;
-      ai = ai + (int)pow(2,k);
+      ai = ai + pow2(k);
     } // end if
 
     i++;
@@ -262,9 +274,9 @@ int main(int argc, char* argv[]){
         exprule[index].field[1].low = rule[i].field[1].low;
         exprule[index].field[1].high = rule[i].field[1].high;
         exprule[index].field[2].low = pf1->value[j];
-        exprule[index].field[2].high = pf1->value[j] + (int)pow(2, 16-pf1->length[j]) - 1;
+        exprule[index].field[2].high = pf1->value[j] + pow2(16-pf1->length[j]) - 1;
         exprule[index].field[3].low = pf2->value[k];
-        exprule[index].field[3].high = pf2->value[k] + (int)pow(2, 16-pf2->length[k]) - 1;
+        exprule[index].field[3].high = pf2->value[k] + pow2(16-pf2->length[k]) - 1;
         exprule[index].field[4].low = rule[i].field[4].low;
         exprule[index].field[4].high = rule[i].field[4].high;
         index++;
@@ -358,9 +370,9 @@ int main(int argc, char* argv[]){
 
   for(i=0;i<numexprules;i++){
     siplen = 32-numBits(exprule[i].field[0].low, exprule[i].field[0].high);
-    sipprefix = (exprule[i].field[0].low >> (32-siplen)) & ((unsigned)pow(2, siplen)-1);
+    sipprefix = (exprule[i].field[0].low >> (32-siplen)) & mask(siplen);
     diplen = 32-numBits(exprule[i].field[1].low, exprule[i].field[1].high);
-    dipprefix = (exprule[i].field[1].low >> (32-diplen)) & ((unsigned)pow(2, diplen)-1);
+    dipprefix = (exprule[i].field[1].low >> (32-diplen)) & mask(diplen);
     for(j=0;j<numexprules;j++){
       if(exprule[j].field[0].low <= exprule[i].field[0].low &&
          exprule[j].field[0].high >= exprule[i].field[0].high){
