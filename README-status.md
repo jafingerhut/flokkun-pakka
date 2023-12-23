@@ -22,6 +22,10 @@ All tests pass!
 Handles `bc1*` test cases without any scaling problems, due to how
 algorithm works.
 
+Only one line of code using floating point operations (see calls to
+`log`), and those are only for calculating statistics about the number
+of memory accesses, not during packet classification.
+
 
 # song-hicut
 
@@ -39,6 +43,14 @@ Handles `bc1*` test cases up to `bc1_k40`, but exhausts freelist for
 very fast with k, which I suspect is a property of the hicut algorithm
 and those rule sets.
 
+Only uses of floating point operations I see are:
+
++ The value `spfac` is a float parameter to the table creation code,
+  used in only a very few places.
++ If you use `opt` equal to 1, where it calculates an `entropy` value
+  during table creation time.
++ For calculating memory access statistics.
+
 
 # song-hypercut
 
@@ -53,6 +65,15 @@ and their names are printed on a failure.
 
 Similar to song-hicut in its handling of bc1* rule sets.
 
+Only uses of floating point operations I see are:
+
++ The value `spfac` is a float parameter to the table creation code,
+  used in only a very few places.
++ The value `avgcomponent` is used in a very few places in table
+  creation code.
++ The values `cost` and `worstcost` are for calculating memory access
+  statistics.
+
 
 # song-rfc
 
@@ -64,6 +85,10 @@ All tests pass except: fw1_5K fw1_10K ipc1_5K ipc1_10K
 
 Failures are for known reasons that parameter settings are too small,
 and their names are printed on a failure.
+
+Only uses of floating point operations I see are:
+
++ Calculation of table size statistics in function `main()`.
 
 
 ## Table size of RFC for bc1 rule sets
@@ -100,6 +125,11 @@ All tests pass!
 Handles `bc1*` test cases without any scaling problems, due to how
 algorithm works.
 
+Only uses of floating point operations I see are:
+
++ Calculation of table size and memory access statistics in function
+  `main()`.
+
 
 # song-woo
 
@@ -118,3 +148,8 @@ limitation in the algorithm.
 
 TODO: Consider investigating whether this is a bug in the
 implementation that can be fixed, without a lot of effort.
+
+Only uses of floating point operations I see are:
+
++ The double array `pref` is used during table creation time.
++ For calculating memory access statistics.
