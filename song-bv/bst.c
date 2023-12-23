@@ -205,7 +205,7 @@ bst::bst(int numrules, struct pc_rule *rule, int dim) {
 bst::~bst() { delete [] nodeSet; }
 
 int* bst::lookup(unsigned long mykey, int *nrules) {
-    register int p;
+    int p;
     p = root;		// p is current node in the BST
     //printf("bst::lookup(mykey %lu) with root %d\n", mykey, root);
 
@@ -246,7 +246,7 @@ int* bst::lookup(unsigned long mykey, int *nrules) {
 }
 
 std::bitset<MAXRULES> bst::bvlookup(unsigned long mykey) {
-    register int p;
+    int p;
     p = root;		// p is current node in the BST
 
     while (1) {
