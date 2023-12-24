@@ -32,16 +32,12 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Results should be same but are not.  Test failed\n");
             exit(1);
         }
-        /*
-        if (prefix != m) {
-            fprintf(stderr, "prefix = %u != %u = m.  Test failed\n", prefix, m);
-            exit(1);
-        }
-        */
         if (prefix_len != (32-i)) {
             fprintf(stderr, "prefix_len = %d != %d = (32-i).  Test failed\n",
                     prefix_len, 32-i);
             exit(1);
         }
     }
+    printf("\nAll tests passed.\n");
+    exit(0);
 }

@@ -26,4 +26,5 @@ void min_max_to_prefix32(unsigned int low, unsigned int high,
 bool rules_disjoint(struct pc_rule *r1, struct pc_rule *r2);
 bool rule_subset(struct pc_rule *r1, struct pc_rule *r2);
 int compare_rules(struct pc_rule *r1, struct pc_rule *r2);
-void print_rule(struct pc_rule *r);
+void print_rule(FILE *fp, struct pc_rule *r);
+void writerule(FILE *fp, llist& rule_list);

@@ -8,6 +8,7 @@ G="../genrules"
 
 set -e
 make
+./test_rules
 for j in \
     $T/acl1 $T/fw1 $T/ipc1 \
     $T/acl1_100 $T/fw1_100 $T/ipc1_100 \
@@ -23,6 +24,9 @@ do
     echo "-----------------------------------------------------------------"
     set -x
     time ${CMD} -r ${j} > ${k}_conf.gv
+    ./test_writerule -r ${j} -w ${k}
+    diff -iw ${j} ${k}
+    /bin/rm -f ${k}
     set +x
 done
 

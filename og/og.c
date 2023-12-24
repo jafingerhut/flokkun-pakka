@@ -77,10 +77,10 @@ int main(int argc, char* argv[])
             case RULE_COMPARE_LATER_STRICT_SUBSET:
                 ++num_lsub;
                 printf("    // R%d", i+1);
-                print_rule(r1);
+                print_rule(stdout, r1);
                 printf("\n");
                 printf("    // R%d", j+1);
-                print_rule(r2);
+                print_rule(stdout, r2);
                 printf("\n");
                 printf("    R%d -> R%d [", i+1, j+1);
                 if (show_edge_labels) {
@@ -91,10 +91,10 @@ int main(int argc, char* argv[])
             case RULE_COMPARE_EQUAL:
                 ++num_eq;
                 printf("    // R%d", i+1);
-                print_rule(r1);
+                print_rule(stdout, r1);
                 printf("\n");
                 printf("    // R%d", j+1);
-                print_rule(r2);
+                print_rule(stdout, r2);
                 printf("\n");
                 printf("    R%d -> R%d [", i+1, j+1);
                 if (show_edge_labels) {

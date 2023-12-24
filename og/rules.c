@@ -157,93 +157,64 @@ void min_max_to_prefix32(unsigned int low, unsigned int high,
     *out_prefix = low;
 }
 
-/*
 void writerule(FILE *fp, llist& rule_list)
 {
     int i = 0;
-    char buf[512];
     struct pc_rule *r;
-    struct llist_node *r1n;
+    struct llist_node *rn;
+    unsigned int field0_prefix, field1_prefix;
+    int field0_prefixlen, field1_prefixlen, field2_prefixlen;
 
-    for (i = 0, r1n = rule.first_node(); r1n != NULL; r1n = rule.next_node(r1n), i++) {
-        struct pc_rule *r1 = (struct pc_rule *) rule.node_item(r1n);
-        r = (struct pc_rule *) malloc(sizeof(struct pc_rule));
-        if (fscanf(fp,"@%u.%u.%u.%u/%u %u.%u.%u.%u/%u %u : %u %u : %u %x/%x\n",
-                   &sip1, &sip2, &sip3, &sip4, &siplen,
-                   &dip1, &dip2, &dip3, &dip4, &diplen,
-                   &(r->field[3].low), &(r->field[3].high),
-                   &(r->field[4].low), &(r->field[4].high),
-                   &proto, &protomask) != 16) {
-            break;
+    for (i = 0, rn = rule_list.first_node(); rn != NULL; rn = rule_list.next_node(rn), i++) {
+        r = (struct pc_rule *) rule_list.node_item(rn);
+        if ((r->field[0].low > r->field[0].high) ||
+            (r->field[1].low > r->field[1].high) ||
+            (r->field[2].low > r->field[2].high) ||
+            (r->field[3].low > r->field[3].high) ||
+            (r->field[4].low > r->field[4].high) ||
+            (r->field[2].high > 255) ||
+            (r->field[3].high > 65535) ||
+            (r->field[4].high > 65535))
+        {
+            fprintf(stderr, "writerule: For rule %d there is a field's low value larger than its high value, or L4 port values greater than 65535, or proto value greater than 255.\n",
+                    i+1);
+            print_rule(stderr, r);
+            exit(1);
         }
-        printf(fp, "@%u.%u.%u.%u/%u %u.%u.%u.%u/%u %u : %u %u : %u %x/%x\n",
-               (r->field[0].
-               );
-        if ((r->field[3].low > r->field[3].high) ||
-            (r->field[3].high > 65535)) {
-            snprintf(buf, sizeof(buf),
-                     "Rule %d has L4 source port range [%u,%u] with lo larger than hi, or hi greater than 65535, which is not supported.\n",
-                     i+1, r->field[3].low, r->field[3].high);
-            fatal(buf);
-        }
-        if ((r->field[4].low > r->field[4].high) ||
-            (r->field[4].high > 65535)) {
-            snprintf(buf, sizeof(buf),
-                     "Rule %d has L4 source port range [%u,%u] with lo larger than hi, or hi greater than 65535, which is not supported.\n",
-                     i+1, r->field[4].low, r->field[4].high);
-            fatal(buf);
-        }
-        if (proto > 255) {
-            snprintf(buf, sizeof(buf),
-                     "Rule %d has protocol %u larger than 255, which is not supported.\n",
-                     i+1, proto);
-            fatal(buf);
-        }
-        if (siplen < 0 || siplen > 32) {
-            snprintf(buf, sizeof(buf),
-                     "Rule %d has source IPv4 prefix length %u outside of range [0,32], which is not supported.\n",
-                     i+1, siplen);
-            fatal(buf);
-        }
-        sip = ((sip1 << 24) | (sip2 << 16) | (sip3 << 8) | sip4);
-        unsigned int smask = mask(32-siplen);
-        if ((sip & smask) != 0) {
-            snprintf(buf, sizeof(buf),
-                     "Rule %d has source IPv4 address %u.%u.%u.%u and prefix len %u with non-0 bits after the prefix length, which is not supported.\n",
-                     i+1, sip1, sip2, sip3, sip4, siplen);
-            fatal(buf);
-        }
-        r->field[0].low = sip;
-        r->field[0].high = sip + smask;
-        if (diplen < 0 || diplen > 32) {
-            snprintf(buf, sizeof(buf),
-                     "Rule %d has destination IPv4 prefix length %u outside of range [0,32], which is not supported.\n",
-                     i+1, diplen);
-            fatal(buf);
-        }
-        dip = ((dip1 << 24) | (dip2 << 16) | (dip3 << 8) | dip4);
-        unsigned int dmask = mask(32-diplen);
-        if ((dip & dmask) != 0) {
-            snprintf(buf, sizeof(buf),
-                     "Rule %d has destination IPv4 address %u.%u.%u.%u and prefix len %u with non-0 bits after the prefix length, which is not supported.\n",
-                     i+1, dip1, dip2, dip3, dip4, diplen);
-            fatal(buf);
-        }
-        r->field[1].low = dip;
-        r->field[1].high = dip + dmask;
-        if (protomask == 0xff) {
-            r->field[2].low = proto;
-            r->field[2].high = proto;
-        } else if (protomask == 0) {
-            r->field[2].low = 0;
-            r->field[2].high = 0xff;
+        min_max_to_prefix32(r->field[0].low, r->field[0].high,
+                            &field0_prefix,
+                            &field0_prefixlen);
+        min_max_to_prefix32(r->field[1].low, r->field[1].high,
+                            &field1_prefix,
+                            &field1_prefixlen);
+        if ((r->field[2].low == 0) && (r->field[2].high == 0xff)) {
+            field2_prefixlen = 0;
+        } else if (r->field[2].low == r->field[2].high) {
+            field2_prefixlen = 8;
         } else {
-            fatal("Protocol mask error\n");
+            fprintf(stderr, "writerule: For rule %d proto field range [%u,%u] is neither single value, nor [0,255], which are only ranges supported.\n",
+                    i+1, r->field[2].low, r->field[2].high);
         }
+        fprintf(fp, "@%u.%u.%u.%u/%u %u.%u.%u.%u/%u %u : %u %u : %u 0x%02X/0x%02X\n",
+                (field0_prefix >> 24) & 0xff,
+                (field0_prefix >> 16) & 0xff,
+                (field0_prefix >>  8) & 0xff,
+                (field0_prefix >>  0) & 0xff,
+                field0_prefixlen,
+                (field1_prefix >> 24) & 0xff,
+                (field1_prefix >> 16) & 0xff,
+                (field1_prefix >>  8) & 0xff,
+                (field1_prefix >>  0) & 0xff,
+                field1_prefixlen,
+                r->field[3].low,
+                r->field[3].high,
+                r->field[4].low,
+                r->field[4].high,
+                r->field[2].low,
+                (field2_prefixlen == 8) ? 0xff : 0);
         ++i;
     }
 }
-*/
 
 bool rules_disjoint(struct pc_rule *r1, struct pc_rule *r2)
 {
@@ -293,13 +264,13 @@ int compare_rules(struct pc_rule *r1, struct pc_rule *r2)
     return RULE_COMPARE_CONFLICT;
 }
 
-void print_rule(struct pc_rule *r)
+void print_rule(FILE *fp, struct pc_rule *r)
 {
     int i;
     for (i = 0; i < MAXDIMENSIONS; i++) {
         if (i != 0) {
-            printf(" ");
+            fprintf(fp, " ");
         }
-        printf("[%u, %u]", r->field[i].low, r->field[i].high);
+        fprintf(fp, "[%u, %u]", r->field[i].low, r->field[i].high);
     }
 }
