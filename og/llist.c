@@ -63,7 +63,7 @@ void llist::operator&=(void *item) {
 // Remove the first i items.
 void llist::operator<<=(int i) {
     struct llist_node *cur;
-    while (first != Null && i--) {
+    while (first != NULL && i--) {
         cur = first;
         first = first->next;
         free(cur);
