@@ -17,4 +17,4 @@ test_writerule: llist.h llist.c rules.h rules.c test_writerule.c
 	${CPP} ${CFLAGS} -o $@ test_writerule.c llist.c rules.c
 
 clean:
-	/bin/rm -f og addconfrules test_rules test_writerule
+	/bin/rm -f og addconfrules test_rules test_writerule *.gv
