@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "rules.h"
+#include "rules.hpp"
 
 FILE *fpr;       // ruleset file to read
 FILE *fpw;       // ruleset file to write

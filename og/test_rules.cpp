@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "rules.h"
+#include "rules.hpp"
 
 int main(int argc, char *argv[]) {
     int i;

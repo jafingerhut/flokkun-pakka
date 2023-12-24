@@ -1,5 +1,5 @@
-#include "stdinc.h"
-#include "llist.h"
+#include "stdinc.hpp"
+#include "llist.hpp"
 
 #define MAXDIMENSIONS 5
 

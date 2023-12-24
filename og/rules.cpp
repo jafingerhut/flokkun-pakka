@@ -1,4 +1,4 @@
-#include "rules.h"
+#include "rules.hpp"
 #include <stdio.h>
 
 unsigned int mask(int k)
