@@ -1,5 +1,6 @@
 #include "stdinc.h"
 #include "og.h"
+#include "llist.h"
 
 FILE *fpr;       // ruleset file
 
@@ -23,20 +24,22 @@ unsigned int mask(int k)
     }
 }
 
-int loadrule(FILE *fp, pc_rule *rule)
+void loadrule(FILE *fp, llist& rule_list)
 {
     unsigned sip1, sip2, sip3, sip4, siplen, sip;
     unsigned dip1, dip2, dip3, dip4, diplen, dip;
     unsigned proto, protomask;
     int i = 0;
     char buf[512];
+    struct pc_rule *newrule;
     
     while (1) {
-        if (fscanf(fp,"@%d.%d.%d.%d/%d %d.%d.%d.%d/%d %d : %d %d : %d %x/%x\n",
+        newrule = (struct pc_rule *) malloc(sizeof(struct pc_rule));
+        if (fscanf(fp,"@%u.%u.%u.%u/%u %u.%u.%u.%u/%u %u : %u %u : %u %x/%x\n",
                    &sip1, &sip2, &sip3, &sip4, &siplen,
                    &dip1, &dip2, &dip3, &dip4, &diplen,
-                   &rule[i].field[3].low, &rule[i].field[3].high,
-                   &rule[i].field[4].low, &rule[i].field[4].high,
+                   &(newrule->field[3].low), &(newrule->field[3].high),
+                   &(newrule->field[4].low), &(newrule->field[4].high),
                    &proto, &protomask) != 16) {
             break;
         }
@@ -52,18 +55,18 @@ int loadrule(FILE *fp, pc_rule *rule)
                      i+1, dip1, dip2, dip3, dip4);
             fatal(buf);
         }
-        if ((rule[i].field[3].low > rule[i].field[3].high) ||
-            (rule[i].field[3].high > 65535)) {
+        if ((newrule->field[3].low > newrule->field[3].high) ||
+            (newrule->field[3].high > 65535)) {
             snprintf(buf, sizeof(buf),
                      "Rule %d has L4 source port range [%u,%u] with lo larger than hi, or hi greater than 65535, which is not supported.\n",
-                     i+1, rule[i].field[3].low, rule[i].field[3].high);
+                     i+1, newrule->field[3].low, newrule->field[3].high);
             fatal(buf);
         }
-        if ((rule[i].field[4].low > rule[i].field[4].high) ||
-            (rule[i].field[4].high > 65535)) {
+        if ((newrule->field[4].low > newrule->field[4].high) ||
+            (newrule->field[4].high > 65535)) {
             snprintf(buf, sizeof(buf),
                      "Rule %d has L4 source port range [%u,%u] with lo larger than hi, or hi greater than 65535, which is not supported.\n",
-                     i+1, rule[i].field[4].low, rule[i].field[4].high);
+                     i+1, newrule->field[4].low, newrule->field[4].high);
             fatal(buf);
         }
         if (proto > 255) {
@@ -86,8 +89,8 @@ int loadrule(FILE *fp, pc_rule *rule)
                      i+1, sip1, sip2, sip3, sip4, siplen);
             fatal(buf);
         }
-        rule[i].field[0].low = sip;
-        rule[i].field[0].high = sip + smask;
+        newrule->field[0].low = sip;
+        newrule->field[0].high = sip + smask;
         if (diplen < 0 || diplen > 32) {
             snprintf(buf, sizeof(buf),
                      "Rule %d has destination IPv4 prefix length %u outside of range [0,32], which is not supported.\n",
@@ -102,20 +105,20 @@ int loadrule(FILE *fp, pc_rule *rule)
                      i+1, dip1, dip2, dip3, dip4, diplen);
             fatal(buf);
         }
-        rule[i].field[1].low = dip;
-        rule[i].field[1].high = dip + dmask;
+        newrule->field[1].low = dip;
+        newrule->field[1].high = dip + dmask;
         if (protomask == 0xff) {
-            rule[i].field[2].low = proto;
-            rule[i].field[2].high = proto;
+            newrule->field[2].low = proto;
+            newrule->field[2].high = proto;
         } else if (protomask == 0) {
-            rule[i].field[2].low = 0;
-            rule[i].field[2].high = 0xff;
+            newrule->field[2].low = 0;
+            newrule->field[2].high = 0xff;
         } else {
             fatal("Protocol mask error\n");
         }
-        i++;
+        rule_list &= newrule;
+        ++i;
     }
-    return i;
 }
 
 void parseargs(int argc, char *argv[]) {
@@ -210,17 +213,14 @@ void print_rule(struct pc_rule *r)
 int main(int argc, char* argv[])
 {
     int numrules = 0;  // actual number of rules in rule set
-    struct pc_rule *rule;
-    char s[200];
+    llist rule;
     int i, j;
     int compare_result;
     
     parseargs(argc, argv);
     
-    while (fgets(s, 200, fpr) != NULL) numrules++;
-    rewind(fpr);
-    rule = (pc_rule *) calloc(numrules, sizeof(pc_rule));
-    numrules = loadrule(fpr, rule);
+    loadrule(fpr, rule);
+    numrules = rule.length();
     printf("// the number of rules = %d\n", numrules);
     
     bool show_edge_labels = false;
@@ -231,9 +231,12 @@ int main(int argc, char* argv[])
     printf("digraph overlap_graph {\n");
     printf("    rankdir=\"LR\";\n");
     printf("    node [shape=\"box\"];\n");
-    for (i = 0 ; i < numrules; i++) {
-        for (j = i+1; j < numrules; j++) {
-            compare_result = compare_rules(&(rule[i]), &(rule[j]));
+    struct llist_node *r1n, *r2n;
+    for (i = 0, r1n = rule.first_node(); r1n != NULL; r1n = rule.next_node(r1n), i++) {
+        struct pc_rule *r1 = (struct pc_rule *) rule.node_item(r1n);
+        for (j = i+1, r2n = rule.next_node(r1n); r2n != NULL; r2n = rule.next_node(r2n), j++) {
+            struct pc_rule *r2 = (struct pc_rule *) rule.node_item(r2n);
+            compare_result = compare_rules(r1, r2);
             switch (compare_result) {
             case RULE_COMPARE_DISJOINT:
                 // print nothing
@@ -249,10 +252,10 @@ int main(int argc, char* argv[])
             case RULE_COMPARE_LATER_STRICT_SUBSET:
                 ++num_lsub;
                 printf("    // R%d", i+1);
-                print_rule(&(rule[i]));
+                print_rule(r1);
                 printf("\n");
                 printf("    // R%d", j+1);
-                print_rule(&(rule[j]));
+                print_rule(r2);
                 printf("\n");
                 printf("    R%d -> R%d [", i+1, j+1);
                 if (show_edge_labels) {
@@ -263,10 +266,10 @@ int main(int argc, char* argv[])
             case RULE_COMPARE_EQUAL:
                 ++num_eq;
                 printf("    // R%d", i+1);
-                print_rule(&(rule[i]));
+                print_rule(r1);
                 printf("\n");
                 printf("    // R%d", j+1);
-                print_rule(&(rule[j]));
+                print_rule(r2);
                 printf("\n");
                 printf("    R%d -> R%d [", i+1, j+1);
                 if (show_edge_labels) {
@@ -308,6 +311,4 @@ int main(int argc, char* argv[])
     printf("//     %10d (avg %.1lf / rule) conflict\n",
            num_conf,
            (double) num_conf / numrules);
-    
-    free(rule);
 }
