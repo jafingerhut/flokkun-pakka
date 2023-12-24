@@ -1,3 +1,6 @@
+#ifndef __STDINC_H__
+#define __STDINC_H__
+
 #include <stdio.h>
 #include <unistd.h>
 #include <ctype.h>
@@ -55,3 +58,5 @@ inline int randgeo(double p) { return int(.999999 + log(randfrac())/log(1-p)); }
 inline double randpar(double mu, double s) {
 	return mu*(1-1/s)/exp((1/s)*log(randfrac()));
 }
+
+#endif  // __STDINC_H__

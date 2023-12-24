@@ -2,10 +2,16 @@ CPP = g++
 #CFLAGS = -ggdb -Wall
 CFLAGS = -O3 -Wall
 
-all: og
+all: og addconfrules test_rules
 
-og: llist.h llist.c og.c og.h stdinc.h
-	${CPP} ${CFLAGS} -o og og.c llist.c
+og: llist.h llist.c rules.h rules.c og.c og.h stdinc.h
+	${CPP} ${CFLAGS} -o $@ og.c llist.c rules.c
+
+addconfrules: llist.h llist.c rules.h rules.c addconfrules.c addconfrules.h stdinc.h
+	${CPP} ${CFLAGS} -o $@ addconfrules.c llist.c rules.c
+
+test_rules: llist.h llist.c rules.h rules.c test_rules.c
+	${CPP} ${CFLAGS} -o $@ test_rules.c llist.c rules.c
 
 clean:
-	/bin/rm -f og
+	/bin/rm -f og addconfrules test_rules

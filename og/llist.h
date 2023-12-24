@@ -1,3 +1,6 @@
+#ifndef __LLIST_H__
+#define __LLIST_H__
+
 // Header file for data structure representing a linked list of things
 // pointed at by (void *) pointers.
 
@@ -52,3 +55,5 @@ inline struct llist_node *llist::next_node(struct llist_node *n) {
 inline void *llist::node_item(struct llist_node *n) {
     return n->item;
 }
+
+#endif // __LLIST_H__

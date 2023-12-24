@@ -1,3 +1,19 @@
+/*
+ * Author: J. Andrew Fingerhut (andy.fingerhut@gmail.com)
+ *
+ * Read a set of rules in ClassBench IPv4 5-tuple syntax.
+ *
+ * Write out a set of rules in the same format, with all conflicting
+ * rules added, implemented as described by algorithm AddNewFilter in
+ * Figure 5 of section III.A. of the following paper:
+ *
+ * Hari Adiseshu, Subhash Suri, Guru Parulkar, "Detecting and
+ * resolving packet filter conflicts", 2000, INFOCOM 2000, DOI
+ * 10.1109/INFCOM.2000.832496,
+ * https://www.researchgate.net/publication/3842432_Detecting_and_resolving_packet_filter_conflicts
+ * 
+ */
+
 #include "stdinc.h"
 #include "og.h"
 #include "llist.h"
@@ -46,16 +62,12 @@ int main(int argc, char* argv[])
     
     loadrule(fpr, rule);
     numrules = rule.length();
-    printf("// the number of rules = %d\n", numrules);
+    printf("the number of rules = %d\n", numrules);
     
-    bool show_edge_labels = false;
     int num_esub = 0;
     int num_lsub = 0;
     int num_eq = 0;
     int num_conf = 0;
-    printf("digraph overlap_graph {\n");
-    printf("    rankdir=\"LR\";\n");
-    printf("    node [shape=\"box\"];\n");
     struct llist_node *r1n, *r2n;
     for (i = 0, r1n = rule.first_node(); r1n != NULL; r1n = rule.next_node(r1n), i++) {
         struct pc_rule *r1 = (struct pc_rule *) rule.node_item(r1n);
@@ -68,47 +80,15 @@ int main(int argc, char* argv[])
                 break;
             case RULE_COMPARE_EARLIER_STRICT_SUBSET:
                 ++num_esub;
-                printf("    R%d -> R%d [", i+1, j+1);
-                if (show_edge_labels) {
-                    printf("label=\"esub\" ");
-                }
-                printf("color=\"green\"];\n");
                 break;
             case RULE_COMPARE_LATER_STRICT_SUBSET:
                 ++num_lsub;
-                printf("    // R%d", i+1);
-                print_rule(r1);
-                printf("\n");
-                printf("    // R%d", j+1);
-                print_rule(r2);
-                printf("\n");
-                printf("    R%d -> R%d [", i+1, j+1);
-                if (show_edge_labels) {
-                    printf("label=\"lsub\" ");
-                }
-                printf("color=\"red\" style=\"bold\"];\n");
                 break;
             case RULE_COMPARE_EQUAL:
                 ++num_eq;
-                printf("    // R%d", i+1);
-                print_rule(r1);
-                printf("\n");
-                printf("    // R%d", j+1);
-                print_rule(r2);
-                printf("\n");
-                printf("    R%d -> R%d [", i+1, j+1);
-                if (show_edge_labels) {
-                    printf("label=\"eq\" ");
-                }
-                printf("color=\"red\" style=\"bold\"];\n");
                 break;
             case RULE_COMPARE_CONFLICT:
                 ++num_conf;
-                printf("    R%d -> R%d [", i+1, j+1);
-                if (show_edge_labels) {
-                    printf("label=\"conf\" ");
-                }
-                printf("color=\"blue\"];\n");
                 break;
             default:
                 {
@@ -121,7 +101,6 @@ int main(int argc, char* argv[])
             }
         }
     }
-    printf("}\n");
     printf("// Number of rules: %d\n", numrules);
     printf("// Number of rule pairs that have each relationship:\n");
     printf("//     %10d (avg %.1lf / rule) earlier is strict subset\n",
