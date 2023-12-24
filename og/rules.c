@@ -187,7 +187,6 @@ void writerule(FILE *fp, llist& rule_list)
         min_max_to_prefix32(r->field[1].low, r->field[1].high,
                             &field1_prefix,
                             &field1_prefixlen);
-        field2_prefixlen = 0;
         if ((r->field[2].low == 0) && (r->field[2].high == 0xff)) {
             field2_prefixlen = 0;
         } else if (r->field[2].low == r->field[2].high) {
@@ -195,6 +194,7 @@ void writerule(FILE *fp, llist& rule_list)
         } else {
             fprintf(stderr, "writerule: For rule %d proto field range [%u,%u] is neither single value, nor [0,255], which are only ranges supported.\n",
                     i+1, r->field[2].low, r->field[2].high);
+            exit(1);
         }
         fprintf(fp, "@%u.%u.%u.%u/%u %u.%u.%u.%u/%u %u : %u %u : %u 0x%02X/0x%02X\n",
                 (field0_prefix >> 24) & 0xff,
