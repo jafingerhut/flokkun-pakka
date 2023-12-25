@@ -327,3 +327,49 @@ void rule_intersection(struct pc_rule *out_intersection_rule,
         }
     }
 }
+
+int remove_unmatchable(llist& rules_in, llist& rules_out) {
+    int i;
+    int num_unmatchable_removed = 0;
+    struct llist_node *node_in, *node_out;
+    int compare_result;
+
+    rules_out.clear();
+
+    for (i = 0, node_in = rules_in.first_node(); node_in != NULL; node_in = rules_in.next_node(node_in), i++) {
+        struct pc_rule *rule_in = (struct pc_rule *) rules_in.node_item(node_in);
+        bool unmatchable = false;
+        for (node_out = rules_out.first_node(); node_out != NULL; node_out = rules_out.next_node(node_out)) {
+            struct pc_rule *rule_out = (struct pc_rule *) rules_out.node_item(node_out);
+            compare_result = compare_rules(rule_out, rule_in);
+            switch (compare_result) {
+            case RULE_COMPARE_LATER_STRICT_SUBSET:
+            case RULE_COMPARE_EQUAL:
+                unmatchable = true;
+                break;
+            case RULE_COMPARE_DISJOINT:
+            case RULE_COMPARE_EARLIER_STRICT_SUBSET:
+            case RULE_COMPARE_CONFLICT:
+                // nothing to do
+                break;
+            default:
+                {
+                    char buf[512];
+                    snprintf(buf, sizeof(buf),
+                             "compare_result has unexpected value %d.  Internal error.\n",
+                             compare_result);
+                    fatal(buf);
+                }
+            }
+            if (unmatchable) {
+                break;
+            }
+        }
+        if (unmatchable) {
+            ++num_unmatchable_removed;
+        } else {
+            rules_out &= rule_in;
+        }
+    }
+    return num_unmatchable_removed;
+}

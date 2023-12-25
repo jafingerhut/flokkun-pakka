@@ -33,3 +33,4 @@ void writerule(FILE *fp, llist& rule_list);
 void rule_intersection(struct pc_rule *out_intersection_rule,
                        struct pc_rule *rule1,
                        struct pc_rule *rule2);
+int remove_unmatchable(llist& rules_in, llist& rules_out);
