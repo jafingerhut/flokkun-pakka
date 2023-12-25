@@ -15,27 +15,40 @@
  */
 
 #include "stdinc.hpp"
-#include "og.hpp"
+#include <string.h>
 #include "llist.hpp"
 #include "rules.hpp"
 
-FILE *fpr;       // ruleset file
+FILE *fpr;       // ruleset file to read
+FILE *fpw;       // ruleset file to write
+
+void print_usage(char *progname) {
+    printf("%s [-r ruleset_to_read] [-w ruleset_to_write] [-h]\n", progname);
+}
 
 void parseargs(int argc, char *argv[]) {
     int	c;
     bool ok = 1;
     fpr = NULL;
-    while ((c = getopt(argc, argv, "r:h")) != -1) {
+    fpw = NULL;
+    while ((c = getopt(argc, argv, "r:w:h")) != -1) {
         switch (c) {
 	case 'r':
             fpr = fopen(optarg, "r");
             if (fpr == NULL) {
-                printf("can't open ruleset file: %s\n", optarg);
+                printf("can't open input ruleset file: %s\n", optarg);
+                ok = 0;
+            }
+            break;
+        case 'w':
+            fpw = fopen(optarg, "w");
+            if (fpw == NULL) {
+                printf("can't open output ruleset file: %s\n", optarg);
                 ok = 0;
             }
             break;
 	case 'h':
-            printf("%s [-r ruleset] [-h]\n", argv[0]);
+            print_usage(argv[0]);
             exit(1);
             break;
 	default:
@@ -43,10 +56,15 @@ void parseargs(int argc, char *argv[]) {
         }
     }
     if (fpr == NULL) {
-        fprintf(stderr, "Ruleset file must be specified.\n");
+        fprintf(stderr, "Input ruleset file must be specified.\n");
+        ok = 0;
+    }
+    if (fpw == NULL) {
+        fprintf(stderr, "Output ruleset file must be specified.\n");
+        ok = 0;
     }
     if (!ok || optind < argc) {
-        fprintf(stderr, "rfc [-r ruleset] [-h]\n");
+        print_usage(argv[0]);
         exit(1);
     }
 }
@@ -54,65 +72,113 @@ void parseargs(int argc, char *argv[]) {
 int main(int argc, char* argv[])
 {
     int numrules = 0;  // actual number of rules in rule set
-    llist rule;
-    int i, j;
+    llist rules_in;
+    llist rules_out;
+    int i;
     int compare_result;
+    struct llist_node *node_in, *node_out;
     
     parseargs(argc, argv);
     
-    loadrule(fpr, rule);
-    numrules = rule.length();
+    loadrule(fpr, rules_in);
+    numrules = rules_in.length();
     printf("the number of rules = %d\n", numrules);
+    
+    for (i = 0, node_in = rules_in.first_node(); node_in != NULL; node_in = rules_in.next_node(node_in), i++) {
+        struct pc_rule *rule_in = (struct pc_rule *) rules_in.node_item(node_in);
+        char buf[512];
+        snprintf(buf, sizeof(buf), "Original rule %d", i+1);
+        int sz = strlen(buf) + 1;
+        rule_in->comment = (char *) malloc(sz);
+        strncpy(rule_in->comment, buf, sz);
+    }
     
     int num_esub = 0;
     int num_lsub = 0;
     int num_eq = 0;
     int num_conf = 0;
-    struct llist_node *r1n, *r2n;
-    for (i = 0, r1n = rule.first_node(); r1n != NULL; r1n = rule.next_node(r1n), i++) {
-        struct pc_rule *r1 = (struct pc_rule *) rule.node_item(r1n);
-        for (j = i+1, r2n = rule.next_node(r1n); r2n != NULL; r2n = rule.next_node(r2n), j++) {
-            struct pc_rule *r2 = (struct pc_rule *) rule.node_item(r2n);
-            compare_result = compare_rules(r1, r2);
+    int num_unmatchable_removed = 0;
+    int num_intersection_rules_added = 0;
+    for (i = 0, node_in = rules_in.first_node(); node_in != NULL; node_in = rules_in.next_node(node_in), i++) {
+        struct pc_rule *rule_in = (struct pc_rule *) rules_in.node_item(node_in);
+        llist rules_intersections;
+        bool delete_unmatchable_rule = false;
+        for (node_out = rules_out.first_node(); node_out != NULL; node_out = rules_out.next_node(node_out)) {
+            struct pc_rule *rule_out = (struct pc_rule *) rules_out.node_item(node_out);
+            compare_result = compare_rules(rule_out, rule_in);
             switch (compare_result) {
             case RULE_COMPARE_DISJOINT:
-                // print nothing
                 break;
             case RULE_COMPARE_EARLIER_STRICT_SUBSET:
                 ++num_esub;
                 break;
             case RULE_COMPARE_LATER_STRICT_SUBSET:
                 ++num_lsub;
+                delete_unmatchable_rule = true;
                 break;
             case RULE_COMPARE_EQUAL:
                 ++num_eq;
+                delete_unmatchable_rule = true;
                 break;
             case RULE_COMPARE_CONFLICT:
-                ++num_conf;
+                {
+                    char buf[1024];
+                    ++num_conf;
+                    struct pc_rule *new_rule = alloc_rule();
+                    snprintf(buf, sizeof(buf),
+                             "New rule %d combined from (%s) and (%s)",
+                             num_conf, rule_out->comment, rule_in->comment);
+                    int sz = strlen(buf) + 1;
+                    new_rule->comment = (char *) malloc(sz);
+                    strncpy(new_rule->comment, buf, sz);
+                    rule_intersection(new_rule, rule_out, rule_in);
+                    // TODO: Verify that return value is not empty rule,
+                    // which would be some kind of bug in this code.
+                    rules_intersections &= new_rule;
+                }
                 break;
             default:
                 {
                     char buf[512];
                     snprintf(buf, sizeof(buf),
-                             "compare_result has unexpcted value %d.  Internal error.\n",
+                             "compare_result has unexpected value %d.  Internal error.\n",
                              compare_result);
                     fatal(buf);
                 }
             }
+            if (delete_unmatchable_rule) {
+                break;
+            }
+        }
+        if (delete_unmatchable_rule) {
+            ++num_unmatchable_removed;
+        } else {
+            // Put rules_intersections _before_ the current rules in
+            // rules_out.  If we appended them to the end as lower
+            // priority rules, all of them would become unmatchable,
+            // because they are subsets of existing rules in
+            // rules_out.
+            num_intersection_rules_added += rules_intersections.length();
+            rules_out.push_list(rules_intersections);
+            rules_out &= rule_in;
         }
     }
-    printf("// Number of rules: %d\n", numrules);
-    printf("// Number of rule pairs that have each relationship:\n");
-    printf("//     %10d (avg %.1lf / rule) earlier is strict subset\n",
+    writerule(fpw, rules_out);
+    printf("%10d input rules\n", numrules);
+    printf("%10d (avg %.1lf / rule) unmatchable rules removed\n",
+           num_unmatchable_removed,
+           (double) num_unmatchable_removed / numrules);
+    printf("%10d (avg %.1lf / rule) new intersection rules added\n",
+           num_intersection_rules_added,
+           (double) num_intersection_rules_added / numrules);
+    printf("%10d (avg %.1lf / rule) output rules\n",
+           rules_out.length(),
+           (double) rules_out.length() / numrules);
+    
+    printf("%10d (avg %.1lf / rule) earlier is strict subset\n",
            num_esub,
            (double) num_esub / numrules);
-    printf("//     %10d (avg %.1lf / rule) later is strict subset\n",
-           num_lsub,
-           (double) num_lsub / numrules);
-    printf("//     %10d (avg %.1lf / rule) equal\n",
-           num_eq,
-           (double) num_eq / numrules);
-    printf("//     %10d (avg %.1lf / rule) conflict\n",
+    printf("%10d (avg %.1lf / rule) conflict\n",
            num_conf,
            (double) num_conf / numrules);
 }
