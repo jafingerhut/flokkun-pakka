@@ -23,6 +23,7 @@ public:
     void operator<<=(int); // remove initial items
     //void operator=(list&); // list assignment
     void push(void *);        // push item onto front of list
+    void push_list(llist&);   // push arg list at beginning of this list
     //bit  mbr(int);         // return true if member of list
     //int  suc(int);         // return successor
     void *tail();           // return last item on list

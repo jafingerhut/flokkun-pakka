@@ -100,6 +100,28 @@ void llist::push(void *item) {
     }
 }
 
+// Add argument llist at the beginning of this list.  The argument
+// list nodes are used for this purpose, not copied, so the argument
+// list becomes empty, to prevent a scenario where later modifications
+// to the argument list would mangle this list.
+
+void llist::push_list(llist& L) {
+    if (L.len == 0) {
+        // Nothing to do
+        return;
+    }
+    if (first == NULL) {
+        first = L.first;
+        last = L.last;
+    } else {
+        L.last->next = first;
+        first = L.first;
+    }
+    len += L.len;
+    L.first = L.last = NULL;
+    L.len = 0;
+}
+
 /*
 // Return true if i in list, else false.
 bit llist::mbr(int i) {
