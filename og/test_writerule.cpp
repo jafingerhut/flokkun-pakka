@@ -1,4 +1,12 @@
-#include <stdio.h>
+/*
+ * Author: J. Andrew Fingerhut (andy.fingerhut@gmail.com)
+ *
+ * Read a set of rules in ClassBench IPv4 5-tuple syntax, and write
+ * them back out, as a test of the function that read rules from a
+ * file, and the one that writes them to a file.
+ */
+
+#include "stdinc.hpp"
 #include "rules.hpp"
 
 FILE *fpr;       // ruleset file to read
@@ -55,7 +63,7 @@ int main(int argc, char* argv[])
 {
     int numrules = 0;  // actual number of rules in rule set
     llist rule;
-    
+
     parseargs(argc, argv);
     loadrule(fpr, rule);
     numrules = rule.length();
