@@ -1,6 +1,14 @@
 #include "rules.hpp"
 #include <stdio.h>
 
+struct pc_rule *alloc_rule() {
+    struct pc_rule *r = (struct pc_rule *) malloc(sizeof(struct pc_rule));
+    if (r != NULL) {
+        r->comment = NULL;
+    }
+    return r;
+}
+
 unsigned int mask(int k)
 {
     if (k < 0 || k > 32) {
@@ -22,16 +30,24 @@ void loadrule(FILE *fp, llist& rule_list)
     unsigned proto, protomask;
     int i = 0;
     char buf[512];
+    char readbuf[1024];
     struct pc_rule *newrule;
+    int ret;
     
     while (1) {
-        newrule = (struct pc_rule *) malloc(sizeof(struct pc_rule));
-        if (fscanf(fp,"@%u.%u.%u.%u/%u %u.%u.%u.%u/%u %u : %u %u : %u %x/%x\n",
+        newrule = alloc_rule();
+        if (fgets(readbuf, sizeof(readbuf), fp) == NULL) {
+            break;
+        }
+        ret = sscanf(readbuf, "@%u.%u.%u.%u/%u %u.%u.%u.%u/%u %u : %u %u : %u %x/%x",
                    &sip1, &sip2, &sip3, &sip4, &siplen,
                    &dip1, &dip2, &dip3, &dip4, &diplen,
                    &(newrule->field[3].low), &(newrule->field[3].high),
                    &(newrule->field[4].low), &(newrule->field[4].high),
-                   &proto, &protomask) != 16) {
+                   &proto, &protomask);
+        if (ret != 16) {
+            fprintf(stderr, "loadrule: On line %d fscanf returned %d\n",
+                    i+1, ret);
             break;
         }
         if (sip1 > 255 || sip2 > 255 || sip3 > 255 || sip4 > 255) {
@@ -164,6 +180,7 @@ void writerule(FILE *fp, llist& rule_list)
     struct llist_node *rn;
     unsigned int field0_prefix, field1_prefix;
     int field0_prefixlen, field1_prefixlen, field2_prefixlen;
+    char *comment;
 
     for (i = 0, rn = rule_list.first_node(); rn != NULL; rn = rule_list.next_node(rn), i++) {
         r = (struct pc_rule *) rule_list.node_item(rn);
@@ -196,7 +213,12 @@ void writerule(FILE *fp, llist& rule_list)
                     i+1, r->field[2].low, r->field[2].high);
             exit(1);
         }
-        fprintf(fp, "@%u.%u.%u.%u/%u %u.%u.%u.%u/%u %u : %u %u : %u 0x%02X/0x%02X\n",
+        if (r->comment == NULL) {
+            comment = (char *) "";
+        } else {
+            comment = r->comment;
+        }
+        fprintf(fp, "@%u.%u.%u.%u/%u %u.%u.%u.%u/%u %u : %u %u : %u 0x%02X/0x%02X %s\n",
                 (field0_prefix >> 24) & 0xff,
                 (field0_prefix >> 16) & 0xff,
                 (field0_prefix >>  8) & 0xff,
@@ -212,7 +234,8 @@ void writerule(FILE *fp, llist& rule_list)
                 r->field[4].low,
                 r->field[4].high,
                 r->field[2].low,
-                (field2_prefixlen == 8) ? 0xff : 0);
+                (field2_prefixlen == 8) ? 0xff : 0,
+                comment);
         ++i;
     }
 }
@@ -273,5 +296,34 @@ void print_rule(FILE *fp, struct pc_rule *r)
             fprintf(fp, " ");
         }
         fprintf(fp, "[%u, %u]", r->field[i].low, r->field[i].high);
+    }
+}
+
+void rule_intersection(struct pc_rule *out_intersection_rule,
+                       struct pc_rule *rule1,
+                       struct pc_rule *rule2)
+{
+    int i;
+    unsigned int min_hi;
+    unsigned int max_lo;
+    bool disjoint = false;
+
+    for (i = 0; i < MAXDIMENSIONS; i++) {
+        max_lo = max(rule1->field[i].low, rule2->field[i].low);
+        min_hi = min(rule1->field[i].high, rule2->field[i].high);
+        if (min_hi < max_lo) {
+            disjoint = true;
+            break;
+        }
+        out_intersection_rule->field[i].low = max_lo;
+        out_intersection_rule->field[i].high = min_hi;
+    }
+    if (disjoint) {
+        // Intentionally create the output rule so that for every
+        // field, hi < lo.
+        for (i = 0; i < MAXDIMENSIONS; i++) {
+            out_intersection_rule->field[i].low = 1;
+            out_intersection_rule->field[i].high = 0;
+        }
     }
 }
