@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
                 {
                     char buf[512];
                     snprintf(buf, sizeof(buf),
-                             "compare_result has unexpcted value %d.  Internal error.\n",
+                             "compare_result has unexpected value %d.  Internal error.\n",
                              compare_result);
                     fatal(buf);
                 }
