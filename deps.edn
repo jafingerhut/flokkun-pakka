@@ -1,0 +1,59 @@
+;; See shell scripts './script/sdo' and './script/jdo' for sample
+;; useful combinations of aliases to use to accomplish common tasks.
+
+;; One way to specify a local version of ClojureScript, in case you
+;; want to test with modifications to it:
+;; org.clojure/clojurescript {:local/root "/Users/jafinger/clj/clojurescript"}
+
+{:paths ["src"]
+ :aliases
+ {:test-rule-io {:exec-fn flokkun-pakka.main/test-rule-io
+                 :exec-args {:a 1 :b 2}}
+
+  ;; Common alias to use for all Clojure/Java commands
+  :clj {:jvm-opts ["-XX:-OmitStackTraceInFastThrow"]}
+
+  ;; - start a Clojure/Java Socket REPL on port 50505
+  :clj-socket {:jvm-opts ["-Dclojure.server.repl={:port,50505,:accept,clojure.core.server/repl}"]}
+
+  ;; Common alias to use for all Clojure/Java commands that run tests
+  :clj-test {:extra-paths ["test"]
+             :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}}}
+
+  ;; Run 'short' tests
+  :clj-runt {:main-opts ["-e" "(require,'[clojure.test,:as,t],'clojure.core.rrb-vector.test-clj-only,'clojure.core.rrb-vector.test-common),(t/run-tests,'clojure.core.rrb-vector.test-common),(t/run-tests,'clojure.core.rrb-vector.test-clj-only)"]}
+
+  ;; Run generative and/or 'long' tests
+  :clj-runlongtests {:main-opts ["-e"
+                                 "(require,'[clojure.test,:as,t],'clojure.core.rrb-vector.long-test),(t/run-tests,'clojure.core.rrb-vector.long-test)"]}
+
+  ;; Run performance tests
+  :clj-runperf {:main-opts ["-e" "(require,'[clojure.test,:as,t],'clojure.core.rrb-vector-performance-test),(t/run-tests,'clojure.core.rrb-vector-performance-test)"]}
+
+  ;; Run whatever the current 'focus' tests are
+  :clj-runfocus {:main-opts ["-e" "(require,'[clojure.test,:as,t],'[clojure.core.rrb-vector.test-common,:as,ct]),(ct/test-reduce-subvec-catvec2)"]}
+
+  :cljol {:extra-deps {cljol/cljol {:git/url "https://github.com/jafingerhut/cljol"
+                                    :sha "bb5549e9832e73e4a9fc5dfdf695c48e797729fa"}}}
+  :cap {;; recommended options from README of
+        ;; https://github.com/clojure-goes-fast/clj-async-profiler
+        :jvm-opts ["-Djdk.attach.allowAttachSelf"
+                   ;; I have trouble entering password for this from
+                   ;; clj REPL.  Maybe clojure command instead of clj
+                   ;; is better for this?
+                   "-Djol.tryWithSudo=true"
+                   "-XX:+UnlockDiagnosticVMOptions"
+                   "-XX:+DebugNonSafepoints"]
+        :extra-deps {com.clojure-goes-fast/clj-async-profiler
+                     {:mvn/version "0.4.0"}}}
+  :nodis {:extra-deps {com.clojure-goes-fast/clj-java-decompiler
+                       {:mvn/version "0.2.1"}}}
+  :eastwood {:extra-deps {jonase/eastwood {:mvn/version "1.4.2"}}
+             :main-opts ["-m" "eastwood.lint"
+                         "{:source-paths,[\"src/main/clojure\"],:test-paths,[\"src/test/clojure\"],:add-linters,[:unused-fn-args,:unused-locals,:unused-namespaces,:unused-private-vars],:exclude-linters,[:implicit-dependencies],:exclude-namespaces,[]}"]}
+  :clj-kondo {:extra-deps {clj-kondo/clj-kondo {:mvn/version "RELEASE"}}
+              :main-opts ["-m" "clj-kondo.main"]}
+
+  ;; pull in specific versions of Clojure:
+  :1.11   {:override-deps {org.clojure/clojure {:mvn/version "1.11.1"}}}
+  }}
