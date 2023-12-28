@@ -238,7 +238,7 @@
           sport-str (l4-port-match-criteria->classbench-str sport)
           dport-str (l4-port-match-criteria->classbench-str dport)
           extra-data-str (if (contains? r :extra-data)
-                           (str "  " (prn-str (:extra-data r)))
+                           (str "  " (pr-str (:extra-data r)))
                            "")]
       (str "@" sa-str " " da-str " " sport-str " " dport-str " " proto-str
            extra-data-str))))
@@ -266,35 +266,19 @@ cb-line-re
 (def x (re-matches cb-line-re l1))
 (def x (re-matches cb-line-re l2))
 
-x
-(subvec x 1 6)
-(subvec x 6 11)
-(subvec x 11 13)
-(subvec x 13 15)
-(subvec x 15 17)
-
-(doc parse-long)
-(parse-long "224")
-
 (parse_classbench-rule-line l1)
 (parse_classbench-rule-line l2)
 
 (require '[clojure.java.io :as io])
 
 (def d1 "/Users/andy/Documents/p4-docs/flokkun-pakka/orig/song-filterset/")
-(def r1 (load-classbench-rules-file (str d1 "acl1_100")))
-
 (def d2 "/Users/andy/Documents/p4-docs/flokkun-pakka/flokkun-pakka/tmp/")
+
+(def r1 (load-classbench-rules-file (str d1 "acl1_100")))
 (dump-ipv4-classbench-rules-file (str d2 "acl1_100") r1)
 
 (count r1)
 (pprint (take 5 r1))
 (pprint (take-last 5 r1))
-
-(seq? '(1 2 3))
-(seq? [1 2 3])
-(apropos "seq")
-(sequential? '(1 2 3))
-(sequential? [1 2 3])
 
 )

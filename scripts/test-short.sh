@@ -22,6 +22,7 @@ do
     ./scripts/test_ruleio.sh ${j} tmp/${k}
     diff -iw ${j} tmp/${k}
     #/bin/rm -f ${k}
+    ./scripts/test_remove_unmatchable.sh ${j} tmp/${k}_matchable_rules tmp/${k}_unmatchable_rules
     set +x
 done
 
