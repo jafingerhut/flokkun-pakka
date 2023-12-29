@@ -1,5 +1,6 @@
 (ns flokkun-pakka.main
-  (:require [flokkun-pakka.rules :as r]
+  (:require [clojure.java.io :as io]
+            [flokkun-pakka.rules :as r]
             [flokkun-pakka.io :as fio]))
 
 
@@ -31,10 +32,21 @@
     (fio/dump-ipv4-classbench-rules-file (:out-unmatchable m) unmatchable-rules)))
 
 
+(defn test-write-overlap-graph [m]
+  (when-not (and (string? (:in m))
+                 (string? (:out m)))
+    (println "Input map must have strings containing file names as values of keys :in and :out")
+    (System/exit 1))
+  (let [rules (fio/load-ipv4-classbench-rules-file (:in m))]
+    (println (format "Read %d rules" (count rules)))
+    (with-open [wrtr (io/writer (:out m))]
+      (fio/write-graphviz-overlap-graph wrtr rules))))
+
+
 (comment
 
 (in-ns 'user)
-(require '[flokkun-pakka.main :as m])
+(require '[flokkun-pakka.main :as m] :reload)
 (require '[flokkun-pakka.io :as fio])
 (require '[flokkun-pakka.rules :as r] :reload)
 
@@ -47,6 +59,10 @@
 (def r2 (r/remove-unmatchable r1))
 (count r2)
 (map (fn [[k v]] [k (count v)]) r2)
+
+(require '[clojure.java.io :as io])
+(with-open [wrtr (io/writer (str d2 "acl1_100_conf.gv"))]
+  (fio/write-graphviz-overlap-graph wrtr r1))
 
 (def x1 {:field [{:kind :range, :low 1079732992, :high 1079732992} {:kind :range, :low 2327357940, :high 2327357940} {:kind :range, :low 6, :high 6} {:kind :range, :low 0, :high 65535} {:kind :range, :low 4646, :high 4646}]})
 

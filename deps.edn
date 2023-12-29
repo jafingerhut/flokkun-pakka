@@ -6,9 +6,11 @@
 ;; org.clojure/clojurescript {:local/root "/Users/jafinger/clj/clojurescript"}
 
 {:paths ["src"]
+ :deps {ubergraph/ubergraph {:mvn/version "0.8.2"}}
  :aliases
  {:test-rule-io {:exec-fn flokkun-pakka.main/test-rule-io}
   :test-remove-unmatchable {:exec-fn flokkun-pakka.main/test-remove-unmatchable-rules}
+  :test-write-overlap-graph {:exec-fn flokkun-pakka.main/test-write-overlap-graph}
 
   ;; Common alias to use for all Clojure/Java commands
   :clj {:jvm-opts ["-XX:-OmitStackTraceInFastThrow"]}

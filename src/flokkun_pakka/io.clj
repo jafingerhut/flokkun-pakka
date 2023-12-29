@@ -1,5 +1,7 @@
 (ns flokkun-pakka.io
-  (:require [clojure.java.io :as io]))
+  (:require [clojure.string :as str]
+            [clojure.java.io :as io]
+            [flokkun-pakka.rules :as r]))
 
 
 (def cb-line-re
@@ -36,12 +38,6 @@
                     #"\s*(.*)\s*"
                     #"$"
                     ]))))
-
-(defn mask [n]
-  (if (>= n 64)
-    (bit-shift-left 1N 64)
-    ;; TODO
-    ))
 
 
 (defn strings-to-ipv4-prefix [ip0-s ip1-s ip2-s ip3-s prefix-len-s]
@@ -255,6 +251,104 @@
   (with-open [wrtr (io/writer fname)]
     (write-ipv4-classbench-rules wrtr rules)))
 
+
+(defn print-rule [r]
+  (print (str/join " " (map (fn [f] (format "[%d, %d]" (:low f) (:high f)))
+                            (:field r)))))
+
+
+(defn write-graphviz-overlap-graph-helper [r1 r2 r1-rule-num r2-rule-num
+                                           show-edge-labels
+                                           num-eq num-esub num-lsub num-conf]
+  (case (r/compare-rules r1 r2)
+    :rule-compare-disjoint
+    nil  ;; print nothing
+    
+    :rule-compare-equal
+    (do
+      (swap! num-eq inc)
+      (print (format "    // R%d" r1-rule-num))
+      (print-rule r1)
+      (println)
+      (print (format "    // R%d" r2-rule-num))
+      (print-rule r2)
+      (println)
+      (print (format "    R%d -> R%d [" r1-rule-num r2-rule-num))
+      (when show-edge-labels
+        (print "label=\"eq\" "))
+      (println "color=\"crimson\" style=\"bold\"];"))
+    
+    :rule-compare-earlier-strict-subset
+    (do
+      (swap! num-esub inc)
+      (print (format "    R%d -> R%d [" r1-rule-num r2-rule-num))
+      (when show-edge-labels
+        (print "label=\"esub\" "))
+      (println "color=\"green\"];"))
+    
+    :rule-compare-later-strict-subset
+    (do
+      (swap! num-lsub inc)
+      (print (format "    // R%d" r1-rule-num))
+      (print-rule r1)
+      (println)
+      (print (format "    // R%d" r2-rule-num))
+      (print-rule r2)
+      (println)
+      (print (format "    R%d -> R%d [" r1-rule-num r2-rule-num))
+      (when show-edge-labels
+        (print "label=\"lsub\" "))
+      (println "color=\"red\" style=\"bold\"];"))
+    
+    :rule-compare-conflict
+    (do
+      (swap! num-conf inc)
+      (print (format "    R%d -> R%d [" r1-rule-num r2-rule-num))
+      (when show-edge-labels
+        (print "label=\"conf\" "))
+      (println "color=\"blue\"];"))))
+
+
+(defn write-graphviz-overlap-graph [wrtr rules]
+  (binding [*out* wrtr]
+    (println "digraph overlap_graph {")
+    (println "    rankdir=\"LR\";")
+    (println "    node [shape=\"box\"];")
+    (let [show-edge-labels false
+          num-rules (count rules)
+          num-eq (atom 0)
+          num-esub (atom 0)
+          num-lsub (atom 0)
+          num-conf (atom 0)]
+      (loop [rules1 rules
+             i 0]
+        (if (seq rules1)
+          (let [r1 (first rules1)]
+            (loop [rules2 (next rules1)
+                   j (inc i)]
+              (if (seq rules2)
+                (let [r2 (first rules2)]
+                  (write-graphviz-overlap-graph-helper r1 r2 (inc i) (inc j)
+                                                       show-edge-labels
+                                                       num-eq num-esub
+                                                       num-lsub num-conf)
+                  (recur (next rules2) (inc j)))))
+            (recur (next rules1) (inc i)))))
+      (println "}")
+      (println (format "// Number of rules: %d" num-rules))
+      (println "// Number of rule pairs that have each relationship:")
+      (println (format "//     %10d (avg %.1f / rule) earlier is strict subset"
+                       @num-esub
+                       (/ (double @num-esub) num-rules)))
+      (println (format "//     %10d (avg %.1f / rule) later is strict subset"
+                       @num-lsub
+                       (/ (double @num-lsub) num-rules)))
+      (println (format "//     %10d (avg %.1f / rule) equal"
+                       @num-eq
+                       (/ (double @num-eq) num-rules)))
+      (println (format "//     %10d (avg %.1f / rule) conflict"
+                       @num-conf
+                       (/ (double @num-conf) num-rules))))))
 
 
 (comment
