@@ -73,6 +73,7 @@ int main(int argc, char* argv[])
 {
     int numrules = 0;  // actual number of rules in rule set
     llist rules_in;
+    llist rules_opt;
     llist rules_out;
     int i;
     int compare_result;
@@ -92,17 +93,21 @@ int main(int argc, char* argv[])
         rule_in->comment = (char *) malloc(sz);
         strncpy(rule_in->comment, buf, sz);
     }
+
+    int num_unmatchable_removed = remove_unmatchable(rules_in, rules_opt);
+    printf("removed %d unmatchable rules\n", num_unmatchable_removed);
     
     int num_esub = 0;
     int num_lsub = 0;
     int num_eq = 0;
     int num_conf = 0;
-    int num_unmatchable_removed = 0;
+    num_unmatchable_removed = 0;
     int num_intersection_rules_added = 0;
-    for (i = 0, node_in = rules_in.first_node(); node_in != NULL; node_in = rules_in.next_node(node_in), i++) {
-        struct pc_rule *rule_in = (struct pc_rule *) rules_in.node_item(node_in);
-        llist rules_intersections;
+    for (i = 0, node_in = rules_opt.first_node(); node_in != NULL; node_in = rules_opt.next_node(node_in), i++) {
+        struct pc_rule *rule_in = (struct pc_rule *) rules_opt.node_item(node_in);
+        llist maybe_next_rules_out;
         bool delete_unmatchable_rule = false;
+        int num_added_for_this_rule_in = 0;
         for (node_out = rules_out.first_node(); node_out != NULL; node_out = rules_out.next_node(node_out)) {
             struct pc_rule *rule_out = (struct pc_rule *) rules_out.node_item(node_out);
             compare_result = compare_rules(rule_out, rule_in);
@@ -124,6 +129,7 @@ int main(int argc, char* argv[])
                 {
                     char buf[1024];
                     ++num_conf;
+                    ++num_added_for_this_rule_in;
                     struct pc_rule *new_rule = alloc_rule();
                     snprintf(buf, sizeof(buf),
                              "New rule %d combined from (%s) and (%s)",
@@ -134,7 +140,7 @@ int main(int argc, char* argv[])
                     rule_intersection(new_rule, rule_out, rule_in);
                     // TODO: Verify that return value is not empty rule,
                     // which would be some kind of bug in this code.
-                    rules_intersections &= new_rule;
+                    maybe_next_rules_out &= new_rule;
                 }
                 break;
             default:
@@ -149,17 +155,16 @@ int main(int argc, char* argv[])
             if (delete_unmatchable_rule) {
                 break;
             }
+            maybe_next_rules_out &= rule_out;
         }
         if (delete_unmatchable_rule) {
             ++num_unmatchable_removed;
         } else {
-            // Put rules_intersections _before_ the current rules in
-            // rules_out.  If we appended them to the end as lower
-            // priority rules, all of them would become unmatchable,
-            // because they are subsets of existing rules in
-            // rules_out.
-            num_intersection_rules_added += rules_intersections.length();
-            rules_out.push_list(rules_intersections);
+            // Erase current contents of rules_out and replace it with
+            // the contents of maybe_next_rules_out.
+            num_intersection_rules_added += num_added_for_this_rule_in;
+            rules_out.clear();
+            rules_out.push_list(maybe_next_rules_out);
             rules_out &= rule_in;
         }
     }

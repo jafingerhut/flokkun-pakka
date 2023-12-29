@@ -46,7 +46,6 @@ int main(int argc, char* argv[])
     
     loadrule(fpr, rule);
     numrules = rule.length();
-    printf("// the number of rules = %d\n", numrules);
     
     bool show_edge_labels = false;
     int num_esub = 0;
@@ -100,7 +99,7 @@ int main(int argc, char* argv[])
                 if (show_edge_labels) {
                     printf("label=\"eq\" ");
                 }
-                printf("color=\"red\" style=\"bold\"];\n");
+                printf("color=\"crimson\" style=\"bold\"];\n");
                 break;
             case RULE_COMPARE_CONFLICT:
                 ++num_conf;
