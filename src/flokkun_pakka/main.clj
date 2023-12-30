@@ -69,14 +69,12 @@
         _ (println (format "%10d rules read" (count rules)))
         res (r/add-resolve-rules rules {:show-progress true})]
     (fio/dump-ipv4-classbench-rules-file (:out m) (:rules res))
-    (fio/dump-ipv4-classbench-rules-file (:unmatched-out m)
-        (:unmatchable-rules-removed-after-add-resolve res))
     (println (format "%10d rules removed as unmatchable before add-resolve-rules"
                      (:num-unmatchable-before-add-resolve res)))
-    (println (format "%10d rules removed as unmatchable during add-resolve-rules"
-                     (:num-unmatchable-during-add-resolve res)))
-    (println (format "%10d resolve rules not added during add-resolve-rules because equal to earlier rule"
-                     (:num-not-added-because-equal res)))
+    (println (format "%10d resolve rules created during add-resolve-rules"
+                     (:num-resolve-rules-created res)))
+    (println (format "%10d duplicate rules removed after add-resolve-rules"
+                     (:num-duplicates-after-add-resolve res)))
     (println (format "%10d rules removed as unmatchable after add-resolve-rules"
                      (:num-unmatchable-after-add-resolve res)))
     (println (format "%10d rules written" (count (:rules res))))))
@@ -109,5 +107,18 @@
 
 (r/rules-disjoint x1 x2)
 (map r/fields-disjoint (:field x1) (:field x2))
+
+(def e1 [1 2])
+(def e2 [3 4 5])
+(def e3 [6 7])
+
+(def m1 {e1 e1, e2 e2, e3 e3})
+
+(find m1 e1)
+(identical? (key (find m1 e1)) e1)
+(identical? (val (find m1 e1)) e1)
+(identical? (key (find m1 [1 2])) e1)
+(identical? (val (find m1 [1 2])) e1)
+(identical? [1 2] e1)
 
 )
