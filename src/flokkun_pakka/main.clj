@@ -16,7 +16,7 @@
     (fio/dump-ipv4-classbench-rules-file (:out m) rules)))
 
 
-(defn test-remove-unmatchable-rules [m]
+(defn test-remove-unmatchable [m]
   (when-not (and (string? (:in m))
                  (string? (:out m))
                  (string? (:out-unmatchable m)))
@@ -32,6 +32,22 @@
     (fio/dump-ipv4-classbench-rules-file (:out-unmatchable m) unmatchable-rules)))
 
 
+(defn test-remove-duplicates [m]
+  (when-not (and (string? (:in m))
+                 (string? (:out m))
+                 (string? (:out-unmatchable m)))
+    (println "Input map must have strings containing file names as values of keys :in :out :out-unmatchable")
+    (System/exit 1))
+  (let [rules (fio/load-ipv4-classbench-rules-file (:in m))
+        _ (println (format "Read %d rules" (count rules)))
+        {:keys [rules-kept duplicate-rules]} (r/remove-duplicates rules)]
+    (println (format "Removing %d duplicate rules, leaving %d"
+                     (count duplicate-rules)
+                     (count rules-kept)))
+    (fio/dump-ipv4-classbench-rules-file (:out m) rules-kept)
+    (fio/dump-ipv4-classbench-rules-file (:out-unmatchable m) duplicate-rules)))
+
+
 (defn test-write-overlap-graph [m]
   (when-not (and (string? (:in m))
                  (string? (:out m)))
@@ -41,6 +57,29 @@
     (println (format "Read %d rules" (count rules)))
     (with-open [wrtr (io/writer (:out m))]
       (fio/write-graphviz-overlap-graph wrtr rules))))
+
+
+(defn test-add-resolve-rules [m]
+  (when-not (and (string? (:in m))
+                 (string? (:out m))
+                 (string? (:unmatched-out m)))
+    (println "Input map must have strings containing file names as values of keys :in and :out")
+    (System/exit 1))
+  (let [rules (fio/load-ipv4-classbench-rules-file (:in m))
+        _ (println (format "%10d rules read" (count rules)))
+        res (r/add-resolve-rules rules {:show-progress true})]
+    (fio/dump-ipv4-classbench-rules-file (:out m) (:rules res))
+    (fio/dump-ipv4-classbench-rules-file (:unmatched-out m)
+        (:unmatchable-rules-removed-after-add-resolve res))
+    (println (format "%10d rules removed as unmatchable before add-resolve-rules"
+                     (:num-unmatchable-before-add-resolve res)))
+    (println (format "%10d rules removed as unmatchable during add-resolve-rules"
+                     (:num-unmatchable-during-add-resolve res)))
+    (println (format "%10d resolve rules not added during add-resolve-rules because equal to earlier rule"
+                     (:num-not-added-because-equal res)))
+    (println (format "%10d rules removed as unmatchable after add-resolve-rules"
+                     (:num-unmatchable-after-add-resolve res)))
+    (println (format "%10d rules written" (count (:rules res))))))
 
 
 (comment
