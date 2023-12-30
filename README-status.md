@@ -102,7 +102,7 @@ K:
 Command used to find the size of the table required in phase 3 of the
 RFC implementation in directory `song-rfc`:
 
-```
+```bash
 ./rfc -r bc1_k${K} | grep -A 1 'start phase 3'
 ```
 
@@ -112,6 +112,21 @@ RFC implementation in directory `song-rfc`:
 |  25 |     457,652 |  (25+1)^4 +  (25+1)^2 |
 |  40 |   2,827,442 |  (40+1)^4 +  (40+1)^2 |
 | 100 | 104,070,602 | (100+1)^4 + (100+1)^2 |
+
+Command used to find the number of resolve rules added to an original
+set of rules, run from root directory of this repo:
+
+```bash
+./scripts/test_add_resolve_rules.sh genrules/bc1_k${K} tmp/bc1_k${K}_addrr
+```
+
+| k value for rule set | Resolve rules added | Formula that matches this value |
+| ------------------------- | ------------------------------------------------------- | ------------------------------- |
+|   5 |       1,275 | C(4,2)*k^2 + C(4,3)*k^3 + C(4,4)*k^4 |
+|  13 |      38,363 | C(4,2)*k^2 + C(4,3)*k^3 + C(4,4)*k^4 |
+|  25 |     456,875 | C(4,2)*k^2 + C(4,3)*k^3 + C(4,4)*k^4 |
+|  40 |   2,825,600 | C(4,2)*k^2 + C(4,3)*k^3 + C(4,4)*k^4 |
+| 100 | 104,060,000 | C(4,2)*k^2 + C(4,3)*k^3 + C(4,4)*k^4 |
 
 
 # song-tss

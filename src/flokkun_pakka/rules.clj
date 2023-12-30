@@ -198,7 +198,7 @@
 
 
 (defn add-resolve-rules [rules opts]
-  (let [k :rr-data
+  (let [k :extra-data
         r0 (map-indexed (fn [idx r] (assoc r k {:orig-rule (inc idx)}))
                         rules)
         r1 (remove-unmatchable r0 opts)
@@ -214,10 +214,8 @@
         r3 (remove-duplicates r2 opts)
         _ (when (:show-progress opts)
             (println (format "%d rules after remove-duplicates done ..."
-                             (count (:rules-kept r3)))))
-        r4 (remove-unmatchable (:rules-kept r3) opts)]
-    {:rules (:rules-kept r4)
+                             (count (:rules-kept r3)))))]
+    {:rules (:rules-kept r3)
      :num-unmatchable-before-add-resolve (count (:unmatchable-rules r1))
      :num-resolve-rules-created (- (count r2) (count (:rules-kept r1)))
-     :num-duplicates-after-add-resolve (count (:duplicate-rules r3))
-     :num-unmatchable-after-add-resolve (count (:unmatchable-rules r4))}))
+     :num-duplicates-after-add-resolve (count (:duplicate-rules r3))}))
