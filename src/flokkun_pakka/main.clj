@@ -66,15 +66,35 @@
     (System/exit 1))
   (let [rules (fio/load-ipv4-classbench-rules-file (:in m))
         _ (println (format "%10d rules read" (count rules)))
-        res (r/add-resolve-rules rules {:show-progress true})]
+        res (r/add-resolve-rules rules {:show-progress true})
+        n1 (count rules)
+        n2 (- (count rules) (:num-unmatchable-before-add-resolve res))]
     (fio/dump-ipv4-classbench-rules-file (:out m) (:rules res))
-    (println (format "%10d rules removed as unmatchable before add-resolve-rules"
-                     (:num-unmatchable-before-add-resolve res)))
-    (println (format "%10d resolve rules created during add-resolve-rules"
-                     (:num-resolve-rules-created res)))
-    (println (format "%10d duplicate rules removed after add-resolve-rules"
-                     (:num-duplicates-after-add-resolve res)))
-    (println (format "%10d rules written" (count (:rules res))))))
+
+    (println)
+    (println (format "  %10d orig rules read" (count rules)))
+
+    (let [x (:num-unmatchable-before-add-resolve res)]
+      (println (format "- %10d (%.2f / orig rule) rules removed as unmatchable before add-resolve-rules"
+                       x (/ (double x) n1))))
+    (println "  ----------")
+    (println (format "  %10d (%.2f / orig rule) rules after unmatchables removed"
+                     n2 (/ (double n2) n1)))
+    (println)
+    (let [x (:num-resolve-rules-created res)]
+      (println (format "  %10d (%.1f / rule) resolve rules created during add-resolve-rules"
+                       x (/ (double x) n2))))
+    (let [x (:num-duplicates-after-add-resolve res)]
+      (println (format "  %10d (%.1f / rule) duplicate rules removed after add-resolve-rules"
+                       x (/ (double x) n2))))
+    (let [x (- (:num-resolve-rules-created res)
+               (:num-duplicates-after-add-resolve res))]
+      (println (format "+ %10d (%.1f / rule) non-duplicate resolve rules added during add-resolve-rules"
+                       x (/ (double x) n2))))
+    (println "  ----------")
+    (let [x (count (:rules res))]
+      (println (format "  %10d (%.1f / rule) rules written"
+                       x (/ (double x) n2))))))
 
 
 (comment
