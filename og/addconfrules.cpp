@@ -3,8 +3,9 @@
  *
  * Read a set of rules in ClassBench IPv4 5-tuple syntax.
  *
- * Write out a set of rules in the same format, with all conflicting
- * rules added, implemented as described by algorithm AddNewFilter in
+ * Write out a set of rules in the same format, with resolve rules
+ * added for all pairs of rules that were conflicting in the original
+ * rule set, implemented as described by algorithm AddNewFilter in
  * Figure 5 of section III.A. of the following paper:
  *
  * Hari Adiseshu, Subhash Suri, Guru Parulkar, "Detecting and
