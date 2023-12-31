@@ -167,13 +167,6 @@
       (persistent! ret-vec))))
   
 
-;; TODO: Idea to improve efficiency of add-resolve-rules-helper: Keep
-;; count of the number of duplicate rules that rules-out-vec contains,
-;; and only when it exceeds some threshold, only then remove them all,
-;; between itrations of the loop, before continuing.  Because
-;; rules-out-vec is maintained in reverse priority order, the _last_
-;; equal rule should be kept, and the earlier ones removed.
-
 ;; For better efficiency, the set of rules should not contain any
 ;; rules that would be removed by remove-unmatchable, or equivalently,
 ;; the input should be the :rules-kept part of the output of a call to
@@ -219,3 +212,103 @@
      :num-unmatchable-before-add-resolve (count (:unmatchable-rules r1))
      :num-resolve-rules-created (- (count r2) (count (:rules-kept r1)))
      :num-duplicates-after-add-resolve (count (:duplicate-rules r3))}))
+
+
+(defn resolve-rules-to-add2 [rule-to-add cur-rules-data
+                             k data-combine-fn]
+  (loop [remaining-cur-rules (:rules-out-vec cur-rules-data)
+         ret-vec (transient (conj (:rules-out-vec cur-rules-data) rule-to-add))
+         ret-set (:rules-out-set cur-rules-data)
+         num-duplicates (:num-duplicates-in-vec cur-rules-data)]
+    (if (seq remaining-cur-rules)
+      (let [rule (first remaining-cur-rules)]
+        (if (= (compare-rules rule rule-to-add) :rule-compare-conflict)
+          (let [resolve-rule (assoc
+                              (rule-intersection rule-to-add rule)
+                              k (data-combine-fn (get rule-to-add k)
+                                                 (get rule k)))
+                dup? (contains? ret-set (:field resolve-rule))]
+              (recur (rest remaining-cur-rules)
+                     (conj! ret-vec resolve-rule)
+                     (if dup? ret-set (conj ret-set (:field resolve-rule)))
+                     (if dup? (inc num-duplicates) num-duplicates)))
+          ;; else
+          (recur (rest remaining-cur-rules) ret-vec ret-set num-duplicates)))
+      (assoc cur-rules-data
+             :rules-out-vec (persistent! ret-vec)
+             :rules-out-set ret-set
+             :num-duplicates-in-vec num-duplicates))))
+  
+
+;; add-resolve-rules-helper2 implements an idea to improve efficiency
+;; of add-resolve-rules-helper: Keep count of the number of duplicate
+;; rules that rules-out-vec contains, and when it exceeds some
+;; threshold, only then remove them all, between itrations of the
+;; loop, before continuing.  Because rules-out-vec is maintained in
+;; reverse priority order, the _last_ equal rule should be kept, and
+;; the earlier ones removed.
+
+;; For better efficiency, the set of rules should not contain any
+;; rules that would be removed by remove-unmatchable, or equivalently,
+;; the input should be the :rules-kept part of the output of a call to
+;; remove-unmatchable.
+(defn add-resolve-rules-helper2 [rules k data-combine-fn opts]
+  (let [last-print-count (atom 0)]
+    (loop [remaining-rules-in (rseq rules)
+           m {:rules-out-vec []
+              :rules-out-set #{}
+              :num-duplicates-in-vec 0
+              :duplicates-removed 0}]
+      (if (seq remaining-rules-in)
+        (let [rule-in (first remaining-rules-in)
+              next-m (resolve-rules-to-add2 rule-in m k data-combine-fn)
+              _ (when (:show-progress opts)
+                  (let [n (count (:rules-out-vec next-m))]
+                    (when (>= n (+ @last-print-count 5000))
+                      (println (format " %d more rules added by add-resolve-rules-helper2, %d more rules to process ..."
+                                       (- n @last-print-count)
+                                       (count remaining-rules-in)))
+                      (reset! last-print-count n))))
+              ]
+          ;; Different values of the threshold should not affect the
+          ;; correctness, but may affect the efficiency.
+          (if (>= (:num-duplicates-in-vec next-m) 1000)
+            (let [tmp (remove-duplicates (rseq (:rules-out-vec next-m)))
+                  num-dups-removed (count (:duplicate-rules tmp))]
+              (when (:show-progress opts)
+                (println (format "%d duplicate rules removed during add-resolve-rules-helper2"
+                                 num-dups-removed)))
+              (recur (rest remaining-rules-in)
+                     {:rules-out-vec (vec (rseq (:rules-kept tmp)))
+                      :rules-out-set (:rules-out-set next-m)
+                      :num-duplicates-in-vec 0
+                      :duplicates-removed (+ (:duplicates-removed next-m)
+                                             num-dups-removed)}))
+            ;; else
+            (recur (rest remaining-rules-in) next-m)))
+        ;; else
+        (vec (rseq (:rules-out-vec m)))))))
+
+
+;; TODO: Another idea that might lead to a more efficient version of
+;; add-resolve-rules-helper:
+;;
+;; Instead of delaying elimination of duplicates like
+;; add-resolve-rules-helper2 does, do it immediately.
+;;
+;; I do not know of a good way to efficiently remove elements from a
+;; persistent sequence.  In the absence of creating a good method for
+;; doing so, or of using mutable doubly-linked lists, another approach
+;; would be to simply update a Clojure vector to change a duplicate to
+;; be removed to nil, a kind of "lazy deletion", and have future
+;; iterations of the vector recognize and skip over nil elements.
+;;
+;; To quickly find the vector index that contains the duplicate,
+;; maintain a map from (:field rule) vector values to the vector index
+;; containing the only current index of a rule with those field match
+;; criteria.
+;;
+;; When a later duplicate rule is created, and we want to remove the
+;; earlier one, first update the vector to change the earlier
+;; duplicate to nil, then update the map to contain the index of the
+;; just-created rule.
