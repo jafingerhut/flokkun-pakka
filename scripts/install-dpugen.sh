@@ -17,3 +17,10 @@ F="$HOME/dpugen-setup.bash"
 cp /dev/null ${F}
 echo "source \$HOME/venv-dpugen/bin/activate" > ${F}
 echo "export PYTHONPATH=\"\$HOME/dpugen:\$HOME/venv-dpugen/lib/python3.8/site-packages\"" > ${F}
+
+echo ""
+echo "To try running dpugen, run these commands:"
+echo ""
+echo "    source \$HOME/dpugen-setup.bash"
+echo "    cd \$HOME/dpugen"
+echo "    python3 -m dpugen.dash -o small.json"
