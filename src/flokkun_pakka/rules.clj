@@ -312,3 +312,165 @@
 ;; earlier one, first update the vector to change the earlier
 ;; duplicate to nil, then update the map to contain the index of the
 ;; just-created rule.
+
+
+
+(defn make-change-points [int-range-seq min-int max-int]
+  (reduce (fn [m range]
+            (let [m (update m (:low range)
+                            #(conj (or % [])
+                                   [:add-range range]))]
+              (if (< (:high range) max-int)
+                (update m (inc (:high range))
+                        #(conj (or % [])
+                               [:remove-range range]))
+                m)))
+          (sorted-map) int-range-seq))
+
+
+;; int-range-seq is a sequence of ranges, each range represented as a
+;; map with keys :low and :high.  For every range r, this condition is
+;; true:
+;;
+;;     (<= min-int (:low r) (:high r) max-int)
+;;
+;; Unchecked assumption about arguments: Each distinct range occurs at
+;; most once in int-range-seq.
+
+(defn make-int-range-binary-search-tables [int-range-seq min-int max-int]
+  (let [change-points (make-change-points int-range-seq min-int max-int)
+        [field-val interval-updates] (first change-points)
+        first-change-point-min-int? (= min-int field-val)]
+    (loop [cur-matching-ranges (if first-change-point-min-int?
+                                 (set (map second interval-updates))
+                                 #{})
+           remaining-change-points (if first-change-point-min-int?
+                                     (rest change-points)
+                                     change-points)
+           binary-search-vec [0]
+           matching-ranges-vec [cur-matching-ranges]]
+      (if (seq remaining-change-points)
+        ;; todo
+        (let [[field-val interval-updates] (first remaining-change-points)
+              next-matching-ranges (reduce
+                                    (fn [matching-ranges [change range]]
+                                      (case change
+                                        :add-range (conj matching-ranges range)
+                                        :remove-range
+                                        (disj matching-ranges range)))
+                                    cur-matching-ranges
+                                    interval-updates)]
+          (recur next-matching-ranges
+                 (rest remaining-change-points)
+                 (conj binary-search-vec field-val)
+                 (conj matching-ranges-vec next-matching-ranges)))
+        ;; else
+        {:binary-search-vec binary-search-vec
+         :matching-ranges matching-ranges-vec}))))
+
+
+;; Calculate and return an integer value j in the range [min-int,
+;; max-int] that maximizes the number of ranges in int-range-seq that
+;; j lies in.  Also return a sequence of the ranges that j lies in.
+;;
+;; See make-int-range-binary-search-tables for assumed restrictions on
+;; input values.
+
+(defn most-int-ranges-containing-same-value [int-range-seq min-int max-int]
+  (let [{:keys [binary-search-vec matching-ranges]}
+        (make-int-range-binary-search-tables int-range-seq min-int max-int)
+
+        max-idx (apply max-key (fn [idx]
+                                 (count (nth matching-ranges idx)))
+                       (range (count matching-ranges)))]
+    {:field-value (nth binary-search-vec max-idx)
+     :matching-match-criteria (nth matching-ranges max-idx)}))
+
+
+(def ipv4-classbench-field-info
+  [{:long-name "IPv4 source address"
+    :short-name "SA"
+    :min-value 0
+    :max-value 0xffffffff}
+   {:long-name "IPv4 destination address"
+    :short-name "DA"
+    :min-value 0
+    :max-value 0xffffffff}
+   {:long-name "IP protocol"
+    :short-name "prot"
+    :min-value 0
+    :max-value 0xff}
+   {:long-name "L4 source port"
+    :short-name "sport"
+    :min-value 0
+    :max-value 0xffff}
+   {:long-name "L4 destination port"
+    :short-name "dport"
+    :min-value 0
+    :max-value 0xffff}])
+
+
+(defn field-stats [rules field-idx field-info]
+  (let [all-match-criteria (mapv (fn [r] (nth (:field r) field-idx))
+                                 rules)
+        distinct-match-criteria (set all-match-criteria)
+        mir (most-int-ranges-containing-same-value distinct-match-criteria
+                                                   (:min-value field-info)
+                                                   (:max-value field-info))
+        ]
+    {:num-distinct-match-criteria (count distinct-match-criteria)
+     :field-value-matching-max-distinct-match-criteria (:field-value mir)
+     :max-distinct-match-criteria-matched-by-one-packet
+     (:matching-match-criteria mir)
+     :max-num-distinct-match-criteria-matched-by-one-packet
+     (count (:matching-match-criteria mir))}))
+
+
+(defn ipv4-classbench-rule-stats [rules]
+  (mapv (fn [field-idx]
+          (merge (nth ipv4-classbench-field-info field-idx)
+                 (field-stats rules field-idx
+                              (nth ipv4-classbench-field-info field-idx))))
+        (range (count (:field (nth rules 0))))))
+
+
+(comment
+
+(use 'clojure.pprint)
+(use 'clojure.repl)
+
+(def ranges1 [{:low  0 :high 65535}
+              {:low 10 :high 20}
+              {:low 10 :high 50}
+              {:low 20 :high 51}
+              {:low 51 :high 100}])
+(def min-int 0)
+(def max-int 65535)
+
+(def cp1 (make-change-points ranges1 min-int max-int))
+(pprint cp1)
+
+(def mr1 (make-int-range-binary-search-tables ranges1 min-int max-int))
+(pprint mr1)
+
+(def mir1 (most-int-ranges-containing-same-value ranges1 min-int max-int))
+(pprint mir1)
+
+(count (:matching-ranges mr1))
+
+(apropos "max")
+(doc max-key)
+
+(defn num-matching-ranges [idx]
+  (let [dat (nth (:matching-ranges mr1) idx)]
+    (println (format "dbg idx %d cnt %d ranges %s" idx (count dat) dat)))
+  (count (nth (:matching-ranges mr1) idx)))
+
+(def max-idx (apply max-key (fn [idx] (count (nth (:matching-ranges mr1) idx))) (range (count (:matching-ranges mr1)))))
+(def max-idx (apply max-key num-matching-ranges (range (count (:matching-ranges mr1)))))
+
+max-idx
+(nth (:binary-search-vec mr1) max-idx)
+(nth (:matching-ranges mr1) max-idx)
+
+)

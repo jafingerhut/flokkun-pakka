@@ -1,5 +1,6 @@
 (ns flokkun-pakka.main
   (:require [clojure.java.io :as io]
+            [clojure.pprint :as pp]
             [flokkun-pakka.rules :as r]
             [flokkun-pakka.io :as fio]))
 
@@ -95,6 +96,18 @@
     (let [x (count (:rules res))]
       (println (format "  %10d (%.1f / rule) rules written"
                        x (/ (double x) n2))))))
+
+
+(defn test-ipv4-classbench-rule-stats [m]
+  (when-not (and (string? (:in m))
+                 (string? (:out m)))
+    (println "Input map must have strings containing file names as values of keys :in and :out")
+    (System/exit 1))
+  (let [rules (fio/load-ipv4-classbench-rules-file (:in m))
+        _ (println (format "%10d rules read" (count rules)))
+        res (r/ipv4-classbench-rule-stats rules)]
+    (binding [*out* (io/writer (:out m))]
+      (pp/pprint res))))
 
 
 (comment
