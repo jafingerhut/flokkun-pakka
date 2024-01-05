@@ -978,7 +978,7 @@ me most of what I know on this topic.
 
 \section{Proofs}
 
-\subsection{Match criteria that are closed under intersection}
+\subsection{Match kinds that are closed under intersection}
 
 \begin{definition}
 \label{defn:closedunderintersection}
@@ -1162,11 +1162,93 @@ size of the input match criteria.  That relationship should be proved.}
 \todo{Note that set-of-ranges can represent arbitrary sets of field values, given enough sets.  e.g. the single ternary match criteria for a 32-bit field *1 (where the * represents 31 bit positions of wildcard) requires $2^{31}$ ranges to represent.  That is large to seriously consider in a practical implementation.}
 
 
-\subsection{Other proofs}
+\subsection{Other facts about rule intersections}
+
+\begin{lemma}
+\label{lem:rangefieldpairwiseintersectionimpliescommonintersection}
+Let $M = \{m_1, ..., m_k\}$ be a set of range match criteria
+such that for all $m_i, m_j \in M$, $m_i \cap m_j$ is not empty.
+Then $\bigcap_{1 \leq i \leq k} m_i$ is not empty.
+\end{lemma}
+
+\begin{proof}
+Referring to Lemma~\ref{lem:rangematchclosedunderintersection},
+recall that two range match criteria $m_i = [a_i, b_i]$
+and $m_j = [a_j, b_j]$ have a non-empty intersection
+if and only if $a_i \leq b_j$ and $a_j \leq b_i$.
+
+Since this is true for all $m_i, m_j \in M$,
+it must be the case that for all $i$,
+$a_i \leq min_{1 \leq j \leq k} b_j$.
+
+Thus $\max_{1 \leq j \leq k} a_j \leq min_{1 \leq j \leq k} b_j$.
+
+The intersection of all $m_i$ is the range
+$[\max_{1 \leq j \leq k} a_j, min_{1 \leq j \leq k} b_j]$,
+and since the first range end point is at most
+the second range end point, the range is not empty.
+\end{proof}
+
+
+\begin{theorem}
+\label{thm:rangerulepairwiseintersectionimpliescommonintersection}
+Let $F$ be a set of fields, each with a range match kind.
+Let $R = \{r_1, ..., r_k\}$ be a set of rules on $F$
+such that for all $r_i, r_j \in R$, $r_i \cap r_j$ is not empty.
+Then $\bigcap_{1 \leq i \leq k} r_i$ is not empty.
+\end{theorem}
+
+\todo{It seems like this might be a special case of Helly's Theorem.  Is it?}
+
+\begin{proof}
+Let the match criteria for a field $f \in F$ of rule $r_i$ be
+the range $[a_{i,f}, b_{i,f}]$.
+
+Since rules $r_i$ and $r_j$ have a non-empty intersection,
+that implies that every individual field of $r_i$ and $r_j$
+has a non-empty intersection.
+
+By applying Lemma~
+\ref{lem:rangefieldpairwiseintersectionimpliescommonintersection}
+to each field, we know that the intersection of each field's
+match criteria across {\em all} rules has a non-empty intersection.
+
+We can construct the intersection of all rules in $R$ as
+the intersection of each individual field's match criteria.
+Since all fields of this intersection rule have a non-empty
+match criteria, the rule the comprise is also non-empty.
+\end{proof}
+
+
+\begin{theorem}
+\label{thm:ternaryrulepairwiseintersectionimpliescommonintersection}
+Let $F$ be a set of fields, each with a range or ternary match kind.
+Let $R = \{r_1, ..., r_k\}$ be a set of rules on $F$
+such that for all $r_i, r_j \in R$, $r_i \cap r_j$ is not empty.
+Then $\bigcap_{1 \leq i \leq k} r_i$ is not empty.
+\end{theorem}
+
+\begin{proof}
+Recall the technique introduced in the proof of
+Lemma~\ref{lem:ternarymatchclosedunderintersection}
+where a $w$-bit ternary field can be viewed as
+$w$ 1-bit prefix fields.
+Apply that transformation to all ternary field in $R$,
+and further recall that prefix match criteria are simply a restricted
+form of range match criteria.
+
+Apply Theorem~\ref{thm:rangerulepairwiseintersectionimpliescommonintersection}
+to the resulting set of rules,
+we see that the intersection of all rules in $R$
+have a non-empty intersection.
+\end{proof}
 
 \begin{theorem}
 \label{thm:addnewfilterpreservesclosedunderintersection}
 \end{theorem}
+
+
+\subsection{Other proofs}
 
 \end{document}
 \endinput
