@@ -1,0 +1,1174 @@
+%%
+%% This is file `sample-manuscript.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% samples.dtx  (with options: `manuscript')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from sample-manuscript.tex.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file samples.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+%%
+%% Commands for TeXCount
+%TC:macro \cite [option:text,text]
+%TC:macro \citep [option:text,text]
+%TC:macro \citet [option:text,text]
+%TC:envir table 0 1
+%TC:envir table* 0 1
+%TC:envir tabular [ignore] word
+%TC:envir displaymath 0 word
+%TC:envir math 0 word
+%TC:envir comment 0 0
+%%
+%%
+%% The first command in your LaTeX source must be the \documentclass command. This is the generic manuscript mode required for submission and peer review.
+%\documentclass[manuscript,screen,review]{acmart}
+\documentclass[acmsmall]{acmart}
+%% To ensure 100% compatibility, please check the white list of
+%% approved LaTeX packages to be used with the Master Article Template at
+%% https://www.acm.org/publications/taps/whitelist-of-latex-packages 
+%% before creating your document. The white list page provides 
+%% information on how to submit additional LaTeX packages for 
+%% review and adoption.
+%% Fonts used in the template cannot be substituted; margin 
+%% adjustments are not allowed.
+
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
+
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+%\setcopyright{acmlicensed}
+\copyrightyear{2023}
+%\acmYear{2018}
+%\acmDOI{XXXXXXX.XXXXXXX}
+
+\usepackage{makecell}
+
+%% \todo{} command.
+%
+% Outputs red TODOs in the document. Requires \usepackage{color}.
+%
+% Usage: \todo{Document the TODO command.}
+%
+% Comment out second line to disable.
+\newcommand{\todo}[1]{}
+\renewcommand{\todo}[1]{{\color{red} TODO: {#1}}}
+
+% Bitwise operations for formulas
+\newcommand*\BitAnd{\mathbin{\&}}
+\newcommand*\BitOr{\mathbin{|}}
+% TODO: Find a good definition for \BitXor
+% \ll and \gg look a little "tight" to me visually
+%\newcommand*\ShiftLeft{\ll}
+%\newcommand*\ShiftRight{\gg}
+\newcommand*\ShiftLeft{<<}
+\newcommand*\ShiftRight{>>}
+\newcommand*\BitNeg{\ensuremath{\mathord{\sim}}}
+
+% Macros that will let me reconfigure notation later for the priority and action id
+% of a rule.
+\newcommand{\prio}[1]{}
+\renewcommand{\prio}[1]{\ensuremath{\mathtt{prio}({#1})}}
+\newcommand{\actionid}[1]{}
+\renewcommand{\actionid}[1]{\ensuremath{\mathtt{actionid}({#1})}}
+\newcommand{\fullmask}[1]{}
+\renewcommand{\fullmask}[1]{\ensuremath{\mathtt{mask}({#1})}}
+\newcommand{\prefixmask}[2]{}
+\renewcommand{\prefixmask}[2]{\ensuremath{\mathtt{pmask}({#1},{#2})}}
+
+%% These commands are for a PROCEEDINGS abstract or paper.
+% \acmConference[Conference acronym 'XX]{Make sure to enter the correct
+%   conference title from your rights confirmation emai}{June 03--05,
+%   2018}{Woodstock, NY}
+%
+%  Uncomment \acmBooktitle if th title of the proceedings is different
+%  from ``Proceedings of ...''!
+%
+%\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
+%  June 03--05, 2018, Woodstock, NY} 
+
+%% These commands are for a JOURNAL article.
+%\acmJournal{JACM}
+%\acmVolume{37}
+%\acmNumber{4}
+%\acmArticle{111}
+%\acmMonth{8}
+
+%\acmISBN{978-1-4503-XXXX-X/18/06}
+
+
+%%
+%% Submission ID.
+%% Use this when submitting an article to a sponsored event. You'll
+%% receive a unique submission ID from the organizers
+%% of the event, and this ID should be used as the parameter to this command.
+%%\acmSubmissionID{123-A56-BU3}
+
+%%
+%% For managing citations, it is recommended to use bibliography
+%% files in BibTeX format.
+%%
+%% You can then either use BibTeX with the ACM-Reference-Format style,
+%% or BibLaTeX with the acmnumeric or acmauthoryear sytles, that include
+%% support for advanced citation of software artefact from the
+%% biblatex-software package, also separately available on CTAN.
+%%
+%% Look at the sample-*-biblatex.tex files for templates showcasing
+%% the biblatex styles.
+%%
+
+%%
+%% The majority of ACM publications use numbered citations and
+%% references.  The command \citestyle{authoryear} switches to the
+%% "author year" style.
+%%
+%% If you are preparing content for an event
+%% sponsored by ACM SIGGRAPH, you must use the "author year" style of
+%% citations and references.
+%% Uncommenting
+%% the next command will enable that style.
+%%\citestyle{acmauthoryear}
+
+%%
+%% end of the preamble, start of the body of the document source.
+\begin{document}
+
+%%
+%% The "title" command has an optional parameter,
+%% allowing the author to define a "short title" to be used in page headers.
+\title{Packet Classification}
+
+%%
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+%% Of note is the shared affiliation of the first two authors, and the
+%% "authornote" and "authornotemark" commands
+%% used to denote shared contribution to the research.
+\author{J. Andrew Fingerhut}
+\authornote{Both authors contributed equally to this research.}
+\email{andy.fingerhut@gmail.com}
+\orcid{1234-5678-9012}
+
+
+%%
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+\renewcommand{\shortauthors}{Trovato and Tobin, et al.}
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\begin{abstract}
+\todo{Abstract here.}
+\end{abstract}
+
+%%
+%% The code below is generated by the tool at http://dl.acm.org/ccs.cfm.
+%% Please copy and paste the code instead of the example below.
+%%
+\begin{CCSXML}
+<ccs2012>
+ <concept>
+  <concept_id>00000000.0000000.0000000</concept_id>
+  <concept_desc>Do Not Use This Code, Generate the Correct Terms for Your Paper</concept_desc>
+  <concept_significance>500</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>00000000.00000000.00000000</concept_id>
+  <concept_desc>Do Not Use This Code, Generate the Correct Terms for Your Paper</concept_desc>
+  <concept_significance>300</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>00000000.00000000.00000000</concept_id>
+  <concept_desc>Do Not Use This Code, Generate the Correct Terms for Your Paper</concept_desc>
+  <concept_significance>100</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>00000000.00000000.00000000</concept_id>
+  <concept_desc>Do Not Use This Code, Generate the Correct Terms for Your Paper</concept_desc>
+  <concept_significance>100</concept_significance>
+ </concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Do Not Use This Code~Generate the Correct Terms for Your Paper}
+\ccsdesc[300]{Do Not Use This Code~Generate the Correct Terms for Your Paper}
+\ccsdesc{Do Not Use This Code~Generate the Correct Terms for Your Paper}
+\ccsdesc[100]{Do Not Use This Code~Generate the Correct Terms for Your Paper}
+
+%%
+%% Keywords. The author(s) should pick words that accurately describe
+%% the work being presented. Separate the keywords with commas.
+\keywords{Do, Not, Us, This, Code, Put, the, Correct, Terms, for,
+  Your, Paper}
+
+%\received{20 February 2007}
+%\received[revised]{12 March 2009}
+%\received[accepted]{5 June 2009}
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+
+\section{Introduction}
+
+Try citing a paper with a plus sign in its BibTeX identifier~\cite{LXLS+2023}.
+
+
+\section{CCS Concepts and User-Defined Keywords}
+
+Two elements of the ``acmart'' document class provide powerful
+taxonomic tools for you to help readers find your work in an online
+search.
+
+The ACM Computing Classification System ---
+\url{https://www.acm.org/publications/class-2012} --- is a set of
+classifiers and concepts that describe the computing
+discipline. Authors can select entries from this classification
+system, via \url{https://dl.acm.org/ccs/ccs.cfm}, and generate the
+commands to be included in the \LaTeX\ source.
+
+User-defined keywords are a comma-separated list of words and phrases
+of the authors' choosing, providing a more flexible way of describing
+the research being presented.
+
+CCS concepts and user-defined keywords are required for for all
+articles over two pages in length, and are optional for one- and
+two-page articles (or abstracts).
+
+
+\section{Comparison of algorithms for normal packet classification problem}
+
+Notation:
+\begin{itemize}
+  \item $n$ is the number of rules.
+  \item $d$ is the number of fields, or dimensions.
+  \item $w$ is the number of bits in the largest field.
+  \item $t$ is the number of matching rules.  Algorithms that includes this in the search time return all matching rules.
+  \item $H(n,w)$ is the time to perform a hash lookup in a table with up to $n$ elements, each $w$ bits wide.  Often this is considered to be $O(1)$ in papers that use hashing.
+  \item $L(n,w)$ is the time for any longest prefix match algorithm on $n$ prefixes of a field that is $w$ bits wide.
+  \item $k$ is a parameter chosen by the implementer
+\end{itemize}
+
+Table~\ref{tab:summary1} summarizes some memory and run-time properties of several algorithms for the normal packet classification problem with arbitrary dimension $d$.
+
+\begin{table*}
+  \caption{Algorithms for normal packet classification problem}
+  \label{tab:summary1}
+  \begin{tabular}{llcccl}
+    \toprule
+    
+      Algorithm
+    & Match kinds
+    & Search time
+    & Memory
+    & Construction time
+    & Source \\
+    
+    \midrule
+
+      0
+    & ternary, range
+    & $O(n)$
+    & $O(n)$
+    & $O(n)$
+    & linear search
+    \\
+
+      bit vector
+    & range
+    & $O(d(n/k) + d \log(n))$
+    & $O(n^2)$
+    & $O(n^2)$ ?
+    & \cite[Sec. 4]{LS1998}
+    \\
+
+      1
+    & range
+    & $O((\log n)^{2d-1} + t)$
+    & $O(n (\log n)^{d-1} )$
+    & $O(n (\log n)^d )$
+    & \cite[Thm. 3.2]{Edel1983a}
+    \\
+
+      2
+    & range
+    & $O((\log n)^{2d-1} + t)$
+    & $O(n (\log n)^{2d-1} )$
+    & $O(n (\log n)^{2d-1} )$
+    & \cite[Cor. 2.2]{Edel1983a}
+    \\
+
+      3
+    & range
+    & $O(d \log n)$
+    & $O(n^d)$
+    & $O(n^d)$
+    & \cite[Sec. 2.3]{PS1985}
+    \\
+
+      4
+    & prefix
+    & $O(d L(n,w))$
+    & $O(n^d)$
+    & $O(n^d)$
+    & \cite[Sec. 2.3]{PS1985}
+    \\
+
+  \bottomrule
+\end{tabular}
+\end{table*}
+
+Table~\ref{tab:summary2} summarizes some memory and run-time properties of several algorithms for the normal packet classification problem restricted to $d=2$.
+
+\begin{table*}
+  \caption{Algorithms for normal packet classification problem with $d=2$}
+  \label{tab:summary2}
+  \begin{tabular}{llcccl}
+    \toprule
+    
+      Algorithm
+    & Match kinds
+    & Search time
+    & Memory
+    & Construction time
+    & Source \\
+    
+    \midrule
+
+      0
+    & ternary, range
+    & $O(n)$
+    & $O(n)$
+    & $O(n)$
+    & linear search
+    \\
+
+      1
+    & range
+    & $O((\log n)^3 + t)$
+    & $O(n \log n )$
+    & $O(n (\log n)^2 )$
+    & \cite[Thm. 3.2]{Edel1983a}
+    \\
+
+      3
+    & range
+    & $O(\log n)$
+    & $O(n^2)$
+    & $O(n^2)$
+    & \cite[Sec. 2.3]{PS1985}
+    \\
+
+      4
+    & prefix
+    & $O(L(n,w))$
+    & $O(n^2)$
+    & $O(n^2)$
+    & \cite[Sec. 2.3]{PS1985}
+    \\
+
+      Grid of tries
+    & prefix
+    & $O(w H(n,w))$
+    & $O(nw)$
+    & $O(nw)$ ?
+    & \cite{SVSW1998}
+    \\
+
+      Rectangle search
+    & prefix\footnotemark{}
+    & $O(w H(n,w))$
+    & $O(n \sqrt{w})$
+    & $O(nw)$ ?
+    & \cite[Sec. 8]{SSV1999}
+    \\
+
+  \bottomrule
+\end{tabular}
+\end{table*}
+
+\footnotetext{Also generalizes to a set of nested ranges}
+
+Table~\ref{tab:summarylpm} summarizes some memory and run-time properties of several algorithms for the normal packet classification problem restricted to $d=1$, which for
+prefixes is the longest prefix match problem.
+The search times in this table can be used as values for $L(n,w)$.
+
+\begin{table*}
+  \caption{Algorithms for normal packet classification problem with $d=1$}
+  \label{tab:summarylpm}
+  \begin{tabular}{llcccl}
+    \toprule
+    
+      Algorithm
+    & Match kinds
+    & Search time
+    & Memory
+    & Construction time
+    & Source \\
+    
+    \midrule
+
+      1
+    & range
+    & $O(\log n + t)$
+    & $O(n)$
+    & $O(n \log n)$
+    & \cite[Thm. 3.2]{Edel1983a}
+    \\
+
+      todo
+    & prefix
+    & $O((\log w) H(n,w))$
+    & todo
+    & todo
+    & \cite{WVTP1997}
+    \\
+
+  \bottomrule
+\end{tabular}
+\end{table*}
+
+
+\section{Definitions}
+
+This is an alphabetized list of defined terms.
+\begin{itemize}
+\item {\em backward redundancy}, of a pair of rules in a rule sequence:~\ref{defn:backwards-redundant}
+\item {\em conflict}, of rules:~\ref{defn:rule-conflict}
+\item {\em forward redundancy}, of a pair of rules in a rule sequence:~\ref{defn:forward-redundant}
+\item {\em intersect}, of rules:~\ref{defn:rule-overlap}
+\item {\em match}, i.e. of a tuple of field values matching a rule:~\ref{defn:match}
+\item {\em match kind}:~\ref{defn:match-kind}
+\item {\em normal classification problem}:~\ref{defn:normal-classification-problem}
+\item {\em overlap}, of rules:~\ref{defn:rule-overlap}
+\item {\em overlap graph}, of a rule set
+\item {\em redundant rules} - see forward redundancy and backward redundancy
+\item {\em rule}:~\ref{defn:rule}
+\item {\em rule sequence}
+\item {\em subset}, of rules:~\ref{defn:rule-subset}
+\item {\em unmatchable}, of a rule in a rule sequence:~\ref{defn:backwards-redundant}
+\item {\em well-defined rule set}:~\ref{defn:well-defined-rule-set}
+\end{itemize}
+
+\subsection{Definitions of classification problem, match kinds, match criteria}
+
+\begin{definition}[normal classification problem]
+\label{defn:normal-classification-problem}
+An instance of a normal classification problem consists of:
+\begin{itemize}
+\item a set of {\em fields} $F$,
+  where values of field $f \in F$ are integers in the range $[0, 2^w(f)-1]$,
+  i.e. unsigned integers with $W(f)$ bits.
+\item a {\em match kind} for each field (see below), and
+\item a set of {\em rules} $R$
+  against which tuples of field values are matched (see below).
+\end{itemize}
+\end{definition}
+
+\begin{definition}[match kind]
+\label{defn:match-kind}
+A match kind is one of ternary, range, prefix, optional, or exact.
+%\begin{itemize}
+%\item ternary
+%\item range
+%\item prefix
+%\item optional
+%\item exact
+%\item {\em ternary} - the match criteria is a value $V$ and a mask $M$.  A field
+%  value $f$ matches if $(f \BitAnd M) = V$.  The bit positions of $M$ that are
+%  0 are don't care bit positions where the field value can be any bit,
+%  and the bit positions of $M$ that are 1 are exact match bit positions
+%  where the field value must be the same as the corresponding bit
+%  position of $V$.
+%\item {\em range} - the match criteria is a minimum value $MIN$ and a maximum
+%  value $MAX$.  A field value $f$ matches if $(MIN \leq f) \land (f \leq MAX)$.
+%\item {\em prefix} - the match criteria is a value $V$ and a prefix length $P$ in
+%  the range $[0,W]$, where the field is $W$ bits.  A field matches the
+%  same as a ternary field with the same value $V$ and a mask
+%  $M=(((1 \ShiftLeft W) - 1) \ShiftRight (W-P)) \ShiftLeft (W-P)$.
+%  This is a {\rm prefix mask}, such that the value must equal the field in
+%  the most significant $P$ bits.
+%  \begin{itemize}
+%  \item Example: a 32-bit field's prefix match criteria could be value
+%    $V=\mathtt{0x0a010100}$ with prefix length $P=24$, which matches the same as a
+%    ternary field with the same value $V$ and a mask $M=\mathtt{0xffffff00}$
+%  \end{itemize}
+%\item {\em optional} - like ternary, except the mask is restricted to be either
+%  0 for a completely don't care value, or $((1 \ShiftLeft W) - 1)$ for exact
+%  value.
+%\item {\em exact} - the match criteria is a single value $V$.
+%  A field value $f$ matches if $f = V$.
+%\end{itemize}
+\end{definition}
+
+\begin{definition}
+\label{defn:masks}
+The expressions $\fullmask{w}$ and $\prefixmask{w}{p}$ are defined as:
+\begin{itemize}
+\item $\fullmask{w} = (1 \ShiftLeft w) - 1$, where $w \geq 0$ is an integer.
+\item $\prefixmask{w}{p} = (\fullmask{w} \ShiftRight (w-p)) \ShiftLeft (w-p)$,
+where $w \geq 0$ and $0 \leq p \leq w$ are integers.
+%\item $\prefixmask{w}{p} = \fullmask{w} \BitAnd (\BitNeg \fullmask{w-p})$,
+%where $w \geq 0$ and $0 \leq p \leq w$ are integers.
+\end{itemize}
+\end{definition}
+
+\begin{definition}
+\label{defn:match-criteria}
+Table~\ref{tab:matchcriteria} defines the values used to specify
+the {\em match criteria} for each match kind,
+and what the condition is for a field value $x$ to match that match criteria.
+The value $w \geq 1$ is the width of the field in bits.
+\end{definition}
+
+Unless stated explicitly otherwise,
+for a ternary match criteria $m$,
+$V$ and $M$ will satisfy the restriction $V \BitAnd (\BitNeg M) = 0$,
+because if that condition did not hold, no value of $f$ would match $m$.
+
+For the same reason, a range match criteria $MIN$ and $MAX$
+will satisfy the restriction $MIN \leq MAX$.
+
+
+\begin{table*}
+  \caption{Definitions of match criteria for different match kinds}
+  \label{tab:matchcriteria}
+  \begin{tabular}{lcccl}
+    \toprule
+    
+      \makecell{Match \\ Kind}
+    & \makecell{Values specifying \\ the match criteria}
+    & \makecell{Range of \\ values}
+    & \makecell{Match \\ condition}
+    & \makecell{Restriction \\ on values}
+    \\
+    
+    \midrule
+
+      ternary
+    & \makecell{value $V$, \\ mask $M$}
+    & $[0, 2^w-1]$
+    & $(x \BitAnd M) = V$
+    & $V \BitAnd (\BitNeg M) = 0$
+    \\
+
+    \midrule
+      range
+    & \makecell{values $MIN$ \\ and $MAX$}
+    & $[0, 2^w-1]$
+    & \makecell{$(MIN \leq x) \land $ \\ $(x \leq MAX)$}
+    & $MIN \leq MAX$
+    \\
+
+    \midrule
+      prefix
+    & \makecell{value $V$, \\ prefix length $P$}
+    & \makecell{$V$ in $[0, 2^w-1]$, \\ $P$ in $[0, w]$}
+    & \makecell{($x \BitAnd M) = V$ \\ where $M=\prefixmask{w}{P}$}
+    & 
+    \\
+
+    \midrule
+      optional
+    & \makecell{value $V$, \\ don't care $D$}
+    & \makecell{$V$ in $[0, 2^w-1]$ \\ $D$ is boolean}
+    & \makecell{($x \BitAnd M) = V$ \\ where $M=0$ if $d$, \\ else $M=\fullmask{w}$}
+    & 
+    \\
+
+    \midrule
+      exact
+    & value $V$
+    & $[0, 2^w-1]$
+    & $x = V$
+    & 
+    \\
+
+  \bottomrule
+\end{tabular}
+\end{table*}
+
+Relationships:
+\begin{itemize}
+\item {\em exact} is a restriction of {\em optional}.
+\item {\em optional} is a restriction of {\em prefix}.
+\item {\em prefix} is a restriction of {\em ternary}.
+\item {\em prefix} is a restriction of {\em range}.
+\end{itemize}
+Neither of {\em range} and {\em ternary} is a restriction of the other.
+
+\begin{definition}[rule]
+\label{defn:rule}
+Each rule $r$ consists of:
+\begin{itemize}
+\item For every field $f$, a {\em match criteria} appropriate for the match kind
+  of the field.
+\item a {\em priority} $\prio{r}$, which is a positive integer.
+\item an {\em action id} $\actionid{r}$, which for our purposes is specified by a positive integer.
+\end{itemize}
+\end{definition}
+
+Common actions in switches and routers include:
+\begin{itemize}
+\item Permit the packet
+\item Drop the packet
+\item Permit the packet, and log a copy of it to a logging system.
+\item Deny the packet, but log a copy of it to a logging system.
+\item assign values to a subset of the bits in the IPv4 Type of Service
+or IPv6 Traffic Class field, such as the 6-bit DiffServ Code Point (DSCP).
+\item Update a packet counter with a specified index.
+\item Assign a value to the queue that the packet will go to in the traffic management subsystem.
+\end{itemize}
+
+Here we abstract the action associated with a rule to an integer valued action id.
+If two rules have the same action id, then the same action will be performed on them
+if they match those rules.
+If two rules $r_i$ and $r_j$ have different action ids,
+then the action to be performed if the packet matches $r_i$ is different
+than the action to be performed if the packet matches $r_j$.
+
+\begin{definition}[well-defined rule set]
+\label{defn:well-defined-rule-set}
+A rule set $R$ is well-defined if
+for every pair of rules $r_i$ and $r_j$ in $R$,
+at least one of the following conditions is true:
+\begin{itemize}
+\item $\prio{r_i} \neq \prio{r_j}$
+\item $r_i$ is disjoint from $r_j$
+\item $\actionid{r_i} = \actionid{r_j}$
+\end{itemize}
+\end{definition}
+
+For a well-defined rule set,
+if a packet matches both rules $r_i$ and $r_j$, then either:
+\begin{itemize}
+\item their priorities are different, so there is a unique winner, or
+\item they have the same action id,
+    and thus it does not matter which of the rules is the winner.
+\end{itemize}
+
+% What does it mean if a rule set is not well-defined?
+%
+% X == ($\prio{r_i} = \prio{r_j}$
+% Y == ($r_i$ is disjoint from $r_j$)
+% Z == ($\actionid{r_i} = \actionid{r_j}$)
+% If a rule set is {\em not} well-defined, then there is a pair of rules such that:
+%    ~(~X) ^ ~(X ^ Y) ^ ~(X ^ Z)
+% ==    X  ^ (~X v ~Y) ^ (~X v ~Z)
+% ==    X  ^      ~Y   ^ (~X v ~Z)
+% ==    X ^ ~Y ^ ~Z
+% == priorities are same AND they overlap AND their action ids differ
+%
+% Thus it is not well-defined what the action should be if a packet
+% matches both rules $r_i$ and $r_j$.
+
+\begin{definition}[fields matching a rule]
+\label{defn:match}
+A set of fields $F$ {\em matches} a rule $r$ if and only if for every field $f$,
+the value of field $f$ matches the match criteria given in the rule $R$.
+\end{definition}
+
+
+\subsection{Definitions of set relationships between rules}
+
+\begin{definition}[rules overlap, or intersect]
+\label{defn:rule-overlap}
+Rule $r_1$ and $r_2$ {\em overlap}, or {\em intersect},
+if there is a single packet that matches both of the rules.
+\end{definition}
+
+\begin{definition}[disjoint rules]
+\label{defn:disjoint-rules}
+If there is no packet that matches two rules, the rules are {\em disjoint}.
+\end{definition}
+
+Similarly, a set of rules $\{r_1, ..., r_k\}$ {\em overlaps} or {\em intersects}
+if there is a single packet that matches all of the rules.
+If a set of rules overlaps, then every pair of rules in the set also overlap.
+In some scenarios, the converse is also true
+\todo{Give cross-reference to section that proves the converse}.
+
+\begin{definition}[rule subset]
+\label{defn:rule-subset}
+Rule $r_1$ is a {\em subset} of $r_2$ when, for every packet,
+if the packet matches $r_1$, then it also matches $r_2$.
+\end{definition}
+
+\begin{definition}[rule conflict]
+\label{defn:rule-conflict}
+Rules $r_1$ and $r_2$ {\em conflict} if $r_1$ overlaps $r_2$,
+and neither rule is a subset of the other.
+\end{definition}
+Only a few works on packet classification have made use
+of the idea of conflicting rules, or conflict-free rule sequences
+(a rule sequence where every pair of rules does not conflict)
+~\cite{ASP1999,ASP2000,WSV2001}.
+
+The {\em overlap graph} of a set of rules is an undirected graph
+with one node $u_i$ for each rule $r_i$.
+There is an edge $\{u_i, u_j\}$ if and only if
+the rules $r_i$ and $r_j$ overlap.
+
+A {\em rule sequence} is a set of rules that have been sorted
+from highest match priority first to lowest match priority last.
+
+\begin{definition}[backwards redundant, unmatchable]
+\label{defn:backwards-redundant}
+In a rule sequence, if rule $r_i$ appears earlier in the sequence,
+rule $r_j$ appears later,
+and $r_j$ is a subset of $r_i$,
+this is a {\em backwards redundancy}.
+Rule $r_j$ is {\em unmatchable}, at least in the common situation
+where only the highest priority matching rule affects the packet processing behavior.
+\end{definition}
+
+Removing unmatchable rules from a rule sequence
+results in functionally equivalent rule sequence.
+References:~\cite[Sec 2.1]{GM1999a}.
+
+If two consecutive rules in a rule sequence have the same action,
+or are disjoint with each other,
+they may be swapped in order with no difference to the packet processing behavior.
+
+\begin{definition}[forward redundant]
+\label{defn:forward-redundant}
+In a rule sequence, if rule $r_i$ appears earlier in the sequence,
+rule $r_j$ appears later,
+and:
+\begin{itemize}
+\item $r_i$ is a subset of $r_j$,
+\item $r_i$ and $r_j$ have the same action, and
+\item for every rule $r_k$ after $r_i$ but before $r_j$,
+either $r_i$ and $r_k$ are disjoint, or they have the same action
+\end{itemize}
+then this is a {\em forward redundancy}.
+Rule $r_i$ can be removed from the rule sequence
+resulting in a functionally equivalent rule sequence.
+\end{definition}
+
+References:~\cite[Sec 2.1]{GM1999a}.
+
+
+\section{Packet Classification Problems}
+
+The classification problem has these inputs:
+
+\begin{itemize}
+\item a set of field values $f$
+\item a set of rules $R$
+\end{itemize}
+
+and this output:
+
+\begin{itemize}
+\item Among all rules $r$ in $R$ such that $f$ matches $r$, find one that has the
+  maximum priority, and return its action id.  If no rules in $R$ match, return ``none''.
+\end{itemize}
+
+Detail: In this definition of the problem, we will explicitly allow
+sets of rules where more than one are allowed to have the same
+priority value.  In such a case, an algorithm can find {\em any} matching
+rule that has the maximum priority, if there is more than one such
+rule with the same maximum priority value.
+
+Note that typically, the set of rules $R$ will change only rarely,
+compared to how often we receive a new set of field values $f$.
+For example, a network device may process hundreds of millions of
+packets per second, each with their own independent field values to be
+classified, whereas the set of rules $R$ might change on average once
+per hour, or once every 10 minutes.
+
+Thus there are many solutions to this problem that execute fairly
+complex algorithms when a new set of rules $R$ is given, which create
+data structures that can be efficiently used to classify many
+sets of fields against the same set of rules.
+
+This is not true of all solutions or deployments, though.  Some
+published papers have mentioned that for some deployments, updates to
+the sets of rules can come far more often, and often consist of small
+updates of the form:
+
+\begin{itemize}
+\item add one new rule $r$ to the existing set of rules $R$
+\item delete one existing rule $r$ from the current set of rules $R$
+\end{itemize}
+
+
+\section{Lower Bounds}
+
+\todo{What proven lower bounds have been published, and where?}
+
+\todo{Summarize any lower bounds present in these papers, which I suspect have some that might be relevant.  Summarize them even if they are for problems that might not be obvious whether they are relevant to the packet classification problem:
+~\cite{Fred1981}
+~\cite{Chaz1990a}
+~\cite{Chaz1990b}
+%~\cite{}
+}
+
+
+\section{Observed properties of typical rule sets}
+
+These are properties pointed out in existing work on the topic,
+that helped at least one algorithm gain an advantage
+in its approach to the problem.
+
+"Our scheme is motivated by the observation that while filter databases
+contain many different prefixes or ranges,
+the number of distinct prefix lengths tends to be small.
+Thus, the number of distinct combinations of prefix lengths is also small."~\cite[Sec. 5]{SSV1999}
+
+Gupta and McKeown~\cite[Sec. 2.1]{GM1999a} have a detailed description
+of several characteristics they found when analyzing 793 rule sets
+totaling 41,505 rules, thus with an average of 52.3 rules per rule set,
+in 1999.  See there for the full text of their observations,
+but we will summarize them briefly below:
+
+\begin{enumerate}
+  \item Only 0.7\% of the rule sets had more than 1000 rules.  They are manually configured by network operators, and it is significant effort to ensure they are correct.
+  \item The rule sets they collected had a syntax that enabled at most these fields to be specified: IP source and destination address (IPv4 only at this time), IP protocol (8 bits), L4 source and destination ports (16 bits each), Type of Service (ToS, 8 bits), transport layer protocol flags (8 bits).  17\% of all rules had 1 field specified, 23\% had 3 fields specified, and 60\% had 4 fields specified.  Unspecified fields are completely wildcarded.
+  \item The IP protocol field is either exact match or completely wildcard.  The set of exact match values had only 7 elements.
+  \item About 10\% of the rules have L4 port fields with range specifications, e.g. $> 1023$, or range $20-24$.
+  \item About 10\% of all rules had a non-prefix mask for an IP address, i.e. a ternary mask that was not a prefix mask.
+  \item It is common for the match criteria for one or more fields, e.g. the IP source address field, to be the same across multiple rules in a rule set.  This arises naturally when writing such rules, as they are often from one set of hosts to other sets of hosts.
+  \item About 4\% of the rules were backward redundant, and about 4\% more were forward redundant.
+\end{enumerate}
+
+Later~\cite[Sec 5.1]{GM1999a} they observe:
+\begin{quote}
+We analyzed the structure in our dataset to determine
+the number of overlapping regions,
+and we found it to be considerably smaller than the worst case.
+Specifically, for the biggest classifier with 1734 rules,
+we found the number of distinct overlapping regions in four dimensions to be 4316,
+compared to a worst possible case of approximately $10^{13}$
+[$1734^4 \approx 9.0 x 10^{12}]$.
+Similarly we found the number of overlaps to be relatively small
+in each of the classifiers we looked at.
+As we will see, our algorithm will exploit this structure to simplify its task.
+\end{quote}
+
+\todo{What algorithm did they use to calculate this number $4316$?}
+
+Other papers with observations on production rule sets:
+\begin{itemize}
+\item ~\cite[Sec 2]{TT2004b} and Appendix B
+\item ~\cite[Sec 3]{TT2004a}
+\end{itemize}
+
+\todo{Taylor~\cite[Sec 2.2]{TT2004b} gives statistics for many rule sets in Table 2, and more in Appendix B.
+I have files named acl1, fw1, and ipc1 published by H. Song.  Measure these statistics on those files to see if they match what is published in Table 2.  Could those 3 files I have be the original rule sets used in production?  If those statistics match, that is some evidence to support that.}
+
+
+\subsection{Algorithms for calculating properties of rule sets}
+
+
+\subsubsection{For a single field, maximum number of distinct match criteria that a single field value matches}
+
+If the match criteria for a field value is range, prefix, or some other specialization of range, the maximum number of distinct match criteria that are matched by a single field value can be determined in something close to $O(n \log n)$ time.
+
+Construct a sorted list of all match criteria endpoints, of which there are at most $2n$ distinct endpoint values.
+
+The set of match criteria matched by any field avlue $x$ is the same for any value $x$ that is equal to one of those endpoints, or is in the interval $[a_{i}+1, a_{i+1}-1]$, where $a_i$ is one of the endpoints, and $a_{i+1}$ is the next larger endpoint.
+
+Thus for each of the $2n+1$ distinct intervals, calculate the set of match criteria matched by some value $x$ in that range, and take the maximum over those $2n+1$ values.
+
+\todo{Think about algorithms for efficiently calculating this for combinations of 2, 3, etc. fields of a rule set, as mentioned by Taylor~\cite[Sec 2.2]{TT2004b}.}
+
+
+\subsubsection{Maximum number of rules in a rule set matched by any one packet}
+
+\todo{For normal packet classification problem with all range match criteria, I think this is equivalent to solving a maximum clique problem in the overlap graph of the rule set.  Prove or disprove this conjecture, and see if there is anything about overlap graphs that makes maximum clique problem faster to solve for it than for general graphs.  Whether or not there is, find algorithms that are best known for solving maximum clique problem in a graph.}
+
+\todo{Think about algorithms for efficiently calculating this for combinations of 2, 3, etc. fields of a rule set, as mentioned by Taylor~\cite[Sec 2.2]{TT2004b}.}
+
+
+\section{Open Questions}
+
+What properties about a set of rules enables it
+to take a low amount of both time and memory to perform
+packet classification on those rules?
+
+I do not think that this condition is sufficient for RFC to use low memory:
+There exists a small integer $k$ where for all packets,
+it matches at most $k$ rules in the rule set.
+
+Reason: There is a class of rule sets with this property where RFC uses
+$\Theta(n^d)$ memory.
+\todo{Create sub-section with this class of rule sets~\cite[Sec 4.2]{ASP1999},
+and prove this result about RFC memory required.
+I should calculate what the classification time and/or
+memory required are for this class of rule sets for other algorithms.}).
+
+A sufficient condition might be something like:
+the overlap graph of the rule set has at most $cn$ edges for some small constant $c > 0$.
+Or perhaps some restriction on the shape of the graph's edges.
+Can be vertex-colored with at most $k$ colors?
+
+Maximum clique contains at most $k$ nodes?
+I believe that for the normal packet classification problem instances,
+the overlap graph having a clique of $k$ nodes is
+equivalent to the condition
+"for all packets, it matches at most $k$ rules in the rule set".
+Thus if that condition is not sufficient to enable low time and memory,
+then neither is the maximum clique size in the overlap graph.
+\todo{Prove the relationship between maximum clique and maximum number of
+rules that a single packet matches.}
+
+
+\section{Enhancements to investigate}
+
+Gupta and McKeown~\cite[Sec. 7.1]{GM1999a} define the term
+{\em adjacency groups}, and then show how modifying the RFC algorithm
+to find adjacency groups during the creation of RFC data structures
+can reduce their size noticeably.
+\todo{Try to determine why these algorithm changes actually reduce
+the RFC table sizes created.  I was hoping that RFC without such
+an enhancement might be able to somehow find these equivalences on its own.}
+
+Gupta and McKeown~\cite[Sec. 7]{GM1999a} describe a fairly
+straightforward generalization of their work to use a single-dimensional
+algorithm, e.g. for longest prefix match lookups, on individual fields,
+before combining the results across multiple fields.
+\todo{Any implementation I create for this should ideally have the option
+to use this generalization.}
+
+%%
+%% The acknowledgments section is defined using the "acks" environment
+%% (and NOT an unnumbered section). This ensures the proper
+%% identification of the section in the article metadata, and the
+%% consistent spelling of the heading.
+\begin{acks}
+To all of the authors of papers in the bibliography, who taught
+me most of what I know on this topic.
+\end{acks}
+
+%%
+%% The next two lines define the bibliography style to be used, and
+%% the bibliography file.
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{packet-classification}
+
+%%
+%% If your work has an appendix, this is the place to put it.
+\appendix
+
+\section{Proofs}
+
+\subsection{Match criteria that are closed under intersection}
+
+\begin{definition}
+\label{defn:closedunderintersection}
+A match kind is {\em closed under intersection} if,
+for every two match criteria $m_1$, $m_2$ of that match kind,
+their intersection $m_3 = m_1 \cap m_2$ is either:
+\begin{itemize}
+\item empty, or
+\item a match criteria of the same match kind as $m_1$ and $m_2$.
+\end{itemize}
+\end{definition}
+
+\begin{lemma}
+\label{lem:rangematchclosedunderintersection}
+The range match kind is closed under intersection.
+\end{lemma}
+
+\begin{proof}
+Let the range match criteria for $m_1$
+be specified by the range $[a_1, b_1]$, where $a_1 \leq b_1$ are integers,
+and for $m_2$ by the range $[a_2, b_2]$, where $a_2 \leq b_2$ are integers.
+
+Let $a_3 = max(a_1, a_2)$ and $b_3 = min(b_1, b_2)$.
+if $a_3 > b_3$, then either $a_1 > b_2$ or $b_1 > a_2$,
+and the intersection is empty.
+
+Otherwise $m_3 = [a_3, b_3]$ is the intersection of $m_1$ and $m_2$.
+It is straightforward to see that for all integers $x$:
+\begin{itemize}
+\item If $a_1 \leq x \leq b_1$ and $a_2 \leq x \leq b_2$,
+  then $a_3 \leq x \leq b_3$.
+\item If $a_3 \leq x \leq b_3$.
+  then $a_1 \leq x \leq b_1$ and $a_2 \leq x \leq b_2$.
+\end{itemize}
+\end{proof}
+
+\begin{lemma}
+\label{lem:prefixmatchclosedunderintersection}
+The prefix match kind is closed under intersection.
+\end{lemma}
+
+\begin{proof}
+Let prefix match criteria $m_1$
+be specified by value $V_1$ and prefix length $P_1$,
+and let $m_2$
+be specified by value $V_2$ and prefix length $P_2$
+(see Table~\ref{tab:matchcriteria}).
+Let $P=min(P_1,P_2)$.
+
+If the values $V_1$ and $V_2$ differ anywhere in their
+most significant $P$ bits, then their intersection is empty.
+For the rest of this proof we restrict our attention to
+a non-empty intersection, thus $V_1$ and $V_2$ are equal
+in their most significant $P$ bits.
+
+If $P_1 = P_2$, then $m_1$ is the same as $m_2$,
+and their intersection is equal to both of them,
+and the proof is complete for this case.
+
+Assume without loss of generality that $P_1 > P_2$.
+Then the set of values matched by $m_1$ is a strict
+subset of the set of values matched by $m_2$,
+and their intersection is $m_3 = m_1$.
+\end{proof}
+
+\begin{lemma}
+\label{lem:optionalmatchclosedunderintersection}
+The optional match kind is closed under intersection.
+\end{lemma}
+
+\begin{proof}
+Let optional match criteria $m_0$
+be represented by value $V_1$ and Boolean $D_1$,
+and $m_2$
+be represented by value $V_2$ and Boolean $D_2$
+(see Table~\ref{tab:matchcriteria}).
+
+If $D_1$ and $D_2$ are both true,
+then the intersection $m_3$ has $D_3$ equal to true.
+
+If exactly one of $D_1$ and $D_2$ is false,
+then the intersection $m_3$
+is equal to the match criteria with false.
+
+If both $D_1$ and $D_2$ are false,
+then either:
+\begin{itemize}
+\item $V_1 = V_2$, and the intersection $m_3$
+  is equal to $m_1$ and $m_2$.
+\item $V_1 \neq V_2$, and $m_1$ and $m_2$'s interesection is empty.
+\end{itemize}
+\end{proof}
+
+\begin{lemma}
+\label{lem:rulesclosedunderintersection}
+Let $F$ be a set of fields, each with a specified match kind.
+If all of those match kinds are closed under intersection,
+then the set of rules defined on $F$ with those match kinds
+is also closed under intersection.
+\end{lemma}
+
+\begin{proof}
+Let two rules on $d$ fields be specified as
+$r_1 = (m_{1,1}, ..., m_{1,d})$
+and
+$r_2 = (m_{2,1}, ..., m_{2,d})$.
+
+If there exists any $j$ such that $m_{1,j} \cap m_{2,j}$
+is empty, then $r_1 \cap r_2$ is also empty.
+
+Otherwise, let
+$r_3 = (m_{3,1}, ..., m_{3,d})$
+where $m_{3,j} = m_{1,j} \cap m_{2,j}$ for all $j$.
+
+For each $j$, a value of field $j$ matches $m_{3,j}$
+if and only if it matches both $m_{1,j}$ and $m_{2,j}$,
+because of the lemma's prerequisite that each individual
+field's match kind is closed under intersection.
+
+Thus if a tuple of field values $(x_1, ..., x_j)$
+matches $r_1$ and $r_2$, it will also match $r_3$.
+Conversely, if the tuple matches $r_3$, it will also
+match $r_1$ and $r_2$.
+\end{proof}
+
+\begin{lemma}
+\label{lem:ternarymatchclosedunderintersection}
+The ternary match kind is closed under intersection.
+\end{lemma}
+
+\begin{proof}
+There is likely to be a more direct proof of this,
+but this one is presented because of its interesting point of view,
+which is:
+think of a single $w$-bit ternary match kind field
+as $w$ separate 1-bit prefix match kind fields
+(or if you prefer, range or optional instead of prefix).
+
+Example:
+Consider a 4-bit ternary match kind field
+as 4 1-bit prefix match kind fields.
+A rule with match criteria value $V=0100$ (binary)
+and mask $M=0101$ (binary)
+becomes the following 4 match criteria,
+presented in order from most significant bit position to least:
+\begin{itemize}
+\item bit 3: value $V=0$ and prefix length $P=0$.
+\item bit 2: value $V=1$ and prefix length $P=1$.
+\item bit 1: value $V=0$ and prefix length $P=0$.
+\item bit 0: value $V=0$ and prefix length $P=1$.
+\end{itemize}
+In general, a bit position with 1-bit value $V_t$
+and 1-bit mask $M_t$
+becomes a 1-bit prefix field
+with prefix value $V_p=V_t$
+and prefix length $P_p=M_t$.
+
+By Lemma~\ref{lem:prefixmatchclosedunderintersection},
+each of the $w$ 1-bit prefix fields is closed under intersection.
+By Lemma~\ref{lem:rulesclosedunderintersection},
+a rule containing $w$ 1-bit prefix fields is closed
+under intersection, because all of the fields are.
+
+Any rule with $w$ 1-bit prefix fields can be
+viewed as a single $w$-bit ternary match kind field.
+\end{proof}
+
+\begin{lemma}
+\label{lem:rangemsetatchclosedunderintersection}
+The set-of-ranges match kind is closed under intersection.
+\todo{Is this true?  I think so, and similarly for
+set-of-prefix.  Not sure about set-of-ternary, or whether
+set-of-optional even makes good sense as a match criteria.
+This is easily provable, but what makes it possibly
+more interesting and practical is that the number of ranges
+required to representing the intersection of two set-of-ranges
+match criteria is small relative to the total and/or maximum
+size of the input match criteria.  That relationship should be proved.}
+\end{lemma}
+
+\todo{Note that set-of-ranges can represent arbitrary sets of field values, given enough sets.  e.g. the single ternary match criteria for a 32-bit field *1 (where the * represents 31 bit positions of wildcard) requires $2^{31}$ ranges to represent.  That is large to seriously consider in a practical implementation.}
+
+
+\subsection{Other proofs}
+
+\begin{theorem}
+\label{thm:addnewfilterpreservesclosedunderintersection}
+\end{theorem}
+
+\end{document}
+\endinput
+%%
+%% End of file `sample-manuscript.tex'.
