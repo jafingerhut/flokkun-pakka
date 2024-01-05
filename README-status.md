@@ -14,13 +14,12 @@ TODO:
 
 Compiles with:
 + `g++ -O3 -Wall` v9.4.0 with no errors nor warnings
-+ `g++ -O3 -Wall` v13.2.0 with no errors.  2 warnings about ISO C++17
-  does not allow 'register' storage class specifier.
++ `g++ -O3 -Wall` v13.2.0 with no errors nor warnings.
 
 All tests pass!
 
 Handles `bc1*` test cases without any scaling problems, due to how
-algorithm works.
+the algorithm works.
 
 Only one line of code using floating point operations (see calls to
 `log`), and those are only for calculating statistics about the number
@@ -138,7 +137,7 @@ Compiles with:
 All tests pass!
 
 Handles `bc1*` test cases without any scaling problems, due to how
-algorithm works.
+the algorithm works.
 
 Only uses of floating point operations I see are:
 
