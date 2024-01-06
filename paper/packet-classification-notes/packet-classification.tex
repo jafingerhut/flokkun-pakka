@@ -1250,6 +1250,121 @@ have a non-empty intersection.
 
 \subsection{Other proofs}
 
+
+\section{Implementations}
+
+Resources I have examined in depth:
+
+\begin{itemize}
+\item Original ClassBench code released from Washington University,
+  last updated in 2004, \url{https://www.arl.wustl.edu/classbench/}
+  \begin{itemize}
+  \item \url{https://github.com/jafingerhut/classbench} has some
+    small updates to the original ClassBench code to compile and
+    run cleanly with more recent versions of C++ compilers.
+  \end{itemize}
+\item classbench-ng, which adds IPv6 support and other new features
+  to Taylor and Turner's original ClassBench:
+  \url{https://github.com/lucansky/classbench-ng}
+\item 2015 version of Haoyu Song's page
+  related to his dissertation work on packet classification:
+  \url{https://web.archive.org/web/20150627051657/https://www.arl.wustl.edu/~hs1/PClassEval.html}
+  \begin{itemize}
+  \item \url{https://github.com/jafingerhut/flokkun-pakka} has some
+    small updates to Song's original code, enabling it to compile and
+    run cleanly with more recent versions of C++ compilers.
+  \end{itemize}
+\end{itemize}
+
+Resources I have examined only a bit:
+
+\begin{itemize}
+\item 2009 version of David Taylor's page, with links to
+  some of his papers, e.g. ~\cite{TT2005,TS2005},
+  and a link to an implementation of DCFL,
+  but unfortunately web.archive.org has no copy of that file: \url{https://web.archive.org/web/20090831131633/https://www.arl.wustl.edu/~det3}
+\item \url{https://github.com/wenjunpaper} has several projects that
+  appear to have implementations of several kinds of cutting tree
+  packet classification algorithms.
+  \begin{itemize}
+  \item \url{https://github.com/wenjunpaper/CutSplit}
+  \item \url{https://github.com/wenjunpaper/CutTSS}
+  \item \url{https://github.com/wenjunpaper/HybridCuts}
+  \item \url{https://github.com/wenjunpaper/HybridTSS}
+  \item \url{https://github.com/wenjunpaper/KickTree}
+  \item \url{https://github.com/wenjunpaper/TabTree}
+  \end{itemize}
+\item This claims to be an implementation of EffiCuts written by the
+  paper's authors, and modified by another person after that:
+  \url{https://github.com/kun2012/compressedcut}
+\item 2007 version of the Packet Classification Repository,
+  published by the Internet Algorithmics Lab
+  at University of California San Diego:
+  \url{https://web.archive.org/web/20070220003645/http://www.ial.ucsd.edu/classification/}
+\end{itemize}
+
+Resources still to be examined:
+
+\begin{itemize}
+\item \url{https://www.wenjunli.com/}
+  \begin{itemize}
+  \item CutSplit \url{https://www.wenjunli.com/CutSplit/}
+  \item \url{https://wenjunli.com/HybridTSS/}
+  \end{itemize}
+\item TupleMerge, PartitionSort, Tuple Space Search
+  \url{https://github.com/drjdaly/tuplemerge}
+\item \url{https://github.com/AmitBhalerao/Packet-Classification-RFC-Algorithm}
+\item \url{https://github.com/ChengjunJia/PCG}
+\item \url{https://github.com/FighterNan}
+  \begin{itemize}
+  \item \url{https://github.com/FighterNan/Rulesets-Generator}
+  \item \url{https://github.com/FighterNan/Trace-Generator}
+  \end{itemize}
+\item \url{https://github.com/JiaChangGit/network-packet-classification}
+\item \url{https://github.com/KevinWang96/Network_Packet_Classification_on_FPGA}
+\item \url{https://github.com/LinaMaudlej/NeuroCuts_packet_classification}
+\item \url{https://github.com/Nic30/pclass-vectorized}
+\item \url{https://github.com/SZU-AdvTech-2022/293-Neural-Packet-Classification}
+\item \url{https://github.com/ZhongMengxuan/Evaluating-Partitions-in-Packet-Classification}
+\item \url{https://github.com/acsl-technion/nuevomatch}
+\item \url{https://github.com/alonrs}
+  \begin{itemize}
+  \item \url{https://github.com/alonrs/classbench-mapper}
+  \item \url{https://github.com/alonrs/pcap-file-analyzer}
+  \end{itemize}
+\item \url{https://github.com/byted/HiTables}
+\item \url{https://github.com/derekzwy/an-optimal-tcam-encoding-algorithm-for-packet-classification}
+\item \url{https://github.com/huangting53}
+  \begin{itemize}
+  \item \url{https://github.com/huangting53/BitTSS}
+  \item \url{https://github.com/huangting53/CutTSS}
+  \end{itemize}
+\item \url{https://github.com/kikikio/FROD}
+\item \url{https://github.com/licheebrick/pc_plat}
+\item \url{https://github.com/liona24/rvh}
+\item \url{https://github.com/lwj4333765}
+  \begin{itemize}
+  \item \url{https://github.com/lwj4333765/CutTSS}
+  \item \url{https://github.com/lwj4333765/HybridCuts}
+  \item \url{https://github.com/lwj4333765/TabTree}
+  \end{itemize}
+\item \url{https://github.com/melosun-lab/Packet-Classification-with-HyperCut}
+\item \url{https://github.com/neurocuts/neurocuts}
+\item \url{https://github.com/nox-410/packet_classification}
+\item \url{https://github.com/shiwanghua/PacketClassification}
+\item \url{https://github.com/sorrachai/PartitonSort}
+\item \url{https://github.com/susobhang70/trie_packet_classfication}
+\item \url{https://github.com/tanjing09/MBitTree}
+\item \url{https://github.com/xnhp0320}
+  \begin{itemize}
+  \item \url{https://github.com/xnhp0320/SmartSplit}
+  \item \url{https://github.com/xnhp0320/choose-cut}
+  \end{itemize}
+\item \url{https://github.com/xqgex/Packet-Classification-Repository}
+\item \url{https://github.com/yigechen1/efficuts}
+\item \url{https://github.com/zcy-ict/MultilayerTuple}
+\end{itemize}
+
 \end{document}
 \endinput
 %%
