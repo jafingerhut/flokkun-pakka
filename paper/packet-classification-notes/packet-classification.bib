@@ -765,7 +765,7 @@ series = {SIGCOMM '01}
 
 % Andy file name
 % todo
-@ARTICLE{4378358,
+@ARTICLE{CWZL2008,
   author={Che, Hao and Wang, Zhijun and Zheng, Kai and Liu, Bin},
   journal={IEEE Transactions on Computers},
   title={DRES: Dynamic Range Encoding Scheme for TCAM Coprocessors},
@@ -1551,7 +1551,7 @@ numpages = {12},
 keywords = {decision trees, routing, packet filtering, access control lists}
 }
 
-@inproceedings{10.1145/1064212.1064222,
+@inproceedings{CL2005,
 author = {Cohen, Edith and Lund, Carsten},
 title = {Packet Classification in Large ISPs: Design and Evaluation of Decision Tree Classifiers},
 year = {2005},
@@ -1847,7 +1847,7 @@ url = {http://dx.doi.org/10.1007/978-0-387-35580-1_4}
 
 % Andy file name
 % 2009-Packet_classification_algorithms.pdf
-@INPROCEEDINGS{5215939,
+@INPROCEEDINGS{DBB2009,
   author={Dixit, Mrudul and Barbadekar, B. V. and Barbadekar, Ashwinee B.},
   booktitle={2009 IEEE International Symposium on Industrial Electronics},
   title={Packet classification algorithms},
@@ -1963,6 +1963,60 @@ journal = {J. ACM},
 month = {jul},
 pages = {439–463},
 numpages = {25}
+}
+
+% Andy file name
+% todo
+@inproceedings{RTKMH2013,
+author = {R\'{e}tv\'{a}ri, G\'{a}bor and Tapolcai, J\'{a}nos and K\H{o}r\"{o}si, Attila and Majd\'{a}n, Andr\'{a}s and Heszberger, Zal\'{a}n},
+title = {Compressing IP Forwarding Tables: Towards Entropy Bounds and Beyond},
+year = {2013},
+isbn = {9781450320566},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/2486001.2486009},
+doi = {10.1145/2486001.2486009},
+abstract = {Lately, there has been an upsurge of interest in compressed data structures, aiming to pack ever larger quantities of information into constrained memory without sacrificing the efficiency of standard operations, like random access, search, or update. The main goal of this paper is to demonstrate how data compression can benefit the networking community, by showing how to squeeze the IP Forwarding Information Base (FIB), the giant table consulted by IP routers to make forwarding decisions, into information-theoretical entropy bounds, with essentially zero cost on longest prefix match and FIB update. First, we adopt the state-of-the-art in compressed data structures, yielding a static entropy-compressed FIB representation with asymptotically optimal lookup. Then, we re-design the venerable prefix tree, used commonly for IP lookup for at least 20 years in IP routers, to also admit entropy bounds and support lookup in optimal time and update in nearly optimal time. Evaluations on a Linux kernel prototype indicate that our compressors encode a FIB comprising more than 440K prefixes to just about 100--400 KBytes of memory, with a threefold increase in lookup throughput and no penalty on FIB updates.},
+booktitle = {Proceedings of the ACM SIGCOMM 2013 Conference on SIGCOMM},
+pages = {111–122},
+numpages = {12},
+keywords = {ip forwarding table lookup, data compression, prefix tree},
+location = {Hong Kong, China},
+series = {SIGCOMM '13}
+}
+
+% Andy file name
+% 2005-taylor-et-al-on-using-content-addressable-memory-for-packet-classification.pdf
+@Techreport{TS2005,
+  author =       "Taylor, David E. and Spitznagel, Edward W.",
+  year =         "2005",
+  title = {On using content addressable memory for packet classification},
+  institution =  "Washington University in St. Louis",
+  number =       "WUCSE-2005-9",
+  address =      "St. Louis, MO",
+  month =        "May",
+  note =         "",
+  url={https://openscholarship.wustl.edu/cgi/viewcontent.cgi?article=1980&context=cse_research}
+}
+
+% Andy file name
+% 2008-aldiab-et-al-packet-classification-by-multilevel-cutting-of-the-classification-space.pdf
+@article{AGCS2008,
+author = {Aldiab, Motasem and Garcia-Palacios, Emi and Crookes, Danny and Sezer, Sakir},
+title = {Packet Classification by Multilevel Cutting of the Classification Space: An Algorithmic-Architectural Solution for IP Packet Classification in next Generation Networks},
+year = {2008},
+issue_date = {January 2008},
+publisher = {Hindawi Limited},
+address = {London, GBR},
+volume = {2008},
+issn = {1687-7381},
+url = {https://doi.org/10.1155/2008/603860},
+doi = {10.1155/2008/603860},
+abstract = {Traditionally, the Internet provides only a "best-effort" service, treating all packets going to the same destination equally. However, providing differentiated services for different users based on their quality requirements is increasingly becoming a demanding issue. For this, routers need to have the capability to distinguish and isolate traffic belonging to different flows. This ability to determine the flow each packet belongs to is called packet classification. Technology vendors are reluctant to support algorithmic solutions for classification due to their nondeterministic performance. Although content addressable memories (CAMs) are favoured by technology vendors due to their deterministic high-lookup rates, they suffer from the problems of high-power consumption and high-silicon cost. This paper provides a new algorithmic-architectural solution for packet classification that mixes CAMs with algorithms based on multilevel cutting of the classification space into smaller spaces. The provided solution utilizes the geometrical distribution of rules in the classification space. It provides the deterministic performance of CAMs, support for dynamic updates, and added flexibility for system designers.},
+journal = {J. Comp. Sys., Netw., and Comm.},
+month = {jan},
+articleno = {11},
+numpages = {14}
 }
 
 % Alternate url
