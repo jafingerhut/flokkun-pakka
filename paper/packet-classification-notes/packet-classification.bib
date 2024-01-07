@@ -2181,3 +2181,80 @@ abstract="Packet classification involves --- given a set of rules --- finding th
 isbn="978-3-540-45551-6",
 url={https://doi.org/10.1007/3-540-45551-5_45}
 }
+
+% Andy file name
+% 2003-zane-et-al-coolcams-power-efficient-tcams-for-forwarding-engines.pdf
+@INPROCEEDINGS{ZNB2003,
+  author={Zane, Francis and Girija Narlikar and Basu, Anindya},
+  booktitle={IEEE INFOCOM 2003. Twenty-second Annual Joint Conference of the IEEE Computer and Communications Societies (IEEE Cat. No.03CH37428)},
+  title={Coolcams: power-efficient TCAMs for forwarding engines},
+  year={2003},
+  volume={1},
+  number={},
+  pages={42-52 vol.1},
+  doi={10.1109/INFCOM.2003.1208657},
+  url={https://doi.org/10.1109/INFCOM.2003.1208657}
+}
+
+% Andy file name
+% todo
+@INPROCEEDINGS{ZCWL2005,
+  author={Kai Zheng and Hao Che and Zhijun Wang and Bin Liu},
+  booktitle={Proceedings IEEE 24th Annual Joint Conference of the IEEE Computer and Communications Societies.},
+  title={TCAM-based distributed parallel packet classification algorithm with range-matching solution},
+  year={2005},
+  volume={1},
+  number={},
+  pages={293-303 vol. 1},
+  doi={10.1109/INFCOM.2005.1497900},
+  url={https://doi.org/10.1109/INFCOM.2005.1497900}
+}
+
+% tech report version: YK2004a
+% Andy file name
+% todo
+@INPROCEEDINGS{YK2004b,
+  author={Fang Yu and Katz, Randy H.},
+  booktitle={Proceedings. 12th Annual IEEE Symposium on High Performance Interconnects},
+  title={Efficient multi-match packet classification with TCAM},
+  year={2004},
+  volume={},
+  number={},
+  pages={28-34},
+  doi={10.1109/CONECT.2004.1375197},
+  url={https://doi.org/10.1109/CONECT.2004.1375197}
+}
+
+% conference version: YK2004
+% Andy file name
+% 2004-yu-et-al-efficient-multi-match-packet-classification-with-tcam-tech-report.pdf
+@techreport{YK2004a,
+    Author = {Yu, Fang and Katz, Randy H.},
+    Title = {Efficient Multi-Match Packet Classification with TCAM},
+    Institution = {EECS Department, University of California, Berkeley},
+    Year = {2004},
+    Month = {Mar},
+    URL = {http://www2.eecs.berkeley.edu/Pubs/TechRpts/2004/5589.html},
+    Number = {UCB/CSD-04-1316},
+    Abstract = {Today's packet classification systems are designed to provide the highest priority matching result, e.g., the longest prefix match, even if a packet matches multiple classification rules. However, new network applications, such as intrusion detection systems, require information about all matching results. We call this the multi-match classification problem. In several complex network applications, multi-match classification is usually the first step followed by other processing that is dependent on the classification results. Therefore, classification should be even faster than line rate. Pure software solutions cannot support such applications due to their slow speeds. <p>In this paper, we present a solution with Ternary Content Addressable Memory (TCAM), which produces multi-match classification results with only one TCAM lookup and one SRAM lookup per packet -- about ten times fewer memory lookups than pure software solutions. In addition, we present a scheme to remove the negation format in rule sets, which can save up to 95\% of TCAM space than the straight-forward solution. We show that using the pre-processing scheme presented in the paper, header processing for SNORT rule set can be done with one TCAM and one SRAM lookup using a 135KB TCAM.}
+}
+
+% Andy file name
+% 2005-yu-et-al-ssa-a-power-and-memory-efficient-scheme-to-multi-match-packet-classification.pdf
+@inproceedings{YLMK2005,
+author = {Yu, Fang and Lakshman, T. V. and Motoyama, Martin Austin and Katz, Randy H.},
+title = {SSA: A Power and Memory Efficient Scheme to Multi-Match Packet Classification},
+year = {2005},
+isbn = {1595930825},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1095890.1095905},
+doi = {10.1145/1095890.1095905},
+abstract = {New network applications like intrusion detection systems and packet-level accounting require multi-match packet classification, where all matching filters need to be reported. Ternary Content Addressable Memories (TCAMs) have been adopted to solve the multi-match classification problem due to their ability to perform fast parallel matching. However, TCAM is expensive and consumes large amounts of power. None of the previously published multi-match classification schemes is both memory and power efficient. In this paper, we develop a novel scheme that meets both requirements by using a new Set Splitting Algorithm (SSA). The main idea of SSA is that it splits filters into multiple groups and performs separate TCAM lookups into these groups. It guarantees the removal of at least half the intersections when a filter set is split into two sets, thus resulting in low TCAM memory usage. SSA also accesses filters in the TCAM only once per packet, leading to low power consumption. We compare SSA with two best known schemes: MUD [1] and Geometric Intersection-based solutions [2]. Simulation results based on the SNORT filter sets show that SSA uses approximately the same amount of TCAM memory as MUD, but yields a 75\% to 95\% reduction in power consumption. Compared with Geometric Intersection-based solutions, SSA uses 90\% less TCAM memory and power at the cost of one additional TCAM lookup per packet.},
+booktitle = {Proceedings of the 2005 ACM Symposium on Architecture for Networking and Communications Systems},
+pages = {105–113},
+numpages = {9},
+keywords = {multiple-match, packet classification, TCAM, energy-efficient design},
+location = {Princeton, NJ, USA},
+series = {ANCS '05}
+}
