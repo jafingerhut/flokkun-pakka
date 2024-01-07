@@ -410,27 +410,6 @@ abstract = {We present a data structure that can store a set of disjoint fat obj
 
 % Andy file name
 % 1998-srinivasan-et-al-fast-and-scalable-layer-four-switching.pdf
-@article{10.1145/285243.285282,
-author = {Srinivasan, Venkatachary and Varghese, George and Suri, Subhash. and Waldvogel, M.},
-title = {Fast and Scalable Layer Four Switching},
-year = {1998},
-issue_date = {Oct. 1998},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-volume = {28},
-number = {4},
-issn = {0146-4833},
-url = {https://doi.org/10.1145/285243.285282},
-doi = {10.1145/285243.285282},
-abstract = {In Layer Four switching, the route and resources allocated to a packet are determined by the destination address as well as other header fields of the packet such as source address, TCP and UDP port numbers. Layer Four switching unifies firewall processing, RSVP style resource reservation filters, QoS Routing, and normal unicast and multicast forwarding into a single framework. In this framework, the forwarding database of a router consists of a potentially large number of filters on key header fields. A given packet header can match multiple filters, so each filter is given a cost, and the packet is forwarded using the least cost matching filter.In this paper, we describe two new algorithms for solving the least cost matching filter problem at high speeds. Our first algorithm is based on a grid-of-tries construction and works optimally for processing filters consisting of two prefix fields (such as destination-source filters) using linear space. Our second algorithm, cross-producting, provides fast lookup times for arbitrary filters but potentially requires large storage. We describe a combination scheme that combines the advantages of both schemes. The combination scheme can be optimized to handle pure destination prefix filters in 4 memory accesses, destination-source filters in 8 memory accesses worst case, and all other filters in 11 memory accesses in the typical case.},
-journal = {SIGCOMM Comput. Commun. Rev.},
-month = {oct},
-pages = {191–202},
-numpages = {12}
-}
-
-% Andy file name
-% 1998-srinivasan-et-al-fast-and-scalable-layer-four-switching.pdf
 @inproceedings{SVSW1998,
 author = {Srinivasan, Venkatachary and Varghese, George and Suri, Subhash and Waldvogel, Marcel},
 title = {Fast and Scalable Layer Four Switching},
@@ -548,6 +527,26 @@ url = {https://www.researchgate.net/publication/2447037_Packet_Filter_Management
 }
 
 % Andy file name
+% todo
+@article{LLS2002,
+author = {Li, Ji and Liu, Haiyang and Sollins, Karen},
+title = {AFBV: A Scalable Packet Classification Algorithm},
+year = {2002},
+issue_date = {July 2002},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {32},
+number = {3},
+issn = {0146-4833},
+url = {https://doi.org/10.1145/571697.571713},
+doi = {10.1145/571697.571713},
+journal = {SIGCOMM Comput. Commun. Rev.},
+month = {jul},
+pages = {24},
+numpages = {1}
+}
+
+% Andy file name
 % 2003-singh-et-al-hypercuts.pdf
 @inproceedings{SBVW2003,
 author = {Singh, Sumeet and Baboescu, Florin and Varghese, George and Wang, Jia},
@@ -567,8 +566,9 @@ location = {Karlsruhe, Germany},
 series = {SIGCOMM '03}
 }
 
+% tech report version: Tayl2004
 % Andy file name
-% 2005-taylor-survey-and-taxonomy.pdf
+% todo
 @article{Tayl2005,
 author = {Taylor, David E.},
 title = {Survey and Taxonomy of Packet Classification Techniques},
@@ -589,6 +589,7 @@ numpages = {38},
 keywords = {Packet classification, flow identification}
 }
 
+% journal version: Tayl2005
 % Andy file name
 % 2004-taylor-survey-and-taxonomy.pdf
 @Techreport{Tayl2004,
@@ -605,6 +606,8 @@ keywords = {Packet classification, flow identification}
 
 % Possibly a URL of a different version of the paper?
 % https://www.arl.wustl.edu/~jon.turner/pubs/2005/infocom05classBench.pdf
+% conference version: TT2005b
+% tech report version: TT2004a
 % Andy file name
 % 2007-taylor-et-al-classbench-a-packet-classification-benchmark.pdf
 @ARTICLE{TT2007,
@@ -619,8 +622,26 @@ keywords = {Packet classification, flow identification}
   url={https://www.arl.wustl.edu/~jon.turner/pubs/2007/ton-2007det.pdf}
 }
 
+% journal version: TT2007
+% tech report version: TT2004a
 % Andy file name
-% 2004-taylor-turner-classbench.pdf
+% 2005-taylor-et-al-classbench-conference-version.pdf
+@INPROCEEDINGS{TT2005b,
+  author={Taylor, David E. and Turner, Jonathan S.},
+  booktitle={Proceedings IEEE 24th Annual Joint Conference of the IEEE Computer and Communications Societies.},
+  title={ClassBench: a packet classification benchmark},
+  year={2005},
+  volume={3},
+  number={},
+  pages={2068-2079 vol. 3},
+  doi={10.1109/INFCOM.2005.1498483},
+  url={https://doi.org/10.1109/INFCOM.2005.1498483}
+}
+
+% journal version: TT2007
+% conference version: TT2005b
+% Andy file name
+% 2004-taylor-et-al-classbench-tech-report.pdf
 @Techreport{TT2004a,
   author={Taylor, David E. and Turner, Jonathan S.},
   year =         "2004",
@@ -1293,7 +1314,7 @@ series = {ANCS '21}
 }
 
 % Andy file name
-% todo
+% 2022-liu-et-al-hybridtss.pdf
 @inproceedings{LXLS+2023,
 author = {Liu, Yuxi and Xin, Yao and Li, Wenjun and Song, Haoyu and Rottenstreich, Ori and Xie, Gaogang and Li, Weichao and Wang, Yi},
 title = {HybridTSS: A Recursive Scheme Combining Coarse- and Fine- Grained Tuples for Packet Classification},
@@ -1429,7 +1450,7 @@ Network processors are generally configured with only a small amount of memory w
 % alternate with maybe same PDF:
 % https://www.bell-labs.com/usr/milind.buddhikot/www/psdocs/icnp2001-l4.pdf
 % Andy file name
-% 2001-sahasranaman-Comparative_evaluation_of_software_implementations_of_layer-4_packet_classification_schemes.pdf
+% 2001-sahasranaman-et-al-comparative-evaluation-of-software-implementations-of-layer-4-packet-classification-schemes.pdf
 @INPROCEEDINGS{VB2001,
   author={Sahasranaman, Vivek and Buddhikot, Mlind M.},
   booktitle={Proceedings Ninth International Conference on Network Protocols. ICNP 2001},
@@ -1864,7 +1885,7 @@ url = {http://dx.doi.org/10.1007/978-0-387-35580-1_4}
 }
 
 % Andy file name
-% 2024-lin-et-al-1-s2.0-S1389128623005613-main.pdf 2024-lin-et-al-scalable-packet-classification-based-on-rule-categorization-and-cross-producting.pdf
+% 2024-lin-et-al-scalable-packet-classification-based-on-rule-categorization-and-cross-producting.pdf
 @article{LW2024,
 title = {Scalable packet classification based on rule categorization and cross-producting},
 journal = {Computer Networks},
@@ -2258,3 +2279,82 @@ keywords = {multiple-match, packet classification, TCAM, energy-efficient design
 location = {Princeton, NJ, USA},
 series = {ANCS '05}
 }
+
+% Andy file name
+% 1995-rim-nakajima-rectangle-intersection-and-overlap-graphs.pdf
+@ARTICLE{RN1995,
+  author={Rim, Chong S. and Nakajima, Kazuo},
+  journal={IEEE Transactions on Circuits and Systems I: Fundamental Theory and Applications},
+  title={On rectangle intersection and overlap graphs},
+  year={1995},
+  volume={42},
+  number={9},
+  pages={549-553},
+  doi={10.1109/81.414831},
+  url={https://doi.org/10.1109/81.414831}
+}
+
+% Andy file name
+% 2003-suri-et-al-compressing-two-dimensional-routing-tables.pdf
+@article{SSW2003,
+  author =       "Subhash Suri and Tuomas Sandholm and Priyank Warkhede",
+  year =         "2003",
+  title =        "Compressing Two-Dimensional Routing Tables",
+  journal =      "Algorithmica",
+  volume =       "35",
+  number =       "4",
+  pages = {287-300},
+  url = {https://doi.org/10.1007/s00453-002-1000-7},
+  doi = {10.1007/s00453-002-1000-7},
+  abstract = {We consider an algorithmic problem that arises in the context of routing tables used by Internet routers. The Internet addressing scheme is hierarchical, where a group of hosts are identified by a prefix that is common to all the hosts in that group. Each host machine has a unique 32-bit address. Thus, all traffic between a source group s  and a destination group d  can be routed along a particular route c  by maintaining a routing entry (s, d, c)  at all intermediate routers, where s  and d  are binary bit strings. Many different routing tables can achieve the same routing behavior. In this paper we show how to compute the most compact routing table. In particular, we consider the following optimization problem: given a routing table D with N  entries of the form (s, d, c) , determine a conflict-free routing table with fewest entries that has the same routing behavior as D. If the source and destination fields have up to w  bits, and there are at most K  different route values, then our algorithm runs in worst-case time $O(NK w^2)$.}
+}
+
+% Andy file name
+% 2006-pagiamtzis-et-al-cam-circuits.pdf
+@ARTICLE{PS2006,
+  author={Pagiamtzis, Kostas and Sheikholeslami, Ali},
+  journal={IEEE Journal of Solid-State Circuits},
+  title={Content-addressable memory (CAM) circuits and architectures: a tutorial and survey},
+  year={2006},
+  volume={41},
+  number={3},
+  pages={712-727},
+  doi={10.1109/JSSC.2005.864128},
+  url={https://doi.org/10.1109/JSSC.2005.864128}
+}
+
+% Andy file name
+% 2015-kuzniar-et-al-sdn-flow-tables.pdf
+@InProceedings{KPK2015,
+author="Ku{\'{z}}niar, Maciej
+and Pere{\v{s}}{\'i}ni, Peter
+and Kosti{\'{c}}, Dejan",
+editor="Mirkovic, Jelena
+and Liu, Yong",
+title="What You Need to Know About SDN Flow Tables",
+booktitle="Passive and Active Measurement",
+year="2015",
+publisher="Springer International Publishing",
+address="Cham",
+pages="347--359",
+abstract="SDN deployments rely on switches that come from various vendors and differ in terms of performance and available features. Understanding these differences and performance characteristics is essential for ensuring successful deployments. In this paper we measure, report, and explain the performance characteristics of flow table updates in three hardware OpenFlow switches. Our results can help controller developers to make their programs efficient. Further, we also highlight differences between the OpenFlow specification and its implementations, that if ignored, pose a serious threat to network security and correctness.",
+isbn="978-3-319-15509-8",
+url="https://doi.org/10.1007/978-3-319-15509-8_26"
+}
+
+% Andy file name
+% 2017-daly-et-al-tuplemerge-building-online-packet-classifiers-by-omitting-bits.pdf
+@INPROCEEDINGS{DT2017,
+  author={Daly, James and Torng, Eric},
+  booktitle={2017 26th International Conference on Computer Communication and Networks (ICCCN)},
+  title={TupleMerge: Building Online Packet Classifiers by Omitting Bits},
+  year={2017},
+  volume={},
+  number={},
+  pages={1-10},
+  doi={10.1109/ICCCN.2017.8038399},
+  url={https://doi.org/10.1109/ICCCN.2017.8038399}
+}
+
+% This is just a 1-page abstract, not a full paper
+% 2002-li-et-al-afbv-a-scalable-packet-classification-algorithm.pdf
