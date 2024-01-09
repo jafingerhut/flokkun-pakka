@@ -1313,6 +1313,8 @@ location = {Layfette, IN, USA},
 series = {ANCS '21}
 }
 
+% alternate url
+% https://conferences.sigcomm.org/events/apnet2022/papers/HybridTSS-%20A%20Recursive%20Scheme%20Combining%20Coarse-%20and%20Fine-%20Grained%20Tuples%20for%20Packet%20Classification.pdf
 % Andy file name
 % 2022-liu-et-al-hybridtss.pdf
 @inproceedings{LXLS+2023,
@@ -2355,6 +2357,349 @@ url="https://doi.org/10.1007/978-3-319-15509-8_26"
   doi={10.1109/ICCCN.2017.8038399},
   url={https://doi.org/10.1109/ICCCN.2017.8038399}
 }
+
+% Andy file name
+% todo
+@ARTICLE{CW2016a,
+  author={Chang, Dao-Yuan and Wang, Pi-Chung},
+  journal={IEEE/ACM Transactions on Networking},
+  title={TCAM-Based Multi-Match Packet Classification Using Multidimensional Rule Layering},
+  year={2016},
+  volume={24},
+  number={2},
+  pages={1125-1138},
+  doi={10.1109/TNET.2015.2411274},
+  url={https://doi.org/10.1109/TNET.2015.2411274}
+}
+
+% Andy file name
+% todo
+@ARTICLE{CW2016b,
+  author={Cheng, Yu-Chieh and Wang, Pi-Chung},
+  journal={IEEE Transactions on Computers},
+  title={Scalable Multi-Match Packet Classification Using TCAM and SRAM},
+  year={2016},
+  volume={65},
+  number={7},
+  pages={2257-2269},
+  doi={10.1109/TC.2015.2470242},
+  url={https://doi.org/10.1109/TC.2015.2470242}
+}
+
+% Andy file name
+% todo
+@ARTICLE{CW2015,
+  author={Cheng, Yu-Chieh and Wang, Pi-Chung},
+  journal={IEEE Transactions on Computers},
+  title={Packet Classification Using Dynamically Generated Decision Trees},
+  year={2015},
+  volume={64},
+  number={2},
+  pages={582-586},
+  doi={10.1109/TC.2013.227},
+  url={https://doi.org/10.1109/TC.2013.227}
+}
+
+% Andy file name
+% todo
+@ARTICLE{ZWZC2023,
+  author={Zhong, Jincheng and Wei, Ziling and Zhao, Shuang and Chen, Shuhui},
+  journal={IEEE/ACM Transactions on Networking},
+  title={TupleTree: A High-Performance Packet Classification Algorithm Supporting Fast Rule-Set Updates},
+  year={2023},
+  volume={31},
+  number={5},
+  pages={2027-2041},
+  doi={10.1109/TNET.2022.3227206},
+  url={https://doi.org/10.1109/TNET.2022.3227206}
+}
+
+% Andy file name
+% todo
+@ARTICLE{YDLT2018,
+  author={Yingchareonthawornchai, Sorrachai and Daly, James and Liu, Alex X. and Torng, Eric},
+  journal={IEEE/ACM Transactions on Networking},
+  title={A Sorted-Partitioning Approach to Fast and Scalable Dynamic Packet Classification},
+  year={2018},
+  volume={26},
+  number={4},
+  pages={1907-1920},
+  doi={10.1109/TNET.2018.2852710},
+  url={https://doi.org/10.1109/TNET.2018.2852710}
+}
+
+% Andy file name
+% todo
+@ARTICLE{RRS2023,
+  author={Rashelbach, Alon and Rottenstreich, Ori and Silberstein, Mark},
+  journal={IEEE/ACM Transactions on Networking},
+  title={Scaling by Learning: Accelerating Open vSwitch Data Path With Neural Networks},
+  year={2023},
+  volume={31},
+  number={3},
+  pages={1230-1243},
+  doi={10.1109/TNET.2022.3215143},
+  url={https://doi.org/10.1109/TNET.2022.3215143}
+}
+
+% Andy file name
+% todo
+@ARTICLE{Wang2014,
+  author={Wang, Pi-Chung},
+  journal={IEEE Journal on Selected Areas in Communications},
+  title={Scalable Packet Classification for Datacenter Networks},
+  year={2014},
+  volume={32},
+  number={1},
+  pages={124-137},
+  doi={10.1109/JSAC.2014.140112},
+  url={https://doi.org/10.1109/JSAC.2014.140112}
+}
+
+% Andy file name
+% todo
+@ARTICLE{VLZL2016,
+  author={Varvello, Matteo and Laufer, Rafael and Zhang, Feixiong and Lakshman, T. V.},
+  journal={IEEE/ACM Transactions on Networking},
+  title={Multilayer Packet Classification With Graphics Processing Units},
+  year={2016},
+  volume={24},
+  number={5},
+  pages={2728-2741},
+  doi={10.1109/TNET.2015.2491265},
+  url={https://doi.org/10.1109/TNET.2015.2491265}
+}
+
+% Andy file name
+% todo
+@article{ZXW2022,
+title = {DynamicTuple: The dynamic adaptive tuple for high-performance packet classification},
+journal = {Computer Networks},
+volume = {202},
+pages = {108630},
+year = {2022},
+issn = {1389-1286},
+doi = {https://doi.org/10.1016/j.comnet.2021.108630},
+url = {https://www.sciencedirect.com/science/article/pii/S1389128621005193},
+author = {Chunyang Zhang and Gaogang Xie and Xin Wang},
+keywords = {Packet classification, Software Defined Networking, Open vSwitch},
+abstract = {The frequent rule updating in Software Defined Networking and cloud computing requires the packet classification algorithm to perform fast packet matching and flow table updating simultaneously. The existing algorithms, e.g. decision-tree-based or hash-based, achieve fast packet classification at the sacrifice of the rule updating or vice versa. We propose the Dynamic Adaptive Tuple (DynamicTuple) for both fast packet classification and rule updating simultaneously. DynamicTuple builds a performance model of tuple based packet classification and exploits dynamic programming to find the appropriate tuple formulation to minimize the lookup time. When the rules keep updating, DynamicTuple can retain the proper tuples and rebuild the improper tuples, thus the tuple in DynamicTuple is dynamic adaptive. The experimental results demonstrate that DynamicTuple achieves 33.1x, 5.6x, 5.7x classification speed and 2.9x, 11.0x, 8.5x updating speed compared to Tuple Space Search, TupleMerge, PartitionSort. By implementing DynamicTuple, the OpenFlow table of Open vSwitch achieves 26.6x classification speed.}
+}
+
+% Andy file name
+% todo
+@INPROCEEDINGS{WWWZC2022,
+  author={Wang, Jiayao and Wei, Ziling and Wang, Baosheng and Zhong, Jincheng and Chen, Shuhui},
+  booktitle={2022 IEEE International Performance, Computing, and Communications Conference (IPCCC)},
+  title={FATSS: Filter-Assisted Tuple Space Search for Packet Classification},
+  year={2022},
+  volume={},
+  number={},
+  pages={305-312},
+  doi={10.1109/IPCCC55026.2022.9894302},
+  url={https://doi.org/10.1109/IPCCC55026.2022.9894302}
+}
+
+% alternate url
+% https://yangtonghome.github.io/uploads/ancs2019-TabTree.pdf
+% Andy file name
+% 2019-li-et-al-tabtree-a-tss-assisted-bit-selecting-tree-scheme-for-packet-classification-with-balanced-rule-mapping.pdf
+@INPROCEEDINGS{LYCLL2019,
+  author={Li, Wenjun and Yang, Tong and Chang, Yeim-Kuan and Li, Tao and Li, Hui},
+  booktitle={2019 ACM/IEEE Symposium on Architectures for Networking and Communications Systems (ANCS)},
+  title={TabTree: A TSS-assisted Bit-selecting Tree Scheme for Packet Classification with Balanced Rule Mapping},
+  year={2019},
+  volume={},
+  number={},
+  pages={1-8},
+  doi={10.1109/ANCS.2019.8901884},
+  url={https://doi.org/10.1109/ANCS.2019.8901884}
+}
+
+% alternate url
+% https://www.usenix.org/system/files/conference/nsdi15/nsdi15-paper-pfaff.pdf
+% Andy file name
+% 2015-pfaff-et-al-the-design-and-implementation-of-open-vswitch.pdf
+@inproceedings{PPKJ+2015,
+author = {Pfaff, Ben and Pettit, Justin and Koponen, Teemu and Jackson, Ethan J. and Zhou, Andy and Rajahalme, Jarno and Gross, Jesse and Wang, Alex and Stringer, Jonathan and Shelar, Pravin and Amidon, Keith and Casado, Mart\'{\i}n},
+title = {The Design and Implementation of Open VSwitch},
+year = {2015},
+isbn = {9781931971218},
+publisher = {USENIX Association},
+address = {USA},
+abstract = {We describe the design and implementation of Open vSwitch, a multi-layer, open source virtual switch for all major hypervisor platforms. Open vSwitch was designed de novo for networking in virtual environments, resulting in major design departures from traditional software switching architectures. We detail the advanced flow classification and caching techniques that Open vSwitch uses to optimize its operations and conserve hypervisor resources. We evaluate Open vSwitch performance, drawing from our deployment experiences over the past seven years of using and improving Open vSwitch.},
+booktitle = {Proceedings of the 12th USENIX Conference on Networked Systems Design and Implementation},
+pages = {117–130},
+numpages = {14},
+location = {Oakland, CA},
+series = {NSDI'15},
+url = {https://www.usenix.org/conference/nsdi15/technical-sessions/presentation/pfaff}
+}
+
+% alternate url
+% https://dl.ifip.org/db/conf/networking/networking2021/1570699241.pdf
+% Andy file name
+% 2021-zhang-et-al-multilayertuple-a-general-scalable-and-high-performance-packet-classification-algorithm-for-software-defined-network-system.pdf
+@INPROCEEDINGS{XZ2021,
+  author={Zhang, Chunyang and Xie, Gaogang},
+  booktitle={2021 IFIP Networking Conference (IFIP Networking)},
+  title={MultilayerTuple: A General, Scalable and High-performance Packet Classification Algorithm for Software Defined Network System},
+  year={2021},
+  volume={},
+  number={},
+  pages={1-9},
+  doi={10.23919/IFIPNetworking52078.2021.9472824},
+  url={https://doi.org/10.23919/IFIPNetworking52078.2021.9472824}
+}
+
+% Andy file name
+% todo
+@ARTICLE{YGFQL2022,
+  author={Yang, Meiyi and Gao, Deyun and Foh, Chuan Heng and Qin, Yajuan and Leung, Victor C. M.},
+  journal={IEEE Transactions on Network and Service Management},
+  title={A Learned Bloom Filter-Assisted Scheme for Packet Classification in Software-Defined Networking},
+  year={2022},
+  volume={19},
+  number={4},
+  pages={5064-5077},
+  doi={10.1109/TNSM.2022.3181063},
+  url={https://doi.org/10.1109/TNSM.2022.3181063}
+}
+
+% Andy file name
+% 2005-song-et-al-fast-hash-table-lookup-using-extended-bloom-filter-an-aid-to-network-processing.pdf
+@inproceedings{SDTL2005,
+author = {Song, Haoyu and Dharmapurikar, Sarang and Turner, Jonathan and Lockwood, John},
+title = {Fast Hash Table Lookup Using Extended Bloom Filter: An Aid to Network Processing},
+year = {2005},
+isbn = {1595930094},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1080091.1080114},
+doi = {10.1145/1080091.1080114},
+abstract = {Hash tables are fundamental components of several network processing algorithms and applications, including route lookup, packet classification, per-flow state management and network monitoring. These applications, which typically occur in the data-path of high-speed routers, must process and forward packets with little or no buffer, making it important to maintain wire-speed throughout. A poorly designed hash table can critically affect the worst-case throughput of an application, since the number of memory accesses required for each lookup can vary. Hence, high throughput applications require hash tables with more predictable worst-case lookup performance. While published papers often assume that hash table lookups take constant time, there is significant variation in the number of items that must be accessed in a typical hash table search, leading to search times that vary by a factor of four or more.We present a novel hash table data structure and lookup algorithm which improves the performance over a naive hash table by reducing the number of memory accesses needed for the most time-consuming lookups. This allows designers to achieve higher lookup performance for a given memory bandwidth, without requiring large amounts of buffering in front of the lookup engine. Our algorithm extends the multiple-hashing Bloom Filter data structure to support exact matches and exploits recent advances in embedded memory technology. Through a combination of analysis and simulations we show that our algorithm is significantly faster than a naive hash table using the same amount of memory, hence it can support better throughput for router applications that use hash tables.},
+booktitle = {Proceedings of the 2005 Conference on Applications, Technologies, Architectures, and Protocols for Computer Communications},
+pages = {181–192},
+numpages = {12},
+keywords = {hash table, forwarding},
+location = {Philadelphia, Pennsylvania, USA},
+series = {SIGCOMM '05}
+}
+
+% Andy file name
+% todo
+@article{AA2020,
+title = {Common non-wildcard portion-based partitioning approach to SDN many-field packet classification},
+journal = {Computer Networks},
+volume = {181},
+pages = {107534},
+year = {2020},
+issn = {1389-1286},
+doi = {https://doi.org/10.1016/j.comnet.2020.107534},
+url = {https://www.sciencedirect.com/science/article/pii/S1389128620311890},
+author = {Hamed Alimohammadi and Mahmood Ahmadi},
+keywords = {Non-wildcard portion-based partitioning, Many-field packet classification, SDN switch},
+abstract = {Many-field packet classification is a challenging function of the devices in software-defined networking. In this paper, we propose a new algorithm, which partitions a ruleset in a simple way based on non-wildcard portions of the rules. A portion can be a field or a sub-field. The algorithm uses hash tables as the base data structure. In a partition, all the members have a common non-wildcard portion, which is used as the hash key. It means that only a portion of the rules and headers is used for hashing. It simplifies using the hash table for packet classification, which deals with the ternary vectors. The proposed algorithm supports fast updating as a required feature for most of today’s networks. Extensive simulations are conducted to evaluate the algorithm and compare it with well-known algorithms. Results show that the proposed algorithm has a 196% higher throughput and 81% faster update than Tuple Space Search as the base classification algorithm of OpenVSwitch.}
+}
+
+% alternate url
+% https://www.cse.msu.edu/~dalyjame/papers/ByteCuts.pdf
+% Andy file name
+% 2018-daly-et-al-bytecuts-fast-packet-classification-by-interior-bit-extraction.pdf
+@INPROCEEDINGS{DT2018,
+  author={Daly, James and Torng, Eric},
+  booktitle={IEEE INFOCOM 2018 - IEEE Conference on Computer Communications},
+  title={ByteCuts: Fast Packet Classification by Interior Bit Extraction},
+  year={2018},
+  volume={},
+  number={},
+  pages={2654-2662},
+  doi={10.1109/INFOCOM.2018.8486215},
+  url={https://doi.org/10.1109/INFOCOM.2018.8486215}
+}
+
+% Andy file name
+% todo
+@ARTICLE{LYRL+2020,
+  author={Li, Wenjun and Yang, Tong and Rottenstreich, Ori and Li, Xianfeng and Xie, Gaogang and Li, Hui and Vamanan, Balajee and Li, Dagang and Lin, Huiping},
+  journal={IEEE Journal on Selected Areas in Communications},
+  title={Tuple Space Assisted Packet Classification With High Performance on Both Search and Update},
+  year={2020},
+  volume={38},
+  number={7},
+  pages={1555-1569},
+  doi={10.1109/JSAC.2020.2986935},
+  url={https://doi.org/10.1109/JSAC.2020.2986935}
+}
+
+% Andy file name
+% todo
+@ARTICLE{LK2010,
+  author={Lim, Hyesook and Kim, So Yeon},
+  journal={IEEE Micro},
+  title={Tuple Pruning Using Bloom Filters for Packet Classification},
+  year={2010},
+  volume={30},
+  number={3},
+  pages={48-59},
+  doi={10.1109/MM.2010.44},
+  url={https://doi.org/10.1109/MM.2010.44}
+}
+
+% Andy file name
+% todo
+@ARTICLE{Chang2009,
+  author={Chang, Yeim-Kuan},
+  journal={IEEE Transactions on Computers},
+  title={Efficient Multidimensional Packet Classification with Fast Updates},
+  year={2009},
+  volume={58},
+  number={4},
+  pages={463-479},
+  doi={10.1109/TC.2008.181},
+  url={https://doi.org/10.1109/TC.2008.181}
+}
+
+% Andy file name
+% todo
+@ARTICLE{CH2016,
+  author={Chang, Yeim-Kuan and Hsueh, Chun-Sheng},
+  journal={IEEE Transactions on Emerging Topics in Computing},
+  title={Range-Enhanced Packet Classification Design on FPGA},
+  year={2016},
+  volume={4},
+  number={2},
+  pages={214-224},
+  doi={10.1109/TETC.2015.2449666},
+  url={https://doi.org/10.1109/TETC.2015.2449666}
+}
+
+% Andy file name
+% todo
+@INPROCEEDINGS{FHSM2016,
+  author={Fiessler, Andreas and Hager, Sven and Scheuermann, Björn and Moore, Andrew W.},
+  booktitle={2016 ACM/IEEE Symposium on Architectures for Networking and Communications Systems (ANCS)},
+  title={HyPaFilter — A versatile hybrid FPGA packet filter},
+  year={2016},
+  volume={},
+  number={},
+  pages={25-36},
+  doi={10.1145/2881025.2881033},
+  url={https://doi.org/10.1145/2881025.2881033}
+}
+
+@INPROCEEDINGS{GPPR2005,
+  author={Geraci, F. and Pellegrini, M. and Pisati, P. and Rizzo, L.},
+  booktitle={Proceedings IEEE 24th Annual Joint Conference of the IEEE Computer and Communications Societies.},
+  title={Packet classification via improved space decomposition techniques},
+  year={2005},
+  volume={1},
+  number={},
+  pages={304-312 vol. 1},
+  doi={10.1109/INFCOM.2005.1497901},
+  url={https://doi.org/10.1109/INFCOM.2005.1497901}
+}
+
 
 % This is just a 1-page abstract, not a full paper
 % 2002-li-et-al-afbv-a-scalable-packet-classification-algorithm.pdf
