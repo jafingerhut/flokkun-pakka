@@ -64,6 +64,28 @@
       (and (= low high)) :em
       :else :ar)))
 
+(def prefix-mask-to-prefix-len
+  (into {} (map (fn [prefix-len]
+                  {(dec (bit-shift-left 1 (- 32 prefix-len)))
+                   prefix-len})
+                (range 33))))
+
+(defn range-to-32bit-prefix [low high]
+  (let [maybe-mask (bit-xor low high)]
+    (when-not (contains? prefix-mask-to-prefix-len maybe-mask)
+      (throw (IllegalArgumentException.
+              (format "range-to-32bit-prefix: Range [%d,%d] with maybe-mask=%d is not equivalent to any 32-bit prefix match criteria"
+                      low high maybe-mask))))
+    {:value low :prefix-length (prefix-mask-to-prefix-len maybe-mask)}))
+
+(comment
+(= {:value 0 :prefix-length 32} (range-to-32bit-prefix 0 0))
+(= {:value 0 :prefix-length 31} (range-to-32bit-prefix 0 1))
+(range-to-32bit-prefix 0 2)
+(= {:value 0 :prefix-length 30} (range-to-32bit-prefix 0 3))
+(= {:value 0 :prefix-length 16} (range-to-32bit-prefix 0 65535))
+)
+
 (defn port-pair-class [rule]
   [(port-range-class rule cb-sport-field-idx)
    (port-range-class rule cb-dport-field-idx)])
@@ -110,14 +132,14 @@
   (let [num-rules-for-proto (->> (vals dat)
                                  (map count)
                                  (reduce +))
-        start (format "%d %.8f "
+        start (format "%d\t%.8f\t"
                       proto
                       (/ (double num-rules-for-proto) num-rules))
         port-pair-stats (map (fn [ppc]
                                (/ (double (count (get dat ppc [])))
                                   num-rules-for-proto))
                              classbench-parameter-file-port-pair-class-order)]
-    (str start (str/join " " (map #(format "%.8f" %) port-pair-stats)))))
+    (str start (str/join "\t" (map #(format "%.8f" %) port-pair-stats)))))
 
 
 (defn calc-classbench-protocol-data [rules]
@@ -192,20 +214,6 @@
             earlier-subset :rule-compare-earlier-strict-subset
             later-subset :rule-compare-later-strict-subset
             :else :rule-compare-conflict))))
-
-;; Template for a case statement that exhausts all possible
-;; compare-rules return values:
-(comment
-
-(case cmp-result
-  :rule-compare-disjoint
-  :rule-compare-equal
-  :rule-compare-earlier-strict-subset
-  :rule-compare-later-strict-subset
-  :rule-compare-conflict
-  )
-
-)
 
 
 (defn fields-intersection [mc1 mc2]
@@ -583,6 +591,66 @@
         (range (count (:field (nth rules 0))))))
 
 
+(defn source-addr-prefix-len [rule]
+  (let [{:keys [low high]} (nth (:field rule) cb-sa-field-idx)]
+    (:prefix-length (range-to-32bit-prefix low high))))
+
+
+(defn dest-addr-prefix-len [rule]
+  (let [{:keys [low high]} (nth (:field rule) cb-da-field-idx)]
+    (:prefix-length (range-to-32bit-prefix low high))))
+
+
+(defn total-prefix-len [rule]
+  (+ (source-addr-prefix-len rule) (dest-addr-prefix-len rule)))
+
+
+(defn calc-tpl-data [rules]
+  (let [grouped-by-source-addr-prefix-len (group-by source-addr-prefix-len
+                                                    rules)]
+    {:rules rules
+     :by-source-addr-prefix-len
+     (->> (update-vals grouped-by-source-addr-prefix-len (fn [rs] {:rules rs}))
+          (into (sorted-map)))}))
+
+
+(defn calc-one-ppc-data [rules]
+  (let [grouped-by-total-prefix-len (group-by total-prefix-len rules)]
+    {:rules rules
+     :by-total-prefix-len
+     (->> (update-vals grouped-by-total-prefix-len calc-tpl-data)
+          (into (sorted-map)))}))
+
+
+;; calc-classbench-ppc-data returns a map I will call all-ppc-data,
+;; defined as:
+;;
+;; all-ppc-data is a map
+;; + keys are two-element vectors representing PPC values like [:wc :em]
+;; + values are one-ppc-data
+;;
+;; one-ppc-data a map with kv pairs:
+;; + :rules value is vector of rules that have the corresponding
+;;   PPC that is the key in all-ppc-data
+;; + :by-total-prefix-len is a sorted-map with integer keys, and
+;;   values are "tpl-data" (for Total Prefix Length data)
+;;
+;; tpl-data is a map with kv pairs:
+;; + :rules value is vector of rules that have the corresponding
+;;   total-prefix-len that is the key in tpl-data
+;; + :by-source-addr-prefix-len is a sorted-map with integer keys,
+;;   and values are "sapl-data" (for Source Address Prefix Length
+;;   data)
+;;
+;; sapl-data is a map with kv pairs:
+;; + :rules value is vector of rules that have the corresponding
+;;   source-addr-prefix-len that is the key in sapl-data
+
+(defn calc-classbench-ppc-data [rules]
+  (let [grouped-by-ppc (group-by port-pair-class rules)]
+    (update-vals grouped-by-ppc calc-one-ppc-data)))
+
+
 (defn write-ipv4-classbench-parameter-file [wrtr rules]
   (binding [*out* wrtr]
     (println "-scale")
@@ -620,6 +688,26 @@
     ;; different section names, corresponding to the order of the
     ;; pairs in the sequence
     ;; classbench-parameter-file-port-pair-class-order).
+    (let [all-ppc-data (calc-classbench-ppc-data rules)]
+      (doseq [ppc classbench-parameter-file-port-pair-class-order]
+        (println (format "-%s_%s" (name (first ppc)) (name (second ppc))))
+        (let [one-ppc-data (get all-ppc-data ppc)
+              num-rules-with-ppc (count (:rules one-ppc-data))]
+
+          (doseq [total-prefix-len (keys (:by-total-prefix-len one-ppc-data))]
+            (let [tpl-data (get-in one-ppc-data [:by-total-prefix-len total-prefix-len])
+                  num-rules-with-total-prefix-len (count (:rules tpl-data))]
+
+              (print (format "%d,%.8f" total-prefix-len
+                             (/ (double num-rules-with-total-prefix-len)
+                                num-rules-with-ppc)))
+              (doseq [source-addr-prefix-len (keys (:by-source-addr-prefix-len
+                                                    tpl-data))]
+                (print (format "\t%d,%.8f" source-addr-prefix-len
+                               (/ (double (count (:rules (get-in tpl-data [:by-source-addr-prefix-len source-addr-prefix-len]))))
+                                  num-rules-with-total-prefix-len))))
+              (println))))
+        (println "#")))
 
     ;; Source/destination IP address prefix nesting thresholds (snest,
     ;; dnest), and skew (sskew, dskew)

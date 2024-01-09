@@ -155,32 +155,9 @@
   (with-open [rdr (io/reader fname)]
     (parse-ipv4-classbench-rules rdr)))
 
-
-(def prefix-mask-to-prefix-len
-  (into {} (map (fn [prefix-len]
-                  {(dec (bit-shift-left 1 (- 32 prefix-len)))
-                   prefix-len})
-                (range 33))))
-
-(defn range-to-32bit-prefix [low high]
-  (let [maybe-mask (bit-xor low high)]
-    (when-not (contains? prefix-mask-to-prefix-len maybe-mask)
-      (throw (IllegalArgumentException.
-              (format "range-to-32bit-prefix: Range [%d,%d] with maybe-mask=%d is not equivalent to any 32-bit prefix match criteria"
-                      low high maybe-mask))))
-    {:value low :prefix-length (prefix-mask-to-prefix-len maybe-mask)}))
-
-(comment
-(= {:value 0 :prefix-length 32} (range-to-32bit-prefix 0 0))
-(= {:value 0 :prefix-length 31} (range-to-32bit-prefix 0 1))
-(range-to-32bit-prefix 0 2)
-(= {:value 0 :prefix-length 30} (range-to-32bit-prefix 0 3))
-(= {:value 0 :prefix-length 16} (range-to-32bit-prefix 0 65535))
-)
-
 ;; TODO: Consider adding error checking and return of error status
 (defn ipv4-address-match-critera->classbench-str [addr-mc]
-  (let [p (range-to-32bit-prefix (:low addr-mc) (:high addr-mc))
+  (let [p (r/range-to-32bit-prefix (:low addr-mc) (:high addr-mc))
         val (:value p)
         ip0 (bit-and 0xff (bit-shift-right val 24))
         ip1 (bit-and 0xff (bit-shift-right val 16))
