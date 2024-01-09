@@ -20,6 +20,7 @@ do
     echo "-----------------------------------------------------------------"
     set -x
     ./scripts/test_ipv4_classbench_rule_stats.sh ${j} tmp/${k}_rule_stats
+    ./scripts/test_write_ipv4_classbench_parameter_file.sh ${j} tmp/${k}_seed
     #./scripts/test_ruleio.sh ${j} tmp/${k}
     #diff -iw ${j} tmp/${k}
     #/bin/rm -f ${k}

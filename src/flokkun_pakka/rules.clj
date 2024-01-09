@@ -1,5 +1,6 @@
 (ns flokkun-pakka.rules
-  (:require [clojure.set :as set]))
+  (:require [clojure.set :as set]
+            [clojure.string :as str]))
 
 
 (defn concat-vec [v1 v2]
@@ -14,6 +15,154 @@
   (= [1 2 3 4 5] (concat-vec [1 2] [3 4 5]))
   (= [1 2] (concat-vec [1 2] []))
 )
+
+(defn is-range-match-criteria? [mc]
+  (and (= (:kind mc) :range)
+       (contains? mc :low)
+       (contains? mc :high)
+       (integer? (:low mc))
+       (integer? (:high mc))
+       (<= (:low mc) (:high mc))))
+
+(defn range-match-criteria-is-also-optional? [mc min-value max-value]
+  (and (is-range-match-criteria? mc)
+       (<= min-value (:low mc))
+       (<= (:high mc) max-value)
+       (or (= (:low mc) (:high mc))
+           (and (= min-value (:low mc))
+                (= (:high mc) max-value)))))
+
+(comment
+
+(= false (is-range-match-criteria? {:kind :range :low 5}))
+(= true (is-range-match-criteria? {:kind :range :low 5 :high 10}))
+(= false (is-range-match-criteria? {:kind :range :low 5 :high "10"}))
+(= false (is-range-match-criteria? {:kind :range :low 5 :high 4}))
+
+(= false (range-match-criteria-is-also-optional? {:kind :range :low 5 :high 10} 0 255))
+(= true (range-match-criteria-is-also-optional? {:kind :range :low 10 :high 10} 0 255))
+(= true (range-match-criteria-is-also-optional? {:kind :range :low 0 :high 255} 0 255))
+(= false (range-match-criteria-is-also-optional? {:kind :range :low 0 :high 254} 0 255))
+
+)
+
+;; These are the field indexes in most of the ClassBench rule files I
+;; have examined.  I believe that some also support additional fields
+;; like flags and "extra" on each line.
+(def cb-sa-field-idx 0)
+(def cb-da-field-idx 1)
+(def cb-proto-field-idx 2)
+(def cb-sport-field-idx 3)
+(def cb-dport-field-idx 4)
+
+(defn port-range-class [rule field-id]
+  (let [{:keys [low high]} (nth (:field rule) field-id)]
+    (cond
+      (and (= low 0) (= high 65535)) :wc
+      (and (= low 1024) (= high 65535)) :hi
+      (and (= low 0) (= high 1023)) :lo
+      (and (= low high)) :em
+      :else :ar)))
+
+(defn port-pair-class [rule]
+  [(port-range-class rule cb-sport-field-idx)
+   (port-range-class rule cb-dport-field-idx)])
+
+;; Several parts of a ClassBench parameter file list the 25
+;; port-pair-class values in this particular order.
+(def classbench-parameter-file-port-pair-class-order
+  [
+   [:wc :wc]
+   [:wc :hi]
+   [:hi :wc]
+   [:hi :hi]
+   [:wc :lo]
+   [:lo :wc]
+   [:hi :lo]
+   [:lo :hi]
+   [:lo :lo]
+   [:wc :ar]
+   [:ar :wc]
+   [:hi :ar]
+   [:ar :hi]
+   [:wc :em]
+   [:em :wc]
+   [:hi :em]
+   [:em :hi]
+   [:lo :ar]
+   [:ar :lo]
+   [:lo :em]
+   [:em :lo]
+   [:ar :ar]
+   [:ar :em]
+   [:em :ar]
+   [:em :em]
+   ])
+
+
+(defn group-by-range-mc [rules field-id]
+  (group-by (fn [r]
+              (select-keys (nth (:field r) field-id)
+                           [:kind :low :high]))
+            rules))
+
+(defn cb-prots-param-line-for-proto [dat proto num-rules]
+  (let [num-rules-for-proto (->> (vals dat)
+                                 (map count)
+                                 (reduce +))
+        start (format "%d %.8f "
+                      proto
+                      (/ (double num-rules-for-proto) num-rules))
+        port-pair-stats (map (fn [ppc]
+                               (/ (double (count (get dat ppc [])))
+                                  num-rules-for-proto))
+                             classbench-parameter-file-port-pair-class-order)]
+    (str start (str/join " " (map #(format "%.8f" %) port-pair-stats)))))
+
+
+(defn calc-classbench-protocol-data [rules]
+  (let [grouped (-> rules
+               (group-by-range-mc cb-proto-field-idx)
+               (update-vals #(group-by port-pair-class %)))]
+    (into (sorted-map)
+          (map (fn [k]
+                 (let [wc-proto? (and (= (:low k) 0) (= (:high k) 255))
+                       new-k (if wc-proto? -1 (:low k))]
+                   [new-k
+                    (cb-prots-param-line-for-proto (get grouped k)
+                                                   new-k (count rules))]))
+               (keys grouped)))))
+
+
+(defn calc-classbench-port-range-data-helper [rules field-idx]
+  (let [n (count rules)
+        grouped-by-mc (group-by #(nth (:field %) field-idx) rules)
+        mc-counts (->> grouped-by-mc
+                       (map (fn [[match-criteria rules-with-that-mc]]
+                              [match-criteria (count rules-with-that-mc)]))
+                       (sort-by (juxt #(:low (first %)) #(:high (first %))
+                                      second)
+                                #(compare %2 %1)))]
+    (mapv (fn [[match-criteria cnt]]
+            (format "%.8f\t%d:%d"
+                    (/ (double cnt) n)
+                    (:low match-criteria)
+                    (:high match-criteria)))
+          mc-counts)))
+
+
+(defn calc-classbench-port-range-data [rules port-select]
+  (let [field-idx (case port-select
+                    :source-port cb-sport-field-idx
+                    :dest-port cb-dport-field-idx
+                    nil)
+        port-grouped (group-by #(port-range-class % field-idx) rules)
+        em-lines (calc-classbench-port-range-data-helper (:em port-grouped)
+                                                         field-idx)
+        ar-lines (calc-classbench-port-range-data-helper (:ar port-grouped)
+                                                         field-idx)]
+    {:em-lines em-lines
+     :ar-lines ar-lines}))
 
 
 (defn fields-disjoint [mc1 mc2]
@@ -55,7 +204,7 @@
   :rule-compare-later-strict-subset
   :rule-compare-conflict
   )
-  
+
 )
 
 
@@ -165,7 +314,7 @@
           ;; else
           (recur (rest remaining-cur-rules) ret-vec)))
       (persistent! ret-vec))))
-  
+
 
 ;; For better efficiency, the set of rules should not contain any
 ;; rules that would be removed by remove-unmatchable, or equivalently,
@@ -238,7 +387,7 @@
              :rules-out-vec (persistent! ret-vec)
              :rules-out-set ret-set
              :num-duplicates-in-vec num-duplicates))))
-  
+
 
 ;; add-resolve-rules-helper2 implements an idea to improve efficiency
 ;; of add-resolve-rules-helper: Keep count of the number of duplicate
@@ -432,6 +581,65 @@
                  (field-stats rules field-idx
                               (nth ipv4-classbench-field-info field-idx))))
         (range (count (:field (nth rules 0))))))
+
+
+(defn write-ipv4-classbench-parameter-file [wrtr rules]
+  (binding [*out* wrtr]
+    (println "-scale")
+    (println (count rules))
+    (println "#")
+
+    (println "-prots")
+    (doseq [s (vals (calc-classbench-protocol-data rules))]
+      (println s))
+    (println "#")
+
+    (println "-flags")
+    ;; TODO
+    (println "#")
+
+    (println "-extra")
+    ;; TODO
+    (println "#")
+
+    ;; L4 source/destination port arbitrary range and exact match
+    ;; statistics.
+    ;; spar, spem, dpar, dpem
+    (doseq [[field ar-sec-name em-sec-name] [[:source-port "-spar" "-spem"]
+                                             [:dest-port "-dpar" "-dpem"]]]
+      (let [{:keys [ar-lines em-lines]} (calc-classbench-port-range-data
+                                         rules field)]
+        (println ar-sec-name)
+        (doseq [s ar-lines] (println s))
+        (println "#")
+        (println em-sec-name)
+        (doseq [s em-lines] (println s))
+        (println "#")))
+
+    ;; Source/destination address prefix length distributions (25
+    ;; different section names, corresponding to the order of the
+    ;; pairs in the sequence
+    ;; classbench-parameter-file-port-pair-class-order).
+
+    ;; Source/destination IP address prefix nesting thresholds (snest,
+    ;; dnest), and skew (sskew, dskew)
+    (println "-snest")
+    (println "TODO")
+    (println "#")
+    (println "-sskew")
+    (println "TODO")
+    (println "#")
+    (println "-dnest")
+    (println "TODO")
+    (println "#")
+    (println "-dskew")
+    (println "TODO")
+    (println "#")
+
+    ;; IP address prefix correlation (pcorr)
+    (println "-pcorr")
+    (println "TODO")
+    (println "#")))
 
 
 (comment

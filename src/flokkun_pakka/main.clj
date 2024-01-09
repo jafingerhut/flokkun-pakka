@@ -110,12 +110,25 @@
       (pp/pprint res))))
 
 
+(defn test-write-ipv4-classbench-parameter-file [m]
+  (when-not (and (string? (:in m))
+                 (string? (:out m)))
+    (println "Input map must have strings containing file names as values of keys :in and :out")
+    (System/exit 1))
+  (let [rules (fio/load-ipv4-classbench-rules-file (:in m))
+        _ (println (format "%10d rules read" (count rules)))]
+    (binding [*out* (io/writer (:out m))]
+      (r/write-ipv4-classbench-parameter-file *out* rules))))
+
+
 (comment
 
 (in-ns 'user)
 (require '[flokkun-pakka.main :as m] :reload)
 (require '[flokkun-pakka.io :as fio])
 (require '[flokkun-pakka.rules :as r] :reload)
+(require '[clojure.string :as str]
+         '[clojure.java.io :as io])
 
 (def d1 "/Users/andy/Documents/p4-docs/flokkun-pakka/orig/song-filterset/")
 (def d2 "/Users/andy/Documents/p4-docs/flokkun-pakka/tmp/")
@@ -123,9 +136,46 @@
 (def r1 (fio/load-ipv4-classbench-rules-file (str d1 "acl1_100")))
 (count r1)
 (pprint (take 5 r1))
+(pprint (take 1 r1))
 (def r2 (r/remove-unmatchable r1))
-(count r2)
-(map (fn [[k v]] [k (count v)]) r2)
+(update-vals r2 count)
+(def r2 (fio/load-ipv4-classbench-rules-file (str d1 "fw1")))
+
+(defn check-proto-is-match-kind-optional [rules field-id]
+  (first (->> rules
+              (map #(nth (:field %) field-id))
+              (remove #(r/range-match-criteria-is-also-optional? % 0 255)))))
+
+(with-open [wrtr (io/writer (str d2 "acl1_100_param_file"))]
+  (r/write-ipv4-classbench-parameter-file wrtr r1))
+
+(r/calc-classbench-port-range-data r1 :source-port)
+(pprint (r/calc-classbench-port-range-data r1 :dest-port))
+
+(def idx 0)
+(def idx 1)
+(pprint (nth r1 idx))
+(r/port-pair-class (nth r1 idx))
+(pprint (frequencies (map r/port-pair-class r1)))
+(pprint (frequencies (map r/port-pair-class r2)))
+
+(defn distinct-match-criteria [rules field-id]
+  (frequencies (map #(nth (:field %) field-id) rules)))
+
+(count (distinct-match-criteria r1 0))
+(pprint (distinct-match-criteria r1 0))
+(count (distinct-match-criteria r1 1))
+(count (distinct-match-criteria r1 2))
+(pprint (distinct-match-criteria r1 2))
+(count (distinct-match-criteria r1 3))
+(pprint (distinct-match-criteria r1 3))
+(count (distinct-match-criteria r1 4))
+
+(check-proto-is-match-kind-optional r1 2)
+(check-proto-is-match-kind-optional r1 0)
+(check-proto-is-match-kind-optional r1 1)
+(check-proto-is-match-kind-optional r1 3)
+(check-proto-is-match-kind-optional r1 4)
 
 (require '[clojure.java.io :as io])
 (with-open [wrtr (io/writer (str d2 "acl1_100_conf.gv"))]

@@ -14,6 +14,7 @@
   :test-write-overlap-graph {:exec-fn flokkun-pakka.main/test-write-overlap-graph}
   :test-add-resolve-rules {:exec-fn flokkun-pakka.main/test-add-resolve-rules}
   :test-ipv4-classbench-rule-stats {:exec-fn flokkun-pakka.main/test-ipv4-classbench-rule-stats}
+  :test-write-ipv4-classbench-parameter-file {:exec-fn flokkun-pakka.main/test-write-ipv4-classbench-parameter-file}
 
   ;; Common alias to use for all Clojure/Java commands
   :clj {:jvm-opts ["-XX:-OmitStackTraceInFastThrow"]}
