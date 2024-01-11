@@ -1,6 +1,7 @@
 (ns flokkun-pakka.rules
   (:require [clojure.set :as set]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [flokkun-pakka.prefix-map :as pm]))
 
 
 (defn concat-vec [v1 v2]
@@ -76,14 +77,14 @@
       (throw (IllegalArgumentException.
               (format "range-to-32bit-prefix: Range [%d,%d] with maybe-mask=%d is not equivalent to any 32-bit prefix match criteria"
                       low high maybe-mask))))
-    {:value low :prefix-length (prefix-mask-to-prefix-len maybe-mask)}))
+    {:value low :prefix-len (prefix-mask-to-prefix-len maybe-mask)}))
 
 (comment
-(= {:value 0 :prefix-length 32} (range-to-32bit-prefix 0 0))
-(= {:value 0 :prefix-length 31} (range-to-32bit-prefix 0 1))
+(= {:value 0 :prefix-len 32} (range-to-32bit-prefix 0 0))
+(= {:value 0 :prefix-len 31} (range-to-32bit-prefix 0 1))
 (range-to-32bit-prefix 0 2)
-(= {:value 0 :prefix-length 30} (range-to-32bit-prefix 0 3))
-(= {:value 0 :prefix-length 16} (range-to-32bit-prefix 0 65535))
+(= {:value 0 :prefix-len 30} (range-to-32bit-prefix 0 3))
+(= {:value 0 :prefix-len 16} (range-to-32bit-prefix 0 65535))
 )
 
 (defn port-pair-class [rule]
@@ -573,8 +574,7 @@
         distinct-match-criteria (set all-match-criteria)
         mir (most-int-ranges-containing-same-value distinct-match-criteria
                                                    (:min-value field-info)
-                                                   (:max-value field-info))
-        ]
+                                                   (:max-value field-info))]
     {:num-distinct-match-criteria (count distinct-match-criteria)
      :field-value-matching-max-distinct-match-criteria (:field-value mir)
      :max-distinct-match-criteria-matched-by-one-packet
@@ -593,12 +593,12 @@
 
 (defn source-addr-prefix-len [rule]
   (let [{:keys [low high]} (nth (:field rule) cb-sa-field-idx)]
-    (:prefix-length (range-to-32bit-prefix low high))))
+    (:prefix-len (range-to-32bit-prefix low high))))
 
 
 (defn dest-addr-prefix-len [rule]
   (let [{:keys [low high]} (nth (:field rule) cb-da-field-idx)]
-    (:prefix-length (range-to-32bit-prefix low high))))
+    (:prefix-len (range-to-32bit-prefix low high))))
 
 
 (defn total-prefix-len [rule]
@@ -649,6 +649,99 @@
 (defn calc-classbench-ppc-data [rules]
   (let [grouped-by-ppc (group-by port-pair-class rules)]
     (update-vals grouped-by-ppc calc-one-ppc-data)))
+
+
+(defn myf [depth is-prefix? has-left-child? left-val
+           has-right-child? right-val this-node-val]
+  (let [num-children (+ (if has-left-child? 1 0) (if has-right-child? 1 0))
+        one-child-val (if has-left-child? left-val right-val)
+        nesting-delta (if is-prefix? 1 0)]
+    (case num-children
+      0 (assoc this-node-val :max-prefix-nesting 1)
+      1 (assoc one-child-val
+               ;; leave the :weight value as it was
+               :max-prefix-nesting (+ (:max-prefix-nesting one-child-val)
+                                      nesting-delta)
+               :num-nodes-1-child (merge (:num-nodes-1-child one-child-val)
+                                         {depth 1})
+               :num-nodes-2-child (merge (:num-nodes-2-child one-child-val)
+                                         {depth 0}))
+      2 (let [tot-weight (+ (:weight left-val) (:weight right-val)
+                            (or (:weight this-node-val) 0))
+              nesting (+ (max (:max-prefix-nesting left-val)
+                              (:max-prefix-nesting right-val))
+                         nesting-delta)
+              num-nodes-1 (-> (merge-with + (:num-nodes-1-child left-val)
+                                          (:num-nodes-1-child right-val))
+                              (assoc depth 0))
+              num-nodes-2 (-> (merge-with + (:num-nodes-2-child left-val)
+                                          (:num-nodes-2-child right-val))
+                              (assoc depth 1))
+              light-child (min (:weight left-val) (:weight right-val))
+              heavy-child (max (:weight left-val) (:weight right-val))
+              skew (- 1 (/ light-child heavy-child))
+              skews-by-depth (-> (merge-with concat
+                                             (:skew-list left-val)
+                                             (:skew-list right-val))
+                                 (assoc depth [skew]))]
+          (assoc this-node-val
+                 :weight tot-weight
+                 :max-prefix-nesting nesting
+                 :num-nodes-1-child num-nodes-1
+                 :num-nodes-2-child num-nodes-2
+                 :skew-list skews-by-depth)))))
+
+
+(defn average [seq]
+  (/ (reduce + seq) (count seq)))
+
+
+(defn calc-classbench-nest-skew-data [rules addr-choice]
+  (let [field-idx (case addr-choice
+                    :source-addr cb-sa-field-idx
+                    :dest-addr cb-da-field-idx
+                    ;; TODO: throw exception here
+                    nil)
+        ranges (map #(nth (:field %) field-idx) rules)
+        range-freq (frequencies ranges)
+        ;; I tried this variation for calculating skew to see if it
+        ;; matches the parameter files included with ClassBench
+        ;; better, but the values were further from the ClassBench
+        ;; files fw1_seed, ipc1_seed
+        ;;range-freq (update-vals range-freq (constantly 1))
+        prefix-freq (update-keys range-freq
+                                 #(range-to-32bit-prefix (:low %) (:high %)))
+        prefix-map (reduce (fn [pm [prefix weight]]
+                             (pm/pm-assoc pm prefix {:weight weight}))
+                           (pm/prefix-map 32)
+                           prefix-freq)
+        tmp (pm/pm-postorder-walk prefix-map myf)
+        root-val (:root-node-value tmp)
+        avg-skew-by-depth (update-vals (:skew-list root-val) average)]
+    (assoc (select-keys root-val [:max-prefix-nesting :num-nodes-1-child
+                                  :num-nodes-2-child :skew-list])
+           :avg-skew avg-skew-by-depth)))
+
+
+(defn print-skew-section [nest-skew-dat]
+  (doseq [prefix-len (range 33)]
+    (let [p1 (or (get-in nest-skew-dat [:num-nodes-1-child prefix-len]) 0)
+          p2 (or (get-in nest-skew-dat [:num-nodes-2-child prefix-len]) 0)
+          tot (+ p1 p2)
+          p1child (if (zero? tot) 0.0 (/ (double p1) tot))
+          p2child (if (zero? tot) 1.0 (/ (double p2) tot))
+          skew (if (zero? p2)
+                 1.0
+                 (get-in nest-skew-dat [:avg-skew prefix-len]))]
+      (println (format "%d\t%.8f\t%.8f\t%.8f"
+                       prefix-len p1child p2child (double skew)))))
+;;  (doseq [prefix-len (range 33)]
+;;    (println (format "dbg %d\t%s\t%s\t%s"
+;;                     prefix-len
+;;                     (get-in nest-skew-dat [:num-nodes-1-child prefix-len])
+;;                     (get-in nest-skew-dat [:num-nodes-2-child prefix-len])
+;;                     (vec (get-in nest-skew-dat [:skew-list prefix-len])))))
+  )
 
 
 (defn write-ipv4-classbench-parameter-file [wrtr rules]
@@ -711,18 +804,20 @@
 
     ;; Source/destination IP address prefix nesting thresholds (snest,
     ;; dnest), and skew (sskew, dskew)
-    (println "-snest")
-    (println "TODO")
-    (println "#")
-    (println "-sskew")
-    (println "TODO")
-    (println "#")
-    (println "-dnest")
-    (println "TODO")
-    (println "#")
-    (println "-dskew")
-    (println "TODO")
-    (println "#")
+    (let [sa-nest-skew-dat (calc-classbench-nest-skew-data rules :source-addr)]
+      (println "-snest")
+      (println (:max-prefix-nesting sa-nest-skew-dat))
+      (println "#")
+      (println "-sskew")
+      (print-skew-section sa-nest-skew-dat)
+      (println "#"))
+    (let [da-nest-skew-dat (calc-classbench-nest-skew-data rules :dest-addr)]
+      (println "-dnest")
+      (println (:max-prefix-nesting da-nest-skew-dat))
+      (println "#")
+      (println "-dskew")
+      (print-skew-section da-nest-skew-dat)
+      (println "#"))
 
     ;; IP address prefix correlation (pcorr)
     (println "-pcorr")
@@ -731,6 +826,8 @@
 
 
 (comment
+
+(require '[flokkun-pakka.rules :as r] :reload)
 
 (use 'clojure.pprint)
 (use 'clojure.repl)

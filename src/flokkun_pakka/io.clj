@@ -163,7 +163,7 @@
         ip1 (bit-and 0xff (bit-shift-right val 16))
         ip2 (bit-and 0xff (bit-shift-right val  8))
         ip3 (bit-and 0xff (bit-shift-right val  0))]
-    (format "%d.%d.%d.%d/%d" ip0 ip1 ip2 ip3 (:prefix-length p))))
+    (format "%d.%d.%d.%d/%d" ip0 ip1 ip2 ip3 (:prefix-len p))))
 
 
 ;; TODO: Consider adding error checking and return of error status
