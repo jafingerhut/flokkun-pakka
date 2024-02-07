@@ -803,7 +803,7 @@ series = {SIGCOMM '01}
 % alternate url
 % https://www.cs.bgu.ac.il/~hendlerd/papers/TCAM-paper.pdf
 % Andy file name
-% todo
+% 2007-bremler-barr-et-al-space-efficient-tcam-based-classification-using-gray-coding.pdf
 @INPROCEEDINGS{BH2007,
   author={Bremler-Barr, A. and Hendler, D.},
   booktitle={IEEE INFOCOM 2007 - 26th IEEE International Conference on Computer Communications},
@@ -2784,6 +2784,78 @@ series = {SIGCOMM '13}
   month =        "February",
   note =         "",
   url={https://arxiv.org/abs/1402.1194}
+}
+
+% Andy file name
+% todo
+@article{DVS1995,
+title = {Two-Dimensional and Three-Dimensional Point Location in Rectangular Subdivisions},
+journal = {Journal of Algorithms},
+volume = {18},
+number = {2},
+pages = {256-277},
+year = {1995},
+issn = {0196-6774},
+doi = {https://doi.org/10.1006/jagm.1995.1010},
+url = {https://www.sciencedirect.com/science/article/pii/S0196677485710103},
+author = {M. Deberg and M. Vankreveld and J. Snoeyink},
+abstract = {We apply van Emde Boas-type stratified trees to point location problems in rectangular subdivisions in 2 and 3 dimensions. In a subdivision with n rectangles having integer coordinates from [0, U − 1], we locate an integer query point in O((log log U)d) query time using O(n) space when d ≤ 2 or O(n log log U) space when d = 3. Applications and extensions of this "fixed universe" approach include spatial point location using logarithmic time and linear space in rectilinear subdivisions having arbitrary coordinates, point location in c-oriented polygons or fat triangles in the plane, point location in subdivisions of space into "fat prisms," and vertical ray shooting among horizontal "fat objects." Like other results on stratified trees, our algorithms run on a RAM model and make use of perfect hashing.}
+}
+
+% Andy file name
+% 2022-chan-et-al-orthogonal-point-location-and-rectangle-stabbing-queries-in-3-d.pdf
+@article{CNRT2022,
+title = {Orthogonal point location and rectangle stabbing queries in 3-d},
+journal = {Journal of Computational Geometry},
+volume = {13},
+number = {1},
+pages = {399-428},
+year = {2022},
+issn = {0196-6774},
+doi = {https://doi.org/10.20382/jocg.v13i1a15},
+url = {https://jocg.org/index.php/jocg/article/view/4009},
+author = {Timothy M. Chan and Yakov Nekrich and Saladi Rahul and Konstantinos Tsakalidis}
+}
+
+% alternate url
+% https://users.umiacs.umd.edu/~joseph/ffc-crc.pdf
+% Andy file name
+% 2005-shi-et-al-novel-transformation-techniques-using-q-heaps-with-applications-to-computational-geometry.pdf
+% In this paper, the problem of interest to me is called
+% "rectangular point enclosure".
+% Theorem 5.2: There exists a linear-space algorithm to handle the
+% rectangle point enclosure queries in $O(log n/ log log n + f)$ time,
+% where $f$ is the number of segments reported.
+@article{SJ2005,
+author = {Shi, Qingmin and JaJa, Joseph},
+title = {Novel Transformation Techniques Using Q-Heaps with Applications to Computational Geometry},
+journal = {SIAM Journal on Computing},
+volume = {34},
+number = {6},
+pages = {1474-1492},
+year = {2005},
+doi = {10.1137/S0097539703435728},
+URL = {https://doi.org/10.1137/S0097539703435728},
+eprint = {https://doi.org/10.1137/S0097539703435728},
+abstract = { Using the notions of Q-heaps and fusion trees developed by Fredman and Willard, we develop general transformation techniques to reduce a number of computational geometry problems to their special versions in partially ranked spaces. In particular, we develop a fast fractional cascading technique, which uses linear space and enables sublogarithmic iterative search on catalog trees in the case when the degree of each node is bounded by \$O(\log^{\epsilon}n)\$ for some constant \$\epsilon >0\$, where n is the total size of allthe lists stored in the tree. We apply the fast fractional cascading technique in combination with the other techniques to derive the first linear-space sublogarithmic time algorithms for two fundamental geometric retrieval problems: orthogonal segment intersection and rectangular point enclosure.}
+}
+
+% Andy file name
+% 2005-schieber-et-al-computing-the-minimum-dnf-representation-of-boolean-functions-defined-by-ranges.pdf
+@article{SGZ2005,
+title = {Computing the minimum DNF representation of Boolean functions defined by intervals},
+journal = {Discrete Applied Mathematics},
+volume = {149},
+number = {1},
+pages = {154-173},
+year = {2005},
+note = {Boolean and Pseudo-Boolean Functions},
+issn = {0166-218X},
+doi = {https://doi.org/10.1016/j.dam.2004.08.009},
+url = {https://www.sciencedirect.com/science/article/pii/S0166218X05000752},
+author = {Baruch Schieber and Daniel Geist and Ayal Zaks},
+keywords = {Constraint satisfaction, Automatic test generation, Boolean function, DNF, Disjunctive normal form},
+abstract = {For any two n-bit numbers a⩽b define the Boolean function f[a,b]:{0,1}n→{0,1} to be the function for which f[a,b](x)=1 if and only if x is the binary representation of a number in the interval [a,b]. We consider the disjunctive normal form representation of such functions, and show how to compute such a representation with a minimum number of disjuncts in linear time. We also show how to compute a minimum “disjoint” representation; i.e., a representation in which the domains of the disjuncts are mutually disjoint. The minimum disjunctive normal form can be applied to devise efficient constraint satisfaction systems for automatic generation of test patterns.}
 }
 
 % This is just a 1-page abstract, not a full paper

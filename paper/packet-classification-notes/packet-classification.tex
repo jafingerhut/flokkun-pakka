@@ -76,7 +76,9 @@
 % Bitwise operations for formulas
 \newcommand*\BitAnd{\mathbin{\&}}
 \newcommand*\BitOr{\mathbin{|}}
-% TODO: Find a good definition for \BitXor
+%\newcommand*\BitXor{\mathbin{^}}
+%\newcommand*\BitXor{\mathbin{\wedge}}
+\newcommand*\BitXor{\mathbin{\hat{}}}
 % \ll and \gg look a little "tight" to me visually
 %\newcommand*\ShiftLeft{\ll}
 %\newcommand*\ShiftRight{\gg}
@@ -267,6 +269,7 @@ Notation:
   \item $n$ is the number of rules.
   \item $d$ is the number of fields, or dimensions.
   \item $w$ is the number of bits in the largest field.
+  \item $W$ is the word size in the RAM model of computation.
   \item $t$ is the number of matching rules.  Algorithms that includes this in the search time return all matching rules.
   \item $H(n,w)$ is the time to perform a hash lookup in a table with up to $n$ elements, each $w$ bits wide.  Often this is considered to be $O(1)$ in papers that use hashing.
   \item $L(n,w)$ is the time for any longest prefix match algorithm on $n$ prefixes of a field that is $w$ bits wide.
@@ -338,9 +341,19 @@ Table~\ref{tab:summary1} summarizes some memory and run-time properties of sever
     & \cite[Sec. 2.3]{PS1985}
     \\
 
+      \makecell{CNRT\footnotemark{} \\ ($d \geq 3$)}
+    & range
+    & $O(\log^{2}_{W} n \cdot \log^{d-3} n + t)$
+    & $O(n \log^{d-3} n)$
+    & ?
+    & \cite[Thm. 6]{CNRT2022}
+    \\
+
   \bottomrule
 \end{tabular}
 \end{table*}
+
+\footnotetext{Chan et al call the problem of interest to us the rectangle stabbing problem}
 
 Table~\ref{tab:summary2} summarizes some memory and run-time properties of several algorithms for the normal packet classification problem restricted to $d=2$.
 
@@ -407,11 +420,20 @@ Table~\ref{tab:summary2} summarizes some memory and run-time properties of sever
     & \cite[Sec. 8]{SSV1999}
     \\
 
+      Shi-Jaja\footnotemark{}
+    & range
+    & $O(\log n / \log \log n + t)$
+    & $O(nw)$
+    & ?
+    & \cite[Sec. 5]{SJ2005}
+    \\
+
   \bottomrule
 \end{tabular}
 \end{table*}
 
 \footnotetext{Also generalizes to a set of nested ranges}
+\footnotetext{Shi and JaJa call the problem we are interested in here the rectangular point enclosion problem}
 
 Table~\ref{tab:summarylpm} summarizes some memory and run-time properties of several algorithms for the normal packet classification problem restricted to $d=1$, which for
 prefixes is the longest prefix match problem.
@@ -1251,6 +1273,19 @@ have a non-empty intersection.
 \subsection{Other proofs}
 
 
+\section{History}
+
+\todo{What is the oldest use of TCAM in a commercial device?}
+\todo{What is the oldest use of TCAM in any device?}
+\todo{What is the oldest mention of TCAM in the published literature?}
+
+\todo{What is the oldest description of expanding a range match on a
+  $w$-bit field into at most $2w-2$ prefix match rules?}
+
+At least one early description of this technique is in
+1998\cite[Sec. 4]{SVSW1998}.
+
+
 \section{Implementations}
 
 Resources I have examined in depth:
@@ -1364,6 +1399,7 @@ Resources still to be examined:
 \item \url{https://github.com/yigechen1/efficuts}
 \item \url{https://github.com/zcy-ict/MultilayerTuple}
 \end{itemize}
+
 
 \end{document}
 \endinput
