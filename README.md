@@ -36,6 +36,6 @@ example, which reads the filter set from the file
 `acl1_10K_seed`:
 
 ```bash
-./scripts/test_write_ipv4_classbench_parameter_file.sh orig/song-filterset/acl1_10K acl1_10K_seed
+./scripts/rule_set_analyzer orig/song-filterset/acl1_10K acl1_10K_seed
 ```
 
