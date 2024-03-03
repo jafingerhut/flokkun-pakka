@@ -1268,10 +1268,182 @@ we see that the intersection of all rules in $R$
 have a non-empty intersection.
 \end{proof}
 
+
+\subsection{Algorithm AddNewRule}
+
+\newcommand{\rulesconflict}[2]{\mathbin{\textsc{RulesConflict}({#1},{#2})}}
+\newcommand{\resolverule}[2]{\mathbin{\textsc{ResolveRule}({#1},{#2})}}
+\newcommand{\addnewrule}[2]{\mathbin{\textsc{AddNewRule}({#1},{#2})}}
+
+Consider $\addnewrule{r}{R}$ shown as Algorithm~\ref{alg:AddNewRule},
+which is originally from a paper by Adiseshu et al~\cite{ASP1999}.
+
+\begin{algorithm}
+\caption{Algorithm $\rulesconflict{r_1}{r_2}$}
+\label{alg:RulesConflict}
+\begin{algorithmic}[1]
+  \State /* Functionally the same as Algorithm $\textsc{2FilterConflict}$ in Figure 7 of~\cite{ASP1999}. */
+  \State /* This version is more general: it applies to rules with match criteria other than ``prefix''. */
+  \If{$((r_1 \cap r_2) = \emptyset)$ or $(r_1 \subseteq r_2)$ or $(r_2 \subseteq r_1)$}
+    \State \Return ``No Conflict''
+  \Else
+    \State \Return ``Conflict''
+  \EndIf
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Algorithm $\resolverule{r_1}{r_2}$}
+\label{alg:ResolveRule}
+\begin{algorithmic}[1]
+  \State /* Functionally the same as Algorithm $\textsc{ResolveFilter}$ in Figure 8 of~\cite{ASP1999}. */
+  \State /* This version is more general: it applies to rules with match criteria other than ``prefix''. */
+  \State \Return $r_1 \cap r_2$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Algorithm $\addnewrule{r}{R}$}
+\label{alg:AddNewRule}
+\begin{algorithmic}[1]
+  \State /* Insert a new rule $r$ into rule set $R$. */
+  \State /* Functionally the same as Algorithm $\textsc{AddNewFilter}$ in Figure 9 of~\cite{ASP1999}. */
+  \State $C \gets \{ r \}$  \label{algline:Cgetsr}
+  \For{$r' \in R$}
+  \If{$\rulesconflict{r}{r'} = $ ``Conflict''}
+              \Comment{See Algorithm~\ref{alg:RulesConflict}}
+    \State $C \gets C \cup \{ r' \}$   \label{algline:addrprimetoC}
+  \EndIf
+  \EndFor
+  \State $R' \gets R$
+  \For{$r' \in C$}
+    \State $R' \gets R' \cup \{ \resolverule{r}{r'} \}$
+              \label{algline:addresolveruletoR}
+              \Comment{See Algorithm~\ref{alg:ResolveRule}}
+  \EndFor
+  \State \Return $R'$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{definition}
+\label{defn:rulesetclosedunderintersection}
+A rule set $R$ is {\em closed under intersection} if,
+for all pairs of rules $r_1, r_2 \in R$, either:
+\begin{itemize}
+\item $r_1 \cap r_2$ is empty, or
+\item $r_1 \cap r_2$ is in $R$.
+\end{itemize}
+\end{definition}
+
+Adiseshu et al write in~\cite[Sec. 4.1]{ASP1999} when describing
+algorithm~\ref{alg:AddNewRule}:
+``A key point to notice that [sic] is that
+{\em adding} a resolve filter
+{\em does not require} a recursive call to the algorithm
+\textsc{AddNewFilter}.''
+They do not give a proof of this statement.
+Theorem~\ref{thm:addnewrulepreservesclosedunderintersection}
+is restatement of that fact, with detailed proof.
+
 \begin{theorem}
-\label{thm:addnewfilterpreservesclosedunderintersection}
+\label{thm:addnewrulepreservesclosedunderintersection}
+If $R$ is closed under intersection,
+and $R$ contains fields that are all closed under intersection,
+then for any rule $r$,
+$R' = \addnewrule{r}{R}$ is closed under intersection.
 \end{theorem}
 
+\begin{proof}
+Consider any pair of rules $r_1, r_2 \in R'$.
+Our proof obligation is to show that
+either $r_1 \cap r_2$ is empty, or $r_1 \cap r_2 \in R'$.
+
+Case 1: $r \in R$.  In this case, $\addnewrule{r}{R}$ returns $R' = R$.
+$R'$ is closed under intersection because $R$ is.
+
+The rest of the cases assume $r \not\in R$.
+Thus $\addnewrule{R}{R} = R'$ consists of the original set $R$,
+plus the new rule $r$,
+plus a set $N=(R'-\{r\})-R$ of other new rules added
+in line~\ref{algline:addresolveruletoR}
+of Algorithm~\ref{alg:AddNewRule}.
+$N$ might be empty.
+
+Case 2: $r_1 \cap r_2$ is empty.  Proof is complete.
+
+Case 3a: $r_1 \subseteq r_2$.
+Thus $r_1 \cap r_2 = r_1$, and $r_1 \in R'$, so proof is complete.
+
+Case 3b: $r_2 \subseteq r_1$ is symmetric with Case 3a,
+with corresponding proof.
+
+The rest of the cases assume $r_1 \cap r_2$ is not empty,
+and neither $r_1$ nor $r_2$ is a subset of the other.
+Thus $\rulesconflict{r_1}{r_2} = $ ``Conflict''.
+
+Case 4: $r_1 \in R$ and $r_2 \in R$.
+Since $R$ is closed under intersection, $r_1 \cap r_2 \in R$
+and thus also in $R'$.
+
+Case 5a: $r_1 \in R$ and $r_2 = r$.
+$r_1$ and $r_2$ conflict,
+so algorithm $\addnewrule{r}{R}$ adds $r'=r_1$ to $C$
+in line~\ref{algline:addrprimetoC},
+and later adds $\resolverule{r_2}{r_1} = r_1 \cap r_2$ to $R'$
+in line~\ref{algline:addresolveruletoR}.
+
+Case 5b: $r_1 = r$ and $r_2 \in R$ is symmetric with Case 5a,
+with the corresponding proof.
+
+Case 6a: $r_1 \in R$ and $r_2 \in N$.
+By the algorithm's construction, if $r_2 \in N$,
+there must exist a rule $s \in R$ that was added to set $C$
+in line~\ref{algline:addrprimetoC},
+that later caused $r_2 = r \cap s$ to be added to $R'$.
+
+Thus
+    $r_1 \cap r_2
+  = r_1 \cap (r \cap s)
+  = (r_1 \cap s) \cap r$.
+Let $t = (r_1 \cap s)$.
+$r_1 \in R$ and $s \in R$,
+so because $R$ is closed under intersection, either:
+\begin{itemize}
+\item $t$ is empty.  Then $r_1 \cap r_2 = t \cap r$ is empty.  Proof done.
+\item $t$ is also in $R$.
+  By the construction of the algorithm, all rules of the form $t \cap r$
+  where $t \in R$ will be in $R'$.
+\end{itemize}
+
+Case 6b: $r_1 \in N$ and $r_2 \in R$.
+Symmetric with Case 6a, with the corresponding proof.
+
+Case 7a: $r_1 = r$ and $r_2 \in N$.
+By the argument described in Case 6a, $r_2 \in N$
+implies that there exists $s \in R$ such that $r_2 = r \cap s$.
+Thus $r_1 \cap r_2 = r \cap (r \cap s) = r \cap s = r_2$,
+which is in $R'$.
+
+Case 7b: $r_1 \in N$ and $r_2 = r$.
+Symmetric with Case 7a, with the corresponding proof.
+
+Case 8: $r_1 \in N$ and $r_2 \in N$.
+By the argument described in Case 6a,
+$r_1 \in N$ implies there exists $s_1 \in R$ such that $r_1 = r \cap s_1$,
+and
+$r_2 \in N$ implies there exists $s_2 \in R$ such that $r_2 = r \cap s_2$.
+By assumption of proof, $s_3 = s_1 \cap s_2$ is either
+empty or $s_3 \in R$.
+
+Then
+ $r_1 \cap r_2
+= (r \cap s_1) \cap (r \cap s_2)
+= (r \cap r) \cap (s_1 \cap s_2)
+= r \cap s_3$.
+
+By the construction of the algorithm, all rules of the form $t \cap r$
+where $t \in R$ will be in $R'$.
+\end{proof}
 
 \subsection{Other proofs}
 
@@ -1279,7 +1451,9 @@ have a non-empty intersection.
 \section{History}
 
 \todo{What is the oldest use of TCAM in a commercial device?}
+
 \todo{What is the oldest use of TCAM in any device?}
+
 \todo{What is the oldest mention of TCAM in the published literature?}
 
 \todo{What is the oldest description of expanding a range match on a
@@ -1470,6 +1644,7 @@ Listing~\ref{lst:pyprog1} contains sample Python program number 1.
 \end{algorithm}
 
 See line~\ref{algline:interestingline} of Algorithm~\ref{alg:myalg1} for more details.
+
 
 
 \end{document}
