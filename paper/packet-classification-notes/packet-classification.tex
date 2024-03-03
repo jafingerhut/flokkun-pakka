@@ -5,17 +5,17 @@
 %% The original source files were:
 %%
 %% samples.dtx  (with options: `manuscript')
-%% 
+%%
 %% IMPORTANT NOTICE:
-%% 
+%%
 %% For the copyright see the source file.
-%% 
+%%
 %% Any modified versions of this file must be renamed
 %% with new filenames distinct from sample-manuscript.tex.
-%% 
+%%
 %% For distribution of the original source see the terms
 %% for copying and modification in the file samples.dtx.
-%% 
+%%
 %% This generated file may be distributed as long as the
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
@@ -38,11 +38,11 @@
 \documentclass[acmsmall]{acmart}
 %% To ensure 100% compatibility, please check the white list of
 %% approved LaTeX packages to be used with the Master Article Template at
-%% https://www.acm.org/publications/taps/whitelist-of-latex-packages 
-%% before creating your document. The white list page provides 
-%% information on how to submit additional LaTeX packages for 
+%% https://www.acm.org/publications/taps/whitelist-of-latex-packages
+%% before creating your document. The white list page provides
+%% information on how to submit additional LaTeX packages for
 %% review and adoption.
-%% Fonts used in the template cannot be substituted; margin 
+%% Fonts used in the template cannot be substituted; margin
 %% adjustments are not allowed.
 
 %%
@@ -62,6 +62,9 @@
 %\acmDOI{XXXXXXX.XXXXXXX}
 
 \usepackage{makecell}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 %% \todo{} command.
 %
@@ -106,7 +109,7 @@
 %  from ``Proceedings of ...''!
 %
 %\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
-%  June 03--05, 2018, Woodstock, NY} 
+%  June 03--05, 2018, Woodstock, NY}
 
 %% These commands are for a JOURNAL article.
 %\acmJournal{JACM}
@@ -283,14 +286,14 @@ Table~\ref{tab:summary1} summarizes some memory and run-time properties of sever
   \label{tab:summary1}
   \begin{tabular}{lccccl}
     \toprule
-    
+
       Algorithm
     & \makecell{Match \\ kinds}
     & Search time
     & Memory
     & Construction time
     & Source \\
-    
+
     \midrule
 
       0
@@ -362,14 +365,14 @@ Table~\ref{tab:summary2} summarizes some memory and run-time properties of sever
   \label{tab:summary2}
   \begin{tabular}{lccccl}
     \toprule
-    
+
       Algorithm
     & \makecell{Match \\ kinds}
     & Search time
     & Memory
     & Construction time
     & Source \\
-    
+
     \midrule
 
       0
@@ -444,14 +447,14 @@ The search times in this table can be used as values for $L(n,w)$.
   \label{tab:summarylpm}
   \begin{tabular}{llcccl}
     \toprule
-    
+
       Algorithm
     & Match kinds
     & Search time
     & Memory
     & Construction time
     & Source \\
-    
+
     \midrule
 
       1
@@ -581,14 +584,14 @@ will satisfy the restriction $MIN \leq MAX$.
   \label{tab:matchcriteria}
   \begin{tabular}{lcccl}
     \toprule
-    
+
       \makecell{Match \\ Kind}
     & \makecell{Values specifying \\ the match criteria}
     & \makecell{Range of \\ values}
     & \makecell{Match \\ condition}
     & \makecell{Restriction \\ on values}
     \\
-    
+
     \midrule
 
       ternary
@@ -611,7 +614,7 @@ will satisfy the restriction $MIN \leq MAX$.
     & \makecell{value $V$, \\ prefix length $P$}
     & \makecell{$V$ in $[0, 2^w-1]$, \\ $P$ in $[0, w]$}
     & \makecell{($x \BitAnd M) = V$ \\ where $M=\prefixmask{w}{P}$}
-    & 
+    &
     \\
 
     \midrule
@@ -619,7 +622,7 @@ will satisfy the restriction $MIN \leq MAX$.
     & \makecell{value $V$, \\ don't care $D$}
     & \makecell{$V$ in $[0, 2^w-1]$ \\ $D$ is boolean}
     & \makecell{($x \BitAnd M) = V$ \\ where $M=0$ if $d$, \\ else $M=\fullmask{w}$}
-    & 
+    &
     \\
 
     \midrule
@@ -627,7 +630,7 @@ will satisfy the restriction $MIN \leq MAX$.
     & value $V$
     & $[0, 2^w-1]$
     & $x = V$
-    & 
+    &
     \\
 
   \bottomrule
@@ -1399,6 +1402,74 @@ Resources still to be examined:
 \item \url{https://github.com/yigechen1/efficuts}
 \item \url{https://github.com/zcy-ict/MultilayerTuple}
 \end{itemize}
+
+
+\section{Practice area}
+
+\subsection{lstlisting block}
+
+\lstset{numbers=left}
+
+\begin{lstlisting}[language=Python,float,label=lst:pyprog1,caption={A sample Python listing},frame=single]
+import numpy as np
+
+def incmatrix(genl1,genl2):
+    m = len(genl1)
+    n = len(genl2)
+    M = None #to become the incidence matrix
+    VT = np.zeros((n*m,1), int)  #dummy variable
+
+    # compute the bitwise xor matrix
+    M1 = bitxormatrix(genl1)
+    M2 = np.triu(bitxormatrix(genl2),1)
+
+    for i in range(m-1):
+        for j in range(i+1, m):
+            [r,c] = np.where(M2 == M1[i,j])
+            for k in range(len(r)):
+                VT[(i)*n + r[k]] = 1;
+                VT[(i)*n + c[k]] = 1;
+                if M is None:
+                    M = np.copy(VT)
+                else:
+                    M = np.concatenate((M, VT), 1)
+                VT = np.zeros((n*m,1), int)
+    return M
+\end{lstlisting}
+
+\begin{lstlisting}[language=C,float,label=lst:Cprog1,caption={A sample C listing},frame=single]
+#include <stdio.h>
+
+int main(int argc, char *argv[]) {
+    printf("Hello world\n");
+}
+\end{lstlisting}
+
+Listing~\ref{lst:pyprog1} contains sample Python program number 1.
+
+\todo{Is there a way to make a \LaTeX{} label for an individual line
+  in a ``lstlisting'' begin/end block, or a range of lines, and then
+  refer to them by ref in the text?}
+
+
+\subsection{algorithm and algorithmic blocks}
+
+\begin{algorithm}
+\caption{My algorithm 1}
+\label{alg:myalg1}
+\begin{algorithmic}[1]
+\State $i \gets 10$
+\If{$i\geq 5$}
+    \State $i \gets i-1$   \label{algline:interestingline}
+\Else
+    \If{$i\leq 3$}
+        \State $i \gets i+2$  \Comment{this is a comment}
+    \EndIf
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+
+See line~\ref{algline:interestingline} of Algorithm~\ref{alg:myalg1} for more details.
 
 
 \end{document}
