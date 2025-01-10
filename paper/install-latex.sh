@@ -29,6 +29,9 @@ then
 	22.04)
 	    supported_distribution=1
 	    ;;
+	24.04)
+	    supported_distribution=1
+	    ;;
     esac
 fi
 
@@ -50,7 +53,12 @@ date
 df -BM .
 
 # Common packages to install on all tested Ubuntu versions
-sudo apt-get --yes install make texlive-xetex dvipng texlive-fonts-extra
+sudo apt-get --yes install \
+    make \
+    texlive-xetex \
+    dvipng \
+    texlive-fonts-extra \
+    texlive-science
 
 set +x
 echo "------------------------------------------------------------"
